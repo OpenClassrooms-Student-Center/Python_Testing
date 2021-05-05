@@ -8,6 +8,16 @@
         "**/__pycache__/**": true,
         "**/.pytest*/**": true
     },
+    "files.watcherExclude": {
+        "**/.git/objects/**": true,
+        "**/.git/subtree-cache/**": true,
+        "**/node_modules/**": true,
+        "**/.hg/store/**": true,
+        "**/__pycache__/**": true,
+        "**/.pytest*/**": true,
+        "**/env/**": true,
+        "**/htmlcov/**": true
+    },
     "python.testing.pytestArgs": [
         "tests"
     ],

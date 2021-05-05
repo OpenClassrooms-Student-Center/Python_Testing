@@ -6,7 +6,11 @@
         {
             "label": "test_coverage",
             "type": "shell",
+<<<<<<< HEAD
             "command": "pytest --cov='Python_Testing' --cov-report html tests/test_*.py"
+=======
+            "command": "source bin/activate && pytest --cov='Python_Testing' --cov-report html tests/test_*.py"
+>>>>>>> 9e77055600b8c409796ce85fa7ef1cfade45ba30
         }
     ]
 }
