@@ -33,11 +33,11 @@ class Test_PythonTesting():
                 assert response.status_code == 200
                 assert b"<title>GUDLFT Registration</title>" in response.data
 
-    @pytest.mark.parametrize("email, result, page_title", [
-    ("admin@irontemple.com", 200, "<title>Summary | GUDLFT Registration</title>"),
-    ("something@mail.com", 400, "<title>Summary | GUDLFT Registration</title>")
+    @pytest.mark.parametrize("email, result, page_title, errors", [
+    ("admin@irontemple.com", 200, "<title>Summary | GUDLFT Registration</title>", []),
+    ("something@mail.com", 200, "<title>GUDLFT Registration</title>", ["Email not found."])
     ])
-    def test_showSummary(self, email, result, page_title):
+    def test_showSummary(self, email, result, page_title, errors):
         with app.test_client() as client:
             client: FlaskClient[Response]
             response: Response = client.post("/showSummary", data={
@@ -46,6 +46,9 @@ class Test_PythonTesting():
             assert response.status_code == result
             assert str.encode(page_title) in response.data
             assert [str.encode(club["email"]) for club in self.clubs if club["email"] == email][0] in response.data
+            for error in errors:
+                print(error)
+                assert str.encode(error) in response.data
 
     @pytest.mark.parametrize("competition, club, result, page_title", [
         ("Spring Festival", "Iron Temple", 200, "<title>Booking for"),
