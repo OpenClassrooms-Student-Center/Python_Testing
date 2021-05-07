@@ -45,10 +45,7 @@ class Test_PythonTesting():
             })
             assert response.status_code == result
             assert str.encode(page_title) in response.data
-            assert [str.encode(club["email"]) for club in self.clubs if club["email"] == email][0] in response.data
-            for error in errors:
-                print(error)
-                assert str.encode(error) in response.data
+            assert all([str.encode(error) in response.data for error in errors])
 
     @pytest.mark.parametrize("competition, club, result, page_title", [
         ("Spring Festival", "Iron Temple", 200, "<title>Booking for"),
