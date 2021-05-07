@@ -65,6 +65,7 @@ class Test_PythonTesting():
         ("Spring Festival", "Iron Temple", 4, 200, "<title>Summary | GUDLFT Registration</title>", [], "Points available: 0"),
         ("Fall Classic", "Simply Lift", 5, 200, "<title>Booking for", ["Club has not enough points."], ""),
         ("New Horizons", "She Lifts", 4, 200, "<title>Booking for", ["Competition has not enough places."], ""),
+        ("Ragnarok", "The strongs", 13, 200, "<title>Booking for", ["You can't reserve more than 12 places."], "")
     ])
     def test_purchasePlaces(self, competition, club, places_required, result, page_title, errors, points):
         with self.app.test_client() as client:

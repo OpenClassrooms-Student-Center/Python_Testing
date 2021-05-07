@@ -2,7 +2,7 @@
 <div class="errors-container">
     <ul>
         {% for error in errors %}
-        <li>{{error}}</li>
+        <li>{{error | safe}}</li>
         {% endfor %}
     </ul>
 </div>
