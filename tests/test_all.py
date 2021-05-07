@@ -13,7 +13,7 @@ class Test_PythonTesting():
     def setup_class(self):
         self.clubs = Test_PythonTesting.loadClubs()
         self.competitions = Test_PythonTesting.loadCompetitions()
-        self.flask_wrapper = FlaskWrapper()
+        self.flask_wrapper = FlaskWrapper("tests/competitions.json", "tests/clubs.json")
         self.app = self.flask_wrapper.app
 
     def teardown_class(self):
@@ -23,7 +23,7 @@ class Test_PythonTesting():
         assert self.flask_wrapper.clubs == self.clubs
 
     def test_loadCompetitions(self):
-        assert self.flask_wrapper.competitions == self.competitions
+        assert self.flask_wrapper.competitions == self.loadCompetitions()
 
     def test_index__(self):
         with self.app.test_client() as client:
@@ -63,8 +63,8 @@ class Test_PythonTesting():
 
     @pytest.mark.parametrize("competition, club, places_required, result, page_title, errors, points", [
         ("Spring Festival", "Iron Temple", 4, 200, "<title>Summary | GUDLFT Registration</title>", [], "Points available: 0"),
-        ("Fall Classic", "Simply Lift", 5, 200, "<title>Summary | GUDLFT Registration</title>", ["Club has not enough points."], ""),
-        ("New Horizons", "She Lifts", 4, 200, "<title>Summary | GUDLFT Registration</title>", ["Competition has not enough places."], ""),
+        ("Fall Classic", "Simply Lift", 5, 200, "<title>Booking for", ["Club has not enough points."], ""),
+        ("New Horizons", "She Lifts", 4, 200, "<title>Booking for", ["Competition has not enough places."], ""),
     ])
     def test_purchasePlaces(self, competition, club, places_required, result, page_title, errors, points):
         with self.app.test_client() as client:
@@ -86,12 +86,14 @@ class Test_PythonTesting():
             response: Response = client.get("/logout")
             assert response.status_code == 302
     
+    @staticmethod
     def loadClubs():
-        with open("clubs.json") as c:
+        with open("tests/clubs.json") as c:
             listOfClubs = json.load(c)['clubs']
             return listOfClubs
 
+    @staticmethod
     def loadCompetitions():
-        with open("competitions.json") as comps:
+        with open("tests/competitions.json") as comps:
             listOfCompetitions = json.load(comps)['competitions']
             return listOfCompetitions

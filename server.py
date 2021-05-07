@@ -54,9 +54,9 @@ class FlaskWrapper():
         club = [c for c in FlaskWrapper.clubs if c['name'] == request.form['club']][0]
         places_required = int(request.form['places'])
         if places_required > int(club["points"]):
-            return render_template(url_for("book"), competition=competition, club=club, errors=["Club has not enough points."])
+            return render_template("booking.html", competition=competition, club=club, errors=["Club has not enough points."])
         if places_required > int(competition["numberOfPlaces"]):
-            return render_template(url_for("book"), competition=competition, club=club, errors=["Competition has not enough places."])
+            return render_template("booking.html", competition=competition, club=club, errors=["Competition has not enough places."])
         competition['numberOfPlaces'] = int(competition['numberOfPlaces']) - places_required
         club["points"] = int(club["points"]) - places_required
         flash('Great-booking complete!')
