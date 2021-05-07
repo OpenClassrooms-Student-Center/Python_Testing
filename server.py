@@ -35,13 +35,13 @@ def showSummary():
 
 @app.route('/book/<competition>/<club>')
 def book(competition,club):
-    foundClub = [c for c in clubs if c['name'] == club][0]
-    foundCompetition = [c for c in competitions if c['name'] == competition][0]
-    if foundClub and foundCompetition:
-        return render_template('booking.html',club=foundClub,competition=foundCompetition)
+    foundClub = [c for c in clubs if c['name'] == club]
+    foundCompetition = [c for c in competitions if c['name'] == competition]
+    if len(foundClub) != 0 and len(foundCompetition) != 0:
+        return render_template('booking.html',club=foundClub[0],competition=foundCompetition[0])
     else:
-        flash("Something went wrong-please try again")
-        return render_template('welcome.html', club=club, competitions=competitions)
+        # flash("Something went wrong-please try again")
+        return render_template('welcome.html', club=club, competitions=competitions, errors=["Club or competition not found."])
 
 
 @app.route('/purchasePlaces',methods=['POST'])
