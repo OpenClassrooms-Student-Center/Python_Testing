@@ -62,20 +62,22 @@ class Test_PythonTesting():
             assert str.encode(page_title) in response.data
             assert all([str.encode(error) in response.data for error in errors])
 
-    @pytest.mark.parametrize("competition, club, places, result, page_title", [
-        ("Spring Festival", "Iron Temple", 1, 200, "<title>Summary | GUDLFT Registration</title>"),
-        ("Fall Classic", "She Lifts", 1, 200, "<title>Summary | GUDLFT Registration</title>"),
+    @pytest.mark.parametrize("competition, club, places_required, result, page_title, errors", [
+        ("Spring Festival", "Iron Temple", 4, 200, "<title>Summary | GUDLFT Registration</title>", []),
+        ("Fall Classic", "Simply Lifts", 5, 200, "<title>Summary | GUDLFT Registration</title>", ["Club has not enouhg points."]),
+        ("New Horizons", "She Lifts", 4, 200, "<title>Summary | GUDLFT Registration</title>", ["Competition has not enough places."]),
     ])
-    def test_purchasePlaces(self, competition, club, places, result, page_title):
+    def test_purchasePlaces(self, competition, club, places_required, result, page_title, errors):
         with app.test_client() as client:
             client: FlaskClient[Response]
             response: Response = client.post("/purchasePlaces", data={
                 "competition": competition,
                 "club": club,
-                "places": places
+                "places": places_required
             })
             assert response.status_code == result
             assert str.encode(page_title) in response.data
+            assert all([str.encode(error) in response.data for error in errors])
 
     def test_logout(self):
         with app.test_client() as client:
@@ -88,7 +90,7 @@ clubs = """[
     {
         "name":"Simply Lift",
         "email":"john@simplylift.co",
-        "points":"13"
+        "points":"4"
     },
     {
         "name":"Iron Temple",
@@ -111,5 +113,10 @@ competitions = """[
         "name": "Fall Classic",
         "date": "2020-10-22 13:30:00",
         "numberOfPlaces": "13"
+    },
+    {
+        "name": "New Horizons",
+        "date": "2020-10-22 13:30:00",
+        "numberOfPlaces": "3"
     }
 ]"""
