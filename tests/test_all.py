@@ -47,19 +47,20 @@ class Test_PythonTesting():
             assert str.encode(page_title) in response.data
             assert all([str.encode(error) in response.data for error in errors])
 
-    @pytest.mark.parametrize("competition, club, result, page_title", [
-        ("Spring Festival", "Iron Temple", 200, "<title>Booking for"),
-        ("Fall Classic", "She Lifts", 200, "<title>Booking for"),
-        ("Spring Festival", "none", 400, "<title>Summary | GUDLFT Registration</title>"),
-        ("none", "She Lifts", 400, "<title>Summary | GUDLFT Registration</title>"),
-        ("none", "none", 400, "<title>Summary | GUDLFT Registration</title>")
+    @pytest.mark.parametrize("competition, club, result, page_title, errors", [
+        ("Spring Festival", "Iron Temple", 200, "<title>Booking for", []),
+        ("Fall Classic", "She Lifts", 200, "<title>Booking for", []),
+        ("Spring Festival", "none", 200, "<title>Summary | GUDLFT Registration</title>", ["Club or competition not found."]),
+        ("none", "She Lifts", 200, "<title>Summary | GUDLFT Registration</title>", ["Club or competition not found."]),
+        ("none", "none", 200, "<title>Summary | GUDLFT Registration</title>", ["Club or competition not found."])
     ])
-    def test_book(self, competition, club, result, page_title):
+    def test_book(self, competition, club, result, page_title, errors):
         with app.test_client() as client:
             client: FlaskClient[Response]
             response: Response = client.get("/book/"+ competition + "/" + club)
             assert response.status_code == result
             assert str.encode(page_title) in response.data
+            assert all([str.encode(error) in response.data for error in errors])
 
     @pytest.mark.parametrize("competition, club, places, result, page_title", [
         ("Spring Festival", "Iron Temple", 1, 200, "<title>Summary | GUDLFT Registration</title>"),
