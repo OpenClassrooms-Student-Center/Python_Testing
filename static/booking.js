@@ -7,7 +7,10 @@ let error_displayer = new ErrorDisplayer(form)
 
 places_required_input.addEventListener("input", function(e) {
     let places_required = e.target.value
-    if (places_required > club_points) {
+    if (places_required > 12) {
+        error_displayer.add("12", "You can't reserve more than 12 places.")
+        e.target.value = 12
+    } else if (places_required > club_points) {
         error_displayer.add("club", "Club has not enough points.")
         e.target.value = club_points
     } else if (places_required > competition_places) {
