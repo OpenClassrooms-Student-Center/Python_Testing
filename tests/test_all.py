@@ -1,5 +1,6 @@
 import json
 
+from urllib.parse import quote, unquote
 from flask.testing import FlaskClient
 from flask.wrappers import Response
 
@@ -46,20 +47,21 @@ class Test_PythonTesting():
             assert str.encode(page_title) in response.data
             assert all([str.encode(error) in response.data for error in errors])
 
-    @pytest.mark.parametrize("competition, club, result, page_title, errors", [
+    @pytest.mark.parametrize("competition, club, result, page_title, messages", [
         ("Spring Festival", "Iron Temple", 200, "<title>Booking for", []),
         ("Fall Classic", "She Lifts", 200, "<title>Booking for", []),
         ("Spring Festival", "none", 200, "<title>Summary | GUDLFT Registration</title>", ["Club or competition not found."]),
         ("none", "She Lifts", 200, "<title>Summary | GUDLFT Registration</title>", ["Club or competition not found."]),
-        ("none", "none", 200, "<title>Summary | GUDLFT Registration</title>", ["Club or competition not found."])
+        ("none", "none", 200, "<title>Summary | GUDLFT Registration</title>", ["Club or competition not found."]),
+        ("Gym 50's", "The strongs", 200, "<title>Summary | GUDLFT Registration</title>", ["Competitions already pasted."])
     ])
-    def test_book(self, competition, club, result, page_title, errors):
+    def test_book(self, competition, club, result, page_title, messages):
         with self.app.test_client() as client:
             client: FlaskClient[Response]
-            response: Response = client.get("/book/"+ competition + "/" + club)
+            response: Response = client.get("/book/"+ quote(competition) + "/" + quote(club))
             assert response.status_code == result
             assert str.encode(page_title) in response.data
-            assert all([str.encode(error) in response.data for error in errors])
+            assert all([str.encode(message) in response.data for message in messages])
 
     @pytest.mark.parametrize("competition, club, places_required, result, page_title, errors, points", [
         ("Spring Festival", "Iron Temple", 4, 200, "<title>Summary | GUDLFT Registration</title>", [], "Points available: 0"),

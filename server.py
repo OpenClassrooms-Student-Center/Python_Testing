@@ -1,4 +1,5 @@
 import json
+from datetime import datetime
 from flask import Flask,render_template,request,redirect,flash,url_for
 
 
@@ -39,13 +40,17 @@ class FlaskWrapper():
 
     @app.route('/book/<competition>/<club>')
     def book(competition,club):
-        foundClub = [c for c in FlaskWrapper.clubs if c['name'] == club]
-        foundCompetition = [c for c in FlaskWrapper.competitions if c['name'] == competition]
-        if len(foundClub) != 0 and len(foundCompetition) != 0:
-            return render_template('booking.html',club=foundClub[0],competition=foundCompetition[0])
+        foundClubs = [c for c in FlaskWrapper.clubs if c['name'] == club]
+        foundCompetitions = [c for c in FlaskWrapper.competitions if c['name'] == competition]
+        if len(foundClubs) != 0 and len(foundCompetitions) != 0:
+            if datetime.fromisoformat(foundCompetitions[0]["date"]) < datetime.now():
+                flash("Competitions already pasted.")
+                return render_template("welcome.html", club=foundClubs[0], competitions=FlaskWrapper.competitions)
+            else:
+                return render_template('booking.html',club=foundClubs[0],competition=foundCompetitions[0])
         else:
-            # flash("Something went wrong-please try again")
-            return render_template('welcome.html', club=club, competitions=FlaskWrapper.competitions, errors=["Club or competition not found."])
+            flash("Something went wrong-please try again")
+            return render_template('welcome.html', club=foundClubs[0], competitions=FlaskWrapper.competitions, errors=["Club or competition not found."])
 
 
     @app.route('/purchasePlaces',methods=['POST'])
