@@ -1,0 +1,17 @@
+{% extends 'index.html' %}
+
+{% block title %}
+<title>Display board</title>
+{% endblock title %}
+
+{% block content %}
+<h2>Display board</h2>
+
+<div>
+    <ul>
+        {% for club in clubs %}
+        <li><strong>{{ club["name"] }}</strong>: {{ club["points"] }}</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock content %}

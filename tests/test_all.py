@@ -1,6 +1,6 @@
 import json
 
-from urllib.parse import quote, unquote
+from urllib.parse import quote
 from flask.testing import FlaskClient
 from flask.wrappers import Response
 
@@ -83,12 +83,22 @@ class Test_PythonTesting():
             if len(errors) == 0:
                 assert str.encode(points) in response.data
 
+    @pytest.mark.parametrize("result, page_title", [
+        (200, "<title>Display board</title>")
+    ])
+    def test_displayerboard(self, result, page_title):
+        with self.app.test_client() as client:
+            client: FlaskClient[Response]
+            response: Response = client.get("/displayerboard")
+            assert response.status_code == result
+            assert str.encode(page_title) in response.data
+
     def test_logout(self):
         with self.app.test_client() as client:
             client: FlaskClient[Response]
             response: Response = client.get("/logout")
             assert response.status_code == 302
-    
+
     @staticmethod
     def loadClubs():
         with open("tests/clubs.json") as c:

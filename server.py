@@ -1,6 +1,7 @@
 import json
 from datetime import datetime
 from flask import Flask,render_template,request,redirect,flash,url_for
+from flask.globals import session
 
 
 class FlaskWrapper():
@@ -50,7 +51,7 @@ class FlaskWrapper():
                 return render_template('booking.html',club=foundClubs[0],competition=foundCompetitions[0])
         else:
             flash("Something went wrong-please try again")
-            return render_template('welcome.html', club=foundClubs[0], competitions=FlaskWrapper.competitions, errors=["Club or competition not found."])
+            return render_template('welcome.html', club=club, competitions=FlaskWrapper.competitions, errors=["Club or competition not found."])
 
 
     @app.route('/purchasePlaces',methods=['POST'])
@@ -70,11 +71,15 @@ class FlaskWrapper():
         return render_template('welcome.html', club=club, competitions=FlaskWrapper.competitions)
 
 
-    # TODO: Add route for points display
+    @app.route("/displayerboard", methods=["GET"])
+    def displayBoard():
+        clubs = FlaskWrapper.clubs
+        return render_template("display_board.html", clubs=clubs)
 
 
     @app.route('/logout')
     def logout():
+        session.pop("user_email", None)
         return redirect(url_for('index'))
 
 
