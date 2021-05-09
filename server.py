@@ -71,13 +71,13 @@ class FlaskWrapper():
         return render_template('welcome.html', club=club, competitions=FlaskWrapper.competitions)
 
 
-    @app.route("/displayerboard", methods=["GET"])
+    @app.route("/displayboard", methods=["GET"])
     def displayBoard():
         clubs = FlaskWrapper.clubs
         return render_template("display_board.html", clubs=clubs)
 
 
-    @app.route('/logout')
+    @app.route('/logout', methods=["GET"])
     def logout():
         session.pop("user_email", None)
         return redirect(url_for('index'))

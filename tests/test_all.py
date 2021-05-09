@@ -86,10 +86,10 @@ class Test_PythonTesting():
     @pytest.mark.parametrize("result, page_title", [
         (200, "<title>Display board</title>")
     ])
-    def test_displayerboard(self, result, page_title):
+    def test_displayboard(self, result, page_title):
         with self.app.test_client() as client:
             client: FlaskClient[Response]
-            response: Response = client.get("/displayerboard")
+            response: Response = client.get("/displayboard")
             assert response.status_code == result
             assert str.encode(page_title) in response.data
 
