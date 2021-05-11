@@ -33,7 +33,9 @@ class FlaskWrapper():
     @app.route('/showSummary',methods=['POST'])
     def showSummary():
         retrieved_clubs = [club for club in FlaskWrapper.clubs if club['email'] == request.form['email']]
-        if len(retrieved_clubs) != 0:
+        for c in FlaskWrapper.competitions:
+            c["is_passed"] = datetime.fromisoformat(c["date"]) < datetime.now() if True else False
+        if retrieved_clubs:
             return render_template('welcome.html',club=retrieved_clubs[0],competitions=FlaskWrapper.competitions)
         else:
             return render_template('login.html', errors=["Email not found."])
@@ -43,9 +45,9 @@ class FlaskWrapper():
     def book(competition,club):
         foundClubs = [c for c in FlaskWrapper.clubs if c['name'] == club]
         foundCompetitions = [c for c in FlaskWrapper.competitions if c['name'] == competition]
-        if len(foundClubs) != 0 and len(foundCompetitions) != 0:
+        if foundClubs and foundCompetitions:
             if datetime.fromisoformat(foundCompetitions[0]["date"]) < datetime.now():
-                flash("Competitions already pasted.")
+                flash("Competitions already passed.")
                 return render_template("welcome.html", club=foundClubs[0], competitions=FlaskWrapper.competitions)
             else:
                 return render_template('booking.html',club=foundClubs[0],competition=foundCompetitions[0])
@@ -56,8 +58,13 @@ class FlaskWrapper():
 
     @app.route('/purchasePlaces',methods=['POST'])
     def purchasePlaces():
-        competition = [c for c in FlaskWrapper.competitions if c['name'] == request.form['competition']][0]
-        club = [c for c in FlaskWrapper.clubs if c['name'] == request.form['club']][0]
+        competitions = [c for c in FlaskWrapper.competitions if c['name'] == request.form['competition']]
+        clubs = [c for c in FlaskWrapper.clubs if c['name'] == request.form['club']]
+        if not competitions and not clubs:
+            return redirect(url_for("logout"))
+        else:
+            competition = competitions[0]
+            club = clubs[0]
         places_required = int(request.form['places'])
         if places_required > int(club["points"]):
             return render_template("booking.html", competition=competition, club=club, errors=["Club has not enough points."])

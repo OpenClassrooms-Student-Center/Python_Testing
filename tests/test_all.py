@@ -53,7 +53,7 @@ class Test_PythonTesting():
         ("Spring Festival", "none", 200, "<title>Summary | GUDLFT Registration</title>", ["Club or competition not found."]),
         ("none", "She Lifts", 200, "<title>Summary | GUDLFT Registration</title>", ["Club or competition not found."]),
         ("none", "none", 200, "<title>Summary | GUDLFT Registration</title>", ["Club or competition not found."]),
-        ("Gym 50's", "The strongs", 200, "<title>Summary | GUDLFT Registration</title>", ["Competitions already pasted."])
+        ("Gym 50's", "The strongs", 200, "<title>Summary | GUDLFT Registration</title>", ["Competitions already passed."])
     ])
     def test_book(self, competition, club, result, page_title, messages):
         with self.app.test_client() as client:

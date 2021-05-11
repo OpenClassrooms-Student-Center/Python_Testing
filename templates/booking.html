@@ -8,13 +8,13 @@
 <h2>{{competition['name']}}</h2>
 Places available: {{competition['numberOfPlaces']}}
 <form action="/purchasePlaces" method="post" id="booking-form">
-    <input type="hidden" name="club_points" value="{{club['points']}}" id="club_points">  
-    <input type="hidden" name="club" value="{{club['name']}}">
-    <input type="hidden" name="competition_places" value="{{competition['numberOfPlaces']}}" id="competition_places">  
-    <input type="hidden" name="competition" value="{{competition['name']}}">
-    <label for="places">How many places?</label><input type="number" value="1" name="places" id="places_required_input"/>
-    <button type="submit">Book</button>
-    {% include 'form-errors-snippet.html' %}
+  <input type="hidden" name="club_points" value="{{club['points']}}" id="club_points">  
+  <input type="hidden" name="club" value="{{club['name']}}">
+  <input type="hidden" name="competition_places" value="{{competition['numberOfPlaces']}}" id="competition_places">  
+  <input type="hidden" name="competition" value="{{competition['name']}}">
+  <label for="places">How many places?</label><input type="number" value="1" name="places" id="places_required_input"/>
+  <button type="submit">Book</button>
+  {% include 'form-errors-snippet.html' %}
 </form>
 
 <script type="text/javascript" src="{{ url_for('static', filename='error-displayer.js') }}"></script>
