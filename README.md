@@ -49,3 +49,24 @@
     We also like to show how well we're testing, so there's a module called 
     [coverage](https://coverage.readthedocs.io/en/coverage-5.1/) you should add to your project.
 
+
+    1. Unit test: Pytest
+    ```
+    pytest
+    ```
+
+    2. Test coverage: python-cov:
+    ```
+    source env/bin/activate && pytest --cov='Python_Testing' --cov-report html tests/test_*.py
+    ```
+    In ./htmlcov, launch index.html with your browser to see the report.
+
+    3. Performance tests: locust
+    ```
+    locust
+    ```
+
+    In web browser, set up a new test with these parameters:
+    - Number of total users to simulate: 10
+    - Spawn rate: 10
+    - Host: the adress of the running flask project with the port (ex: http://localhost:5000)

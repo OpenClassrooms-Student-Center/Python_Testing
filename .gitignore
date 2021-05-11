@@ -1,7 +1,6 @@
-bin
-include
-lib
+env
 .Python
-tests/
 .envrc
 __pycache__
+htmlcov
+.coverage
