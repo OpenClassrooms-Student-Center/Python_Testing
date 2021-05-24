@@ -8,30 +8,19 @@ from server import app
 
 
 class TestServer(unittest.TestCase):
+
     clubs = [
-        {
-            "name": "Simply Lift TEST",
-            "email": "john@simplylift_test.co",
-            "points": "13"
-        },
-        {
-            "name": "Iron Temple",
-            "email": "admin@irontemple.com",
-            "points": "4"
-        },
-    ]
-    clubs_2 = [
-        {
-            "name": "TEST Yves",
-            "email": "john@simplylift_test.co",
-            "points": "14"
-        },
-        {
-            "name": "HAHA",
-            "email": "admin@irontemple.com",
-            "points": "15"
-        },
-    ]
+                {
+                    "name": "Simply Lift TEST",
+                    "email": "john@simplylift_test.co",
+                    "points": "13"
+                },
+                {
+                    "name": "Iron Temple",
+                    "email": "admin@irontemple.com",
+                    "points": "4"
+                },
+            ]
 
     @patch('server.clubs', clubs)
     def test_showClubs(self):
@@ -42,10 +31,9 @@ class TestServer(unittest.TestCase):
 
         with app.test_client() as test_client:
             response = test_client.get('/clubs')
-            assert response.status_code == 200
+            assert response.status_code == 200 
             # check if all items of the list are in response.data
             self.check_list_elements_in_response(self.clubs, response)
-            self.check_list_elements_not_in_response(self.clubs_2, response)
 
     @staticmethod
     def check_list_elements_in_response(iterable, response):
@@ -61,21 +49,6 @@ class TestServer(unittest.TestCase):
         for club in iterable:
             assert club['name'] in response.data.decode('utf8')
             assert club['points'] in response.data.decode('utf8')
-
-    @staticmethod
-    def check_list_elements_not_in_response(iterable, response):
-        """
-            This method allow to check if all elements of an iterable of dict are not
-            in response.data
-            
-            :param iterable: its a list of dict
-            :param response: its a response from a client
-            :type iterable: list
-            :type response: flask.wrappers.Response
-        """
-        for club in iterable:
-            assert club['name'] not in response.data.decode('utf8')
-            assert club['points'] not in response.data.decode('utf8')
 
 
 if __name__ == '__main__':
