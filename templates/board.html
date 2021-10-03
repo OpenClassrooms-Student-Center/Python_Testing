@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>GUDLFT Board</title>
+</head>
+<body>
+    <h1>GUDLFT Board</h1>
+    <p>Here is a table containing the clubs and their associated points.</p>
+    <div>
+        <table>
+            <tr>
+                <th>Clubs</th>
+                <th>Points</th>
+            </tr>
+            {% for name,points in clubs_values %}
+                <tr>
+                    <td>{{name}}</td>
+                    <td>{{points}}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+</body>
+</html>
