@@ -5,3 +5,4 @@ lib
 tests/
 .envrc
 __pycache__
+/test/test_unitaire/.pytest_cache/
