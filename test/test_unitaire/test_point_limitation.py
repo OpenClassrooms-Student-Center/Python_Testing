@@ -19,7 +19,7 @@ def test_use_more_points_than_their_point(client):
                              'numberOfPlaces': competition['numberOfPlaces'],
                              'places': 50,
                          })
-    assert result.status_code != 200
+    assert result.status_code == 200
 
 
 def test_use_less_than_their_point(client):
