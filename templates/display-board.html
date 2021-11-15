@@ -1,0 +1,10 @@
+<h3>Clubs Board :</h3>
+
+<ul>
+	{% for club in club_list %}
+	<li>
+		<p>Club Name : {{ club['name'] }} / Club Points : {{ club['points'] }}</p>
+	</li>
+	<hr>
+	{% endfor %}
+</ul>
