@@ -1,6 +1,7 @@
 import server
 import pytest
 
+
 @pytest.fixture
 def client():
     server.app.config['TESTING'] = True
@@ -18,4 +19,4 @@ def test_club_point_update(client):
                                'places': 3
                            })
     assert response.status_code == 200
-    assert before_points != club['points']
+    assert before_points != int(club['points'])

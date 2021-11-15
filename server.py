@@ -14,7 +14,6 @@ def loadCompetitions():
         listOfCompetitions = json.load(comps)['competitions']
         for comp in listOfCompetitions:
             if datetime.strptime(comp['date'], "%Y-%m-%d %H:%M:%S") < datetime.now():
-                print(comp, 'is outdated')
                 comp['finished'] = True
             else:
                 comp['finished'] = False
