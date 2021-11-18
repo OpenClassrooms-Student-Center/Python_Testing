@@ -1,5 +1,6 @@
 import server
 import pytest
+import copy
 
 
 @pytest.fixture
@@ -9,8 +10,9 @@ def client():
     return clients
 
 def test_club_point_update(client):
-    club = server.clubs[0]
-    before_points = int(club['points'])
+    club = server.clubs[1]
+    print(club['name'])
+    before_points = club["points"]
     competition = server.competitions[0]['name']
     response = client.post('/purchasePlaces',
                            data={
@@ -19,4 +21,5 @@ def test_club_point_update(client):
                                'places': 3
                            })
     assert response.status_code == 200
-    assert before_points != int(club['points'])
+    print(before_points != club['points'])
+    assert before_points != club['points']

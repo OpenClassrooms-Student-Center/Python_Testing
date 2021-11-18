@@ -1,6 +1,5 @@
 import server
 import pytest
-import copy
 
 
 @pytest.fixture
@@ -25,7 +24,8 @@ def test_purchase_place(client):
     club = server.clubs[0]
     competition = server.competitions[0]
 
-    before_point = club["points"]
+    club_before_point = club["points"]
+    competition_before_place = competition['numberOfPlaces']
     result_purchase_place = client.post("/purchasePlaces",
                                         data={
                                             "club": club["name"],
@@ -33,7 +33,8 @@ def test_purchase_place(client):
                                             "places": 10
                                         })
     assert result_purchase_place.status_code == 200
-    assert club["points"] != before_point
+    assert club["points"] != club_before_point
+    assert competition["numberOfPlaces"] != competition_before_place
 
     result_logout = client.get('/logout')
     assert result_logout.status_code == 302
