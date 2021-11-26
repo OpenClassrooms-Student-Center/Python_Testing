@@ -1,5 +1,5 @@
 import json
-from flask import Flask,render_template,request,redirect,flash,url_for
+from flask import Flask, render_template, request, redirect, flash, url_for
 
 
 def loadClubs():
@@ -16,9 +16,6 @@ def loadCompetitions():
 
 app = Flask(__name__)
 app.secret_key = 'something_special'
-
-competitions = loadCompetitions()
-clubs = loadClubs()
 
 @app.route('/')
 def index():
