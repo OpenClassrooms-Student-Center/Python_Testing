@@ -58,11 +58,17 @@ def logout():
 def book(competition,club):
     found_club = [c for c in clubs if c['name'] == club][0]
     found_competition = [c for c in competitions if c['name'] == competition][0]
-    if found_club and found_competition:
-        return render_template('booking.html',club=found_club, competition=found_competition)
-    else:
-        flash("Something went wrong-please try again")
-        return render_template('welcome.html', club=club, competitions=competitions)
+
+    try:
+        if found_club and found_competition and session["user_id"] == found_club["email"]:
+            return render_template('booking.html',club=found_club, competition=found_competition)
+
+        else:
+            flash("Something went wrong-please try again")
+            return render_template('welcome.html', club=club, competitions=competitions)
+    except:
+        flash("You are not logged in.")
+        return redirect(url_for('index'))
 
 
 @app.route('/purchasePlaces',methods=['POST'])
