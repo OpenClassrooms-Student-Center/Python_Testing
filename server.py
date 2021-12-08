@@ -2,21 +2,25 @@ import json
 from flask import Flask, render_template, request, redirect, flash, url_for, session
 
 MAX_CLUB_POINTS = 12
+DB_CLUBS = 'clubs.json'
+DB_COMP = 'competitions.json'
+
 
 def load_clubs():
-    with open('clubs.json') as c:
+    with open(DB_CLUBS) as c:
          list_of_clubs = json.load(c)['clubs']
          return list_of_clubs
 
 def load_competitions():
-    with open('competitions.json') as comps:
+    with open(DB_COMP) as comps:
          list_of_competitions = json.load(comps)['competitions']
          return list_of_competitions
 
-def update_clubs_score(content):
-    with open('clubs.json') as c:
-         updated_clubs = json.dump(c)['clubs']
-         return list_of_clubs
+def update_clubs(content):
+    open(DB_CLUBS,'w').write(content)
+
+def update_competitions(content):
+    open(DB_COMP,'w').write(content)
 
 def return_smallest(club, competition):
     club_points = int(club["points"])
@@ -75,6 +79,7 @@ def book(competition,club):
     found_club = [c for c in clubs if c['name'] == club][0]
     found_competition = [c for c in competitions if c['name'] == competition][0]
     max_selector = MAX_CLUB_POINTS
+
     if int(found_club['points']) < MAX_CLUB_POINTS or int(found_competition['numberOfPlaces']) < MAX_CLUB_POINTS:
         max_selector = return_smallest(found_club, found_competition)
 
@@ -97,26 +102,32 @@ def purchase_places():
     Then, check that the places are still available.
     If so, deduce the club points and places involved and
     redirect user to the welcome template."""
-    competition = [c for c in competitions if c['name'] == request.form['competition']][0]
+    global competitions
     club = [c for c in clubs if c['name'] == request.form['club']][0]
+    competition = [c for c in competitions if c['name'] == request.form['competition']][0]
     places_required = int(request.form['places'])
 
     try:
-        if session["user_id"] == club["email"] and places_required < 0:
-            #TODO: to change if there's a better way of checking
+        if session["user_id"] == club["email"]:
             double_check_comp = load_competitions()
             double_check_club = load_clubs()
             competition = [c for c in double_check_comp if c['name'] == request.form['competition']][0]
             club = [c for c in double_check_club if c['name'] == request.form['club']][0]
             double_check = return_smallest(club, competition)
 
+            if places_required < 0:
+                flash('Please book at least one place.')
+
+                return render_template('welcome.html', club=club, competitions=competitions)
+
             if places_required <= double_check and places_required <= MAX_CLUB_POINTS:
-                competition['numberOfPlaces'] = int(competition['numberOfPlaces']) - places_required
-                club['points'] = int(club['points']) - places_required
+                competition['numberOfPlaces'] = str(int(competition['numberOfPlaces']) - places_required)
+                club['points'] = str(int(club['points']) - places_required)
                 clubs_to_json = json.dumps({"clubs": double_check_club})
                 competitions_to_json = json.dumps({"competitions": double_check_comp})
-                open('clubs.json','w').write(to_json)
-                open('competitions.json','w').write(to_json)
+                update_clubs(clubs_to_json)
+                update_competitions(competitions_to_json)
+                competitions = load_competitions()
                 flash('Great-booking complete!')
 
                 return render_template('welcome.html', club=club, competitions=competitions)
