@@ -13,6 +13,12 @@ def load_competitions():
          list_of_competitions = json.load(comps)['competitions']
          return list_of_competitions
 
+def check_club_competitions(club, competition):
+    list_competitions = [comp.keys() for comp in club['competitions']]
+    if competition['name'] in list_competitions:
+        print(YES)
+    else:
+        print(list_competitions)
 
 app = Flask(__name__)
 app.secret_key = 'something_special'
@@ -65,6 +71,7 @@ def book(competition, club):
     found_club = [c for c in clubs if c['name'] == club][0]
     found_competition = [c for c in competitions if c['name'] == competition][0]
 
+    check_club_competitions(found_club, found_competition)
     try:
         if found_club and found_competition and session["user_id"] == found_club["email"]:
             if datetime.datetime.fromisoformat(found_competition['date']) < datetime.datetime.now():
