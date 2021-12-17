@@ -1,4 +1,6 @@
 bin
+.flaskenv
+.env
 include
 lib
 .Python
