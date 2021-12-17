@@ -29,12 +29,12 @@ def load_config(mode=environ.get('MODE')):
         print(e)
 
 def load_clubs():
-    with open(DB_CLUBS) as c:
+    with open('clubs.json') as c:
          list_of_clubs = json.load(c)['clubs']
          return list_of_clubs
 
 def load_competitions():
-    with open(DB_COMP) as comps:
+    with open('competitions.json') as comps:
          list_of_competitions = json.load(comps)['competitions']
          return list_of_competitions
 
@@ -119,7 +119,7 @@ def logout():
 
 
 @app.route('/book/<competition>/<club>')
-def book(competition,club):
+def book(competition, club):
     found_club = [c for c in clubs if c['name'] == club][0]
     found_competition = [c for c in competitions if c['name'] == competition][0]
     max_selector = MAX_CLUB_POINTS
@@ -148,13 +148,15 @@ def book(competition,club):
     if available_points < max_selector or int(found_competition['numberOfPlaces']) < MAX_CLUB_POINTS:
         max_selector = return_smallest(found_club, found_competition)
 
+    check_club_competitions(found_club, found_competition)
     try:
         if found_club and found_competition and session["user_id"] == found_club["email"]:
             return render_template('booking.html', club=found_club,
                                     competition=found_competition, max_selector=max_selector)
         else:
-            flash("Something went wrong-please try again")
-            return render_template('welcome.html', club=club, competitions=competitions)
+            flash("Something went wrong - please try again")
+            return redirect(url_for('index'))
+
     except:
         flash("You are not logged in.")
         return redirect(url_for('index'))
@@ -162,15 +164,9 @@ def book(competition,club):
 
 @app.route('/purchasePlaces',methods=['POST'])
 def purchase_places():
-    """Check that the user is logged in.
-    Then, check that the places are still available.
-    If so, deduce the club points and places involved and
-    redirect user to the welcome template."""
-    global competitions
-    club = [c for c in clubs if c['name'] == request.form['club']][0]
     competition = [c for c in competitions if c['name'] == request.form['competition']][0]
+    club = [c for c in clubs if c['name'] == request.form['club']][0]
     places_required = int(request.form['places'])
-
     try:
         if session["user_id"] == club["email"]:
             double_check_comp = load_competitions()
@@ -191,9 +187,6 @@ def purchase_places():
                     for comp in club['competitions']:
                         if comp['name'] == competition['name']:
                             comp['places'] = str(int(comp['places']) + places_required)
-
-                print("aaaa")
-
                 clubs_to_json = json.dumps({"clubs": double_check_club})
                 competitions_to_json = json.dumps({"competitions": double_check_comp})
                 update_clubs(clubs_to_json)
@@ -214,3 +207,7 @@ def purchase_places():
     except:
         flash("You are not logged in.")
         return redirect(url_for('index'))
+
+@app.route('/fullDisplay')
+def full_display():
+    return render_template('full_display.html', clubs=clubs)

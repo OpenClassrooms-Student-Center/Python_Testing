@@ -15,7 +15,8 @@
         {% endfor %}
        </ul>
     {% endif%}
-    Points available: {{club['points']}}
+    Points available: {{club['points']}}<br />
+    To check the point balance of other clubs, please see our <a href="{{ url_for('full_display') }}">full club display</a>.
     <h3>Competitions:</h3>
     <ul>
         {% for comp in competitions %}
