@@ -5,9 +5,9 @@ import shutil
 from os import environ
 from flask import Flask, render_template, request, redirect, flash, url_for, session
 
-
+########################## UTILITIES #################################
 # Global variables
-MAX_CLUB_POINTS = 12
+MAX_BOOKED_PLACES = 12
 DB_CLUBS = 'clubs.json'
 DB_COMP = 'competitions.json'
 
@@ -23,8 +23,12 @@ def load_config(mode=environ.get('MODE')):
         elif mode == 'TESTING':
             shutil.copyfile('clubs.json', 'test_clubs.json')
             shutil.copyfile('competitions.json', 'test_competitions.json')
-            DB_COMP = environ.get('DB_CLUBS', 'test_clubs.json')
+            DB_CLUBS = environ.get('DB_CLUBS', 'test_clubs.json')
             DB_COMP = environ.get('DB_COMP', 'test_competitions.json')
+
+        else:
+            print('Could not find .env file.')
+
     except ImportError as e:
         print(e)
 
@@ -45,21 +49,18 @@ def already_booked(club, competition):
 def return_smallest(club, competition):
     club_points = int(club["points"])
     available_places = int(competition["numberOfPlaces"])
-    if club_points < available_places:
-        max_selector = club_points
-    else:
-        max_selector = available_places
 
-    return max_selector
+    return min([club_points, available_places, MAX_BOOKED_PLACES])
+
 
 # Json db utility functions
 def load_clubs():
-    with open('clubs.json') as c:
+    with open(DB_CLUBS) as c:
          list_of_clubs = json.load(c)['clubs']
          return list_of_clubs
 
 def load_competitions():
-    with open('competitions.json') as comps:
+    with open(DB_COMP) as comps:
          list_of_competitions = json.load(comps)['competitions']
          return list_of_competitions
 
@@ -69,17 +70,16 @@ def update_clubs(content):
 def update_competitions(content):
     open(DB_COMP,'w').write(content)
 
-# App-specific global variables
+########################## FLASK SPECIFICS #################################
+# Global variables
 load_config()
 competitions = load_competitions()
 clubs = load_clubs()
 app = Flask(__name__)
-#NOTE: to change later
-app.secret_key = 'something_special'
-#app.secret_key = environ.get('SECRET_KEY')
+app.secret_key = environ.get('SECRET_KEY')
 
 
-# Flask-specific functions
+# Routes
 @app.route('/')
 def index():
     """Shows the form whose data will inform show_summary()"""
@@ -120,29 +120,38 @@ def show_summary():
 
 @app.route('/book/<competition>/<club>')
 def book(competition, club):
+    """Show the form to book places for a competition.
+    Check that conditions for booking are met, setting maximum available places
+    per competition and such."""
     found_club = [c for c in clubs if c['name'] == club][0]
     found_competition = [c for c in competitions if c['name'] == competition][0]
-    max_selector = MAX_CLUB_POINTS
+    max_selector = MAX_BOOKED_PLACES
     available_points = int(found_club['points'])
     places_booked = already_booked(found_club, found_competition)
 
     try:
         if found_club and found_competition and session["user_id"] == found_club["email"]:
-            if datetime.datetime.fromisoformat(found_competition['date']) < datetime.datetime.now():
-                flash("You cannot book places for a past event.")
-                return render_template('welcome.html', club=club, competitions=competitions)
-
-            else:
-                if places_booked == MAX_CLUB_POINTS:
-                    flash(f"You have already booked {MAX_CLUB_POINTS} places!")
+            # Check that the url is valid and that the right club is booking
+            if datetime.datetime.fromisoformat(found_competition['date']) > datetime.datetime.now():
+                # Check that the competition has not occured yet.
+                if places_booked == MAX_BOOKED_PLACES:
+                    #Check that the club has not booked more than its allowed maximum.
+                    flash(f"You have already booked {MAX_BOOKED_PLACES} places!")
                     return render_template('welcome.html', club=club, competitions=competitions)
-                elif places_booked > 0:
-                    max_selector = MAX_CLUB_POINTS - places_booked
 
-                if available_points < max_selector or int(found_competition['numberOfPlaces']) < MAX_CLUB_POINTS:
+                elif places_booked > 0:
+                    # If places have already been booked, substract them from the MAX limit for that club.
+                    max_selector = MAX_BOOKED_PLACES - places_booked
+
+                if available_points < max_selector or int(found_competition['numberOfPlaces']) < MAX_BOOKED_PLACES:
+                    # Determine the max value for the number of places widget on the jinja template.
                     max_selector = return_smallest(found_club, found_competition)
 
-                return render_template('booking.html',club=found_club, competition=found_competition)
+                return render_template('booking.html',club=found_club, competition=found_competition, max_selector=max_selector)
+
+            else:
+                flash("You cannot book places for a past event.")
+                return render_template('welcome.html', club=club, competitions=competitions)
 
         else:
             flash("Something went wrong - please try again")
@@ -155,9 +164,16 @@ def book(competition, club):
 
 @app.route('/purchasePlaces', methods=['POST'])
 def purchase_places():
+    """
+    Checks that the user is logged in, that they can stil book the same number
+    of place (things can change between the book page loading and their reservation).
+    """
+    global competitions
     competition = [c for c in competitions if c['name'] == request.form['competition']][0]
     club = [c for c in clubs if c['name'] == request.form['club']][0]
     places_required = int(request.form['places'])
+
+
     try:
         if session["user_id"] == club["email"]:
             double_check_comp = load_competitions()
@@ -165,13 +181,17 @@ def purchase_places():
             competition = [c for c in double_check_comp if c['name'] == request.form['competition']][0]
             club = [c for c in double_check_club if c['name'] == request.form['club']][0]
             double_check = return_smallest(club, competition)
-            already_booked = already_booked(club, competition)
+            has_booked = already_booked(club, competition)
+            print(competition)
+            print(club)
+            print(double_check)
+            print(has_booked)
 
-            if places_required <= double_check and places_required <= (MAX_CLUB_POINTS - already_booked) :
+            if places_required <= double_check and places_required <= (MAX_BOOKED_PLACES - already_booked) :
                 competition['numberOfPlaces'] = str(int(competition['numberOfPlaces']) - places_required)
                 club['points'] = str(int(club['points']) - places_required)
 
-                if already_booked(club, competition) == 0:
+                if has_booked == 0:
                     club['competitions'] = club['competitions'].append({'name': competition['name'],
                                                                         'places': places_required})
                 else:
