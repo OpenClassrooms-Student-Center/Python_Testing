@@ -5,6 +5,7 @@ bin
 htmlcov/
 include
 lib
+locustfile.py
 .Python
 tests/
 test_clubs.json
