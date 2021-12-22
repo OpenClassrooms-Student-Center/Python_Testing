@@ -1,13 +1,7 @@
 bin
-.coverage
-.env
-.flaskenv
-htmlcov/
 include
 lib
-locustfile.py
 .Python
-tests/
 test_clubs.json
 test_competitions.json
 .envrc
