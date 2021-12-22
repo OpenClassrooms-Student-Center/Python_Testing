@@ -1,9 +1,13 @@
 bin
-.flaskenv
+.coverage
 .env
+.flaskenv
+htmlcov/
 include
 lib
 .Python
 tests/
+test_clubs.json
+test_competitions.json
 .envrc
 __pycache__

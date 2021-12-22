@@ -27,10 +27,11 @@ def load_config(mode=environ.get('MODE')):
             DB_COMP = environ.get('DB_COMP', 'test_competitions.json')
 
         else:
-            print('Could not find .env file.')
+            print('Problem with .env file.')
 
     except ImportError as e:
         print(e)
+
 
 def already_booked(club, competition):
     """Check if the selected club already booked places in the competition by
@@ -46,11 +47,11 @@ def already_booked(club, competition):
 
     return 0
 
-def return_smallest(club, competition):
+def return_smallest(club, competition, max_selector):
     club_points = int(club["points"])
     available_places = int(competition["numberOfPlaces"])
 
-    return min([club_points, available_places, MAX_BOOKED_PLACES])
+    return min([club_points, available_places, max_selector])
 
 
 # Json db utility functions
@@ -137,21 +138,18 @@ def book(competition, club):
                 if places_booked == MAX_BOOKED_PLACES:
                     #Check that the club has not booked more than its allowed maximum.
                     flash(f"You have already booked {MAX_BOOKED_PLACES} places!")
-                    return render_template('welcome.html', club=club, competitions=competitions)
+                    return redirect(url_for('full_display'))
 
-                elif places_booked > 0:
-                    # If places have already been booked, substract them from the MAX limit for that club.
+                elif places_booked >= 0:
+                    # Substract booked places (if any) from the MAX limit for that club.
                     max_selector = MAX_BOOKED_PLACES - places_booked
-
-                if available_points < max_selector or int(found_competition['numberOfPlaces']) < MAX_BOOKED_PLACES:
-                    # Determine the max value for the number of places widget on the jinja template.
-                    max_selector = return_smallest(found_club, found_competition)
+                    max_selector = return_smallest(found_club, found_competition, max_selector)
 
                 return render_template('booking.html',club=found_club, competition=found_competition, max_selector=max_selector)
 
             else:
                 flash("You cannot book places for a past event.")
-                return render_template('welcome.html', club=club, competitions=competitions)
+                return render_template('welcome.html', club=found_club, competitions=competitions)
 
         else:
             flash("Something went wrong - please try again")
@@ -169,51 +167,61 @@ def purchase_places():
     of place (things can change between the book page loading and their reservation).
     """
     global competitions
+    global clubs
+
+    past_competitions = [comp for comp in competitions
+        if datetime.datetime.fromisoformat(comp['date']) < datetime.datetime.now()]
     competition = [c for c in competitions if c['name'] == request.form['competition']][0]
     club = [c for c in clubs if c['name'] == request.form['club']][0]
     places_required = int(request.form['places'])
-
+    places_booked = already_booked(club, competition)
 
     try:
         if session["user_id"] == club["email"]:
+            # Double-check that no place has been reserved meanwhile.
             double_check_comp = load_competitions()
             double_check_club = load_clubs()
             competition = [c for c in double_check_comp if c['name'] == request.form['competition']][0]
             club = [c for c in double_check_club if c['name'] == request.form['club']][0]
-            double_check = return_smallest(club, competition)
-            has_booked = already_booked(club, competition)
-            print(competition)
-            print(club)
-            print(double_check)
-            print(has_booked)
+            double_check = return_smallest(club, competition, MAX_BOOKED_PLACES)
 
-            if places_required <= double_check and places_required <= (MAX_BOOKED_PLACES - already_booked) :
+            if places_required <= double_check and places_required > 0:
                 competition['numberOfPlaces'] = str(int(competition['numberOfPlaces']) - places_required)
                 club['points'] = str(int(club['points']) - places_required)
 
-                if has_booked == 0:
-                    club['competitions'] = club['competitions'].append({'name': competition['name'],
-                                                                        'places': places_required})
+                if places_booked == 0:
+                    club['competitions'].append({'name': competition['name'],
+                                                                        'places': str(places_required)})
                 else:
                     for comp in club['competitions']:
                         if comp['name'] == competition['name']:
                             comp['places'] = str(int(comp['places']) + places_required)
+
                 clubs_to_json = json.dumps({"clubs": double_check_club})
                 competitions_to_json = json.dumps({"competitions": double_check_comp})
                 update_clubs(clubs_to_json)
+                clubs = load_clubs()
                 update_competitions(competitions_to_json)
                 competitions = load_competitions()
                 flash('Great-booking complete!')
 
-                return render_template('welcome.html', club=club, competitions=competitions)
+                return render_template('welcome.html', club=club, competitions=competitions,
+                    past_competitions=past_competitions)
+
+            elif places_required < 1:
+                flash("Please purchase more than one place.")
+                return render_template('welcome.html', club=club, competitions=competitions,
+                    past_competitions=past_competitions)
 
             else:
-                flash("Places were reserved by another club before your validation. Please retry.")
-                return render_template('welcome.html', club=club, competitions=competitions)
+                flash("Not enough available places anymore.")
+                return render_template('welcome.html', club=club, competitions=competitions,
+                    past_competitions=past_competitions)
 
         else:
             flash("Something went wrong-please try again")
-            return render_template('welcome.html', club=club, competitions=competitions)
+            return render_template('welcome.html', club=club, competitions=competitions,
+                past_competitions=past_competitions)
 
     except:
         flash("You are not logged in.")
