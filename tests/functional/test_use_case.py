@@ -17,13 +17,17 @@ from server import app, clubs, load_clubs
 
 MAX_CLUB_POINTS = 12
 
-def test_purchase_twice(auth, client, purchase):
+def test_full_use(auth, client, purchase):
     """
-    GIVEN an existing user
-    WHEN they attempt to purchase places twice
-    THEN points and places are deduced and the competition is added to their profile
+    Describe a case use where the user buys two places,
+    checks a correctly updated Full Display page and then logs out.
     """
     auth.login()
+
+    response = client.get('/book/Frozen Drops/Simply Lift')
+    assert response.status_code == 200
+    assert b"Booking for Frozen Drops" in response.data
+
     response = purchase.purchase()
     db = load_clubs()
 
@@ -39,22 +43,11 @@ def test_purchase_twice(auth, client, purchase):
     assert b"Number of Places: 1" in response.data
     assert db[0]['competitions'][2]['places'] == '4'
 
-def test_full_display_update(auth, client, purchase):
-    """
-    GIVEN an existing user
-    WHEN they purchase places
-    THEN the full display page is updated as well.
-    """
-    auth.login()
-    response = purchase.purchase()
-    db = load_clubs()
-
-    assert response.status_code == 200
-    assert b"Points available: 7" in response.data
-    assert b"Number of Places: 3" in response.data
-
     response = client.get('/fullDisplay')
     assert response.status_code == 200
-    assert b"Current Point Count" in response.data
     assert b"Simply Lift" in response.data
-    assert b"Points: 7" in response.data
+    assert b"Points: 1" in response.data
+
+    response = client.get('/logout')
+    assert response.status_code == 302
+    assert "http://localhost/" == response.headers["Location"]
