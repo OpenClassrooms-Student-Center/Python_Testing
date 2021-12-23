@@ -74,7 +74,9 @@ def test_check_max_selector(auth, client):
     their points and the number of available places
     """
     auth.login()
+    # If the club points are the lowest factor (5 places available, only 12 clubs points)
     response = client.get('/book/Frozen Drops/Simply Lift', follow_redirects=True)
-    assert b'min="1" max=5' in response.data
+    assert b'min="1" max=4' in response.data
+    # If MAX_BOOKED_PLACES is the lowest factor (the club already booked 11 places)
     response = client.get('/book/Spring Festival/Simply Lift', follow_redirects=True)
     assert b'min="1" max=1' in response.data

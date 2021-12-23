@@ -29,7 +29,7 @@ def test_purchase_first_time(auth, client, purchase):
 
     assert response.status_code == 200
     assert b"Summary | GUDLFT Registration" in response.data
-    assert b"Points available: 11" in response.data
+    assert b"Points available: 7" in response.data
     assert b"Number of Places: 3" in response.data
     assert db[0]['competitions'][2]['name'] == 'Frozen Drops'
 
@@ -45,7 +45,7 @@ def test_purchase_places_exists(auth, client, purchase):
 
     assert response.status_code == 200
     assert b"Summary | GUDLFT Registration" in response.data
-    assert b"Points available: 12" in response.data
+    assert b"Points available: 10" in response.data
     assert db[0]['competitions'][0]['places'] == '12'
 
 def test_purchase_not_logged(client, purchase):

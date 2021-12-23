@@ -28,13 +28,13 @@ def test_purchase_twice(auth, client, purchase):
     db = load_clubs()
 
     assert response.status_code == 200
-    assert b"Points available: 11" in response.data
+    assert b"Points available: 7" in response.data
     assert b"Number of Places: 3" in response.data
     assert db[0]['competitions'][2]['name'] == 'Frozen Drops'
 
     response = purchase.purchase()
     db = load_clubs()
     assert response.status_code == 200
-    assert b"Points available: 9" in response.data
+    assert b"Points available: 1" in response.data
     assert b"Number of Places: 1" in response.data
     assert db[0]['competitions'][2]['places'] == '4'
