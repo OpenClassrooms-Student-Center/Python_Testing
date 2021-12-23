@@ -38,3 +38,23 @@ def test_purchase_twice(auth, client, purchase):
     assert b"Points available: 1" in response.data
     assert b"Number of Places: 1" in response.data
     assert db[0]['competitions'][2]['places'] == '4'
+
+def test_full_display_update(auth, client, purchase):
+    """
+    GIVEN an existing user
+    WHEN they purchase places
+    THEN the full display page is updated as well.
+    """
+    auth.login()
+    response = purchase.purchase()
+    db = load_clubs()
+
+    assert response.status_code == 200
+    assert b"Points available: 7" in response.data
+    assert b"Number of Places: 3" in response.data
+
+    response = client.get('/fullDisplay')
+    assert response.status_code == 200
+    assert b"Current Point Count" in response.data
+    assert b"Simply Lift" in response.data
+    assert b"Points: 7" in response.data
