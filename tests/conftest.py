@@ -56,11 +56,6 @@ class PurchaseActions(object):
             data={'places': places, 'club': club, 'competition': competition}
         )
 
-    def only_purchase(self, places='2', club='Simply Lift', competition='Frozen Drops'):
-        return self._client.post(
-            '/purchasePlaces',
-            data={'places': places, 'club': club, 'competition': competition}
-        )
 
 @pytest.fixture
 def auth(client):

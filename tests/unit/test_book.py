@@ -50,8 +50,9 @@ def test_book_past_competition(client, auth):
     auth.login()
     response = client.get('/book/Fall Classic/Simply Lift', follow_redirects=True)
     assert response.status_code == 200
-    assert b"Summary | GUDLFT Registration" in response.data
     assert b"You cannot book places for a past event." in response.data
+    assert b"Summary | GUDLFT Registration" in response.data
+
 
 def test_book_already_bought_all_places(client, auth):
     """

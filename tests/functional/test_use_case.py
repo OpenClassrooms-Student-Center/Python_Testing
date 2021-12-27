@@ -20,7 +20,7 @@ from server import app, clubs, load_clubs
 
 MAX_CLUB_POINTS = 12
 
-def test_full_use(auth, client, only_purchase):
+def test_full_use(auth, client, purchase):
     """
     Describe a case use where the user buys two places,
     checks a correctly updated Full Display page and then logs out.
@@ -31,7 +31,7 @@ def test_full_use(auth, client, only_purchase):
     assert response.status_code == 200
     assert b"Booking for Frozen Drops" in response.data
 
-    response = only_purchase.only_purchase()
+    response = purchase.purchase()
     db = load_clubs()
 
     assert response.status_code == 200
@@ -39,7 +39,7 @@ def test_full_use(auth, client, only_purchase):
     assert b"Number of Places: 3" in response.data
     assert db[0]['competitions'][2]['name'] == 'Frozen Drops'
 
-    response = only_purchase.only_purchase()
+    response = purchase.purchase()
     db = load_clubs()
 
     assert response.status_code == 200

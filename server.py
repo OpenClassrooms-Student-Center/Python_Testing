@@ -253,5 +253,5 @@ def full_display():
             return redirect(url_for('index'))
 
     except:
-        flash("Something went wrong-please try again.")
-        return redirect(url_for('index'))
+            flash("Please log in to access this page.")
+            return redirect(url_for('index'))
