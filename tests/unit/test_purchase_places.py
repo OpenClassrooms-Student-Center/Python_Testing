@@ -1,21 +1,5 @@
-import sys
-import os
+from server import load_clubs, load_competitions
 
-import pytest
-
-from flask import g, json, request, Response, session, url_for
-#from flaskr.db import get_db
-
-current = os.path.dirname(os.path.realpath(__file__))
-test_dir = os.path.dirname(current)
-root_dir = os.path.dirname(test_dir)
-sys.path.append(test_dir)
-sys.path.append(root_dir)
-
-from conftest import *
-from server import app, clubs, load_clubs, load_competitions
-
-MAX_CLUB_POINTS = 12
 
 def test_purchase_first_time(auth, client, purchase):
     """
@@ -32,6 +16,7 @@ def test_purchase_first_time(auth, client, purchase):
     assert b"Points available: 7" in response.data
     assert b"Number of Places: 3" in response.data
     assert db[0]['competitions'][2]['name'] == 'Frozen Drops'
+
 
 def test_purchase_places_exists(auth, client, purchase):
     """
@@ -50,6 +35,7 @@ def test_purchase_places_exists(auth, client, purchase):
     assert db_clubs[0]['competitions'][0]['places'] == '12'
     assert db_comp[0]['numberOfPlaces'] == '24'
 
+
 def test_purchase_not_logged(client, purchase):
     """
     GIVEN a user not logged in
@@ -60,11 +46,12 @@ def test_purchase_not_logged(client, purchase):
     assert response.status_code == 302
     assert "http://localhost/" == response.headers["Location"]
 
+
 def test_purchase_too_much(auth, client, purchase):
     """
     GIVEN an existing user
     WHEN they attempt to purchase more places for a competition than possible
-    THEN the attempts fails
+    THEN the attempt fails
     """
     auth.login()
     response = purchase.purchase('20')
@@ -75,9 +62,8 @@ def test_purchase_too_much(auth, client, purchase):
 def test_purchase_negative_number(auth, client, purchase):
     """
     GIVEN an existing user
-    WHEN they attempt to purchase places for a competition
-    IF they have enough points and there are enough places
-    THEN points and places are deduced
+    WHEN they attempt to purchase a negative amount of places
+    THEN the attempt fails
     """
     auth.login()
     response = purchase.purchase('-6')

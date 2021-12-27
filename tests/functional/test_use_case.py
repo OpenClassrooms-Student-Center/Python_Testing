@@ -1,13 +1,7 @@
 import os.path
 
-
 import sys
 import os
-
-import pytest
-
-from flask import g, json, request, Response, session, url_for
-#from flaskr.db import get_db
 
 current = os.path.dirname(os.path.realpath(__file__))
 test_dir = os.path.dirname(current)
@@ -15,10 +9,8 @@ root_dir = os.path.dirname(test_dir)
 sys.path.append(test_dir)
 sys.path.append(root_dir)
 
-from conftest import *
-from server import app, clubs, load_clubs
+from server import load_clubs
 
-MAX_CLUB_POINTS = 12
 
 def test_full_use(auth, client, purchase):
     """
@@ -53,7 +45,6 @@ def test_full_use(auth, client, purchase):
     assert b"Points: 1" in response.data
 
     db = load_clubs()
-    print(db)
 
     response = client.get('/logout')
     assert response.status_code == 302
