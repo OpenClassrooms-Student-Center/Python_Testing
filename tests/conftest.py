@@ -23,7 +23,14 @@ def test_app():
 
 @pytest.fixture
 def client(test_app):
+    shutil.copyfile('clubs.json', 'test_clubs.json')
+    shutil.copyfile('competitions.json', 'test_competitions.json')
+    load_config(mode='TESTING')
+
     yield test_app.test_client()
+
+    os.remove('test_clubs.json')
+    os.remove('test_competitions.json')
 
 class AuthActions(object):
     def __init__(self, client):
@@ -61,20 +68,8 @@ def auth(client):
 
 @pytest.fixture
 def purchase(client):
-    shutil.copyfile('clubs.json', 'test_clubs.json')
-    shutil.copyfile('competitions.json', 'test_competitions.json')
-    load_config(mode='TESTING')
-
-    yield PurchaseActions(client)
-
-    os.remove('test_clubs.json')
-    os.remove('test_competitions.json')
+    return PurchaseActions(client)
 
 @pytest.fixture
 def only_purchase(client):
-    """Skip the database deletion."""
-    shutil.copyfile('clubs.json', 'test_clubs.json')
-    shutil.copyfile('competitions.json', 'test_competitions.json')
-    load_config(mode='TESTING')
-
-    yield PurchaseActions(client)
+    return PurchaseActions(client)

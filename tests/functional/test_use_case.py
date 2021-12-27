@@ -52,12 +52,9 @@ def test_full_use(auth, client, only_purchase):
     assert b"Simply Lift" in response.data
     assert b"Points: 1" in response.data
 
-    os.remove('test_clubs.json')
-    os.remove('test_competitions.json')
-
     db = load_clubs()
     print(db)
 
     response = client.get('/logout')
-    assert response.status_code == 602
+    assert response.status_code == 302
     assert "http://localhost/" == response.headers["Location"]
