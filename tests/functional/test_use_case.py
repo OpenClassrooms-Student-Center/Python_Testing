@@ -1,3 +1,6 @@
+import os.path
+
+
 import sys
 import os
 
@@ -17,7 +20,7 @@ from server import app, clubs, load_clubs
 
 MAX_CLUB_POINTS = 12
 
-def test_full_use(auth, client, purchase):
+def test_full_use(auth, client, only_purchase):
     """
     Describe a case use where the user buys two places,
     checks a correctly updated Full Display page and then logs out.
@@ -28,7 +31,7 @@ def test_full_use(auth, client, purchase):
     assert response.status_code == 200
     assert b"Booking for Frozen Drops" in response.data
 
-    response = purchase.purchase()
+    response = only_purchase.only_purchase()
     db = load_clubs()
 
     assert response.status_code == 200
@@ -36,8 +39,9 @@ def test_full_use(auth, client, purchase):
     assert b"Number of Places: 3" in response.data
     assert db[0]['competitions'][2]['name'] == 'Frozen Drops'
 
-    response = purchase.purchase()
+    response = only_purchase.only_purchase()
     db = load_clubs()
+
     assert response.status_code == 200
     assert b"Points available: 1" in response.data
     assert b"Number of Places: 1" in response.data
@@ -48,6 +52,12 @@ def test_full_use(auth, client, purchase):
     assert b"Simply Lift" in response.data
     assert b"Points: 1" in response.data
 
+    os.remove('test_clubs.json')
+    os.remove('test_competitions.json')
+
+    db = load_clubs()
+    print(db)
+
     response = client.get('/logout')
-    assert response.status_code == 302
+    assert response.status_code == 602
     assert "http://localhost/" == response.headers["Location"]

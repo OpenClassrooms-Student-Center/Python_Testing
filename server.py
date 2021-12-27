@@ -131,32 +131,37 @@ def book(competition, club):
     max_selector = MAX_BOOKED_PLACES
     places_booked = already_booked(found_club, found_competition)
 
-    try:
-        if found_club and found_competition and session["user_id"] == found_club["email"]:
+    if found_club and found_competition:
+        try:
+            if session["user_id"] == found_club["email"]:
             # Check that the url is valid and that the right club is booking
-            if datetime.datetime.fromisoformat(found_competition['date']) > datetime.datetime.now():
-                # Check that the competition has not occured yet.
-                if places_booked == MAX_BOOKED_PLACES:
-                    #Check that the club has not booked more than its allowed maximum.
-                    flash(f"You have already booked {MAX_BOOKED_PLACES} places!")
-                    return redirect(url_for('full_display'))
+                if datetime.datetime.fromisoformat(found_competition['date']) > datetime.datetime.now():
+                    # Check that the competition has not occured yet.
+                    if places_booked == MAX_BOOKED_PLACES:
+                        #Check that the club has not booked more than its allowed maximum.
+                        flash(f"You have already booked {MAX_BOOKED_PLACES} places!")
+                        return redirect(url_for('full_display'))
 
-                elif places_booked >= 0:
-                    # Substract booked places (if any) from the MAX limit for that club.
-                    max_selector = MAX_BOOKED_PLACES - places_booked
-                    max_selector = return_smallest(found_club, found_competition, max_selector)
+                    elif places_booked >= 0:
+                        # Substract booked places (if any) from the MAX limit for that club.
+                        max_selector = MAX_BOOKED_PLACES - places_booked
+                        print(found_club)
+                        print(found_competition)
+                        max_selector = return_smallest(found_club, found_competition, max_selector)
 
-                return render_template('booking.html',club=found_club, competition=found_competition, max_selector=max_selector)
+                    return render_template('booking.html',club=found_club, competition=found_competition, max_selector=max_selector)
 
+                else:
+                    flash("You cannot book places for a past event.")
+                    return render_template('welcome.html', club=found_club, competitions=competitions)
             else:
-                flash("You cannot book places for a past event.")
-                return render_template('welcome.html', club=found_club, competitions=competitions)
+                flash("You are not logged in.")
+                return redirect(url_for('index'))
 
-        else:
+        except:
             flash("Something went wrong - please try again")
             return redirect(url_for('index'))
-
-    except:
+    else:
         flash("Something went wrong - please try again")
         return redirect(url_for('index'))
 
@@ -176,6 +181,8 @@ def purchase_places():
     club = [c for c in clubs if c['name'] == request.form['club']][0]
     places_required = int(request.form['places'])
     places_booked = already_booked(club, competition)
+
+    print("\n\nCAREFUL! PURCHASE IS OCCURING!\n\n")
 
     try:
         if session["user_id"] == club["email"]:
@@ -230,11 +237,17 @@ def purchase_places():
 
 @app.route('/fullDisplay')
 def full_display():
+    global clubs
+    global competitions
     clubs_list = [club["email"] for club in clubs]
 
     try:
         if session["user_id"] in clubs_list:
+            clubs = load_clubs()
+            competitions = load_competitions()
+
             return render_template('full_display.html', clubs=clubs)
+
         else:
             flash("Please log in to access this page.")
             return redirect(url_for('index'))

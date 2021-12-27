@@ -1,4 +1,5 @@
 import os
+import os.path
 import pytest
 import sys
 
@@ -20,8 +21,12 @@ def test_full_display(client, auth):
     WHEN they attempt to access /fullDisplay
     THEN allow full display
     """
+    shutil.copyfile('clubs.json', 'test_clubs.json')
+    shutil.copyfile('competitions.json', 'test_competitions.json')
+
     auth.login()
     response = client.get('/fullDisplay')
+
     assert response.status_code == 200
     assert b"Current Point Count" in response.data
     assert b"Simply Lift" in response.data
@@ -29,6 +34,9 @@ def test_full_display(client, auth):
     assert b"Iron Temple" in response.data
     assert b"She Lifts" in response.data
 
+    os.remove('test_clubs.json')
+    os.remove('test_competitions.json')
+    
 def test_full_display_unlogged(client, auth):
     """
     GIVEN an unlogged user
