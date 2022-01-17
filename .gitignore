@@ -5,3 +5,9 @@ lib
 tests/
 .envrc
 __pycache__
+
+# virtualenv
+.venv/
+
+# Visual studio code
+.vscode/
