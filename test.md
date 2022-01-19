@@ -45,13 +45,13 @@ we can make sure the user is not logged in by checking if the user is redirected
 ### showSummary()
 
 Make a test that checks if the template is correctly loaded.
-we can make sure the template is loaded by checking if the <title> of the page is correct.
+we can make sure the template is loaded by checking if the <title> of the page is correct. [DONE]
 
 Make a test that checks if the page is correctly loaded (status_code_200).
-we can make sure the page is loaded by checking if the status code is 200.
+we can make sure the page is loaded by checking if the status code is 200. [DONE]
 
 Make a test that check if the competition list is correctly loaded.
-we can make sure the competition list is correct by checking the lenght of the returned array & checking the competition dates.
+we can make sure the competition list is correct by checking the lenght of the returned array & checking the competition dates. [DONE]
 
 
 ### book()
