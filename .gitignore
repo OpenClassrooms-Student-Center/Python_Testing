@@ -2,7 +2,6 @@ bin
 include
 lib
 .Python
-tests/
 .envrc
 __pycache__
 
@@ -11,3 +10,6 @@ __pycache__
 
 # Visual studio code
 .vscode/
+
+# test
+tests/performance_test/
