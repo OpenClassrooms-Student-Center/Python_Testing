@@ -13,3 +13,4 @@ __pycache__
 
 # test
 tests/performance_test/
+test_server.py
