@@ -13,7 +13,7 @@ __author__ = "Antoine 'AatroXiss' BEAUDESSON"
 __copyright__ = "Copyright 2021, Antoine 'AatroXiss' BEAUDESSON"
 __credits__ = ["Antoine 'AatroXiss' BEAUDESSON"]
 __license__ = ""
-__version__ = "0.0.5"
+__version__ = "0.0.6"
 __maintainer__ = "Antoine 'AatroXiss' BEAUDESSON"
 __email__ = "antoine.beaudesson@gmail.com"
 __status__ = "Development"
@@ -80,6 +80,9 @@ class TestIndex():
         response = client.post('/')
         assert response.status_code == 405
 
+
+class TestShowSummary():
+
     def test_post_hp_registered_user_login(self, client):
         """
         Test where a user logs in with a registered email.
@@ -119,10 +122,7 @@ class TestIndex():
         assert response.status_code == 200
         assert ("Error: field is empty") in response.data.decode()
 
-
-class TestShowSummary():
-
-    def test_status_code_200_template(self, client):
+    def test_post_status_code_200_template(self, client):
         """
         Test that the page is loaded correctly.
         we know that because the page has the status code 200.
@@ -170,6 +170,9 @@ class TestBook():
         response = client.get('/book/' + competition_name + '/' + club_name)
         assert response.status_code == 200
         assert ("Booking for " + competition_name) in response.data.decode()
+
+
+class TestPurchasePlaces():
 
     def test_sp_book_too_many_places(self, client):
         """
@@ -238,9 +241,6 @@ class TestBook():
         )
         assert response.status_code == 200
         assert ("Error: you do not have enough points") in response.data.decode()  # noqa
-
-
-class TestPurchasePlaces():
 
     def test_hp_book_succeeded_points_are_deducted(self, client):
         competition_name = server.loadCompetitions()[0]['name']
