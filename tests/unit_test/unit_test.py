@@ -1,6 +1,6 @@
 # unit_test.py
 # created 19/01/2021 at 16:24 by Antoine 'AatroXiss' BEAUDESSON
-# last modified 20/01/2021 at 11:49 by Antoine 'AatroXiss' BEAUDESSON
+# last modified 20/01/2021 at 14:25 by Antoine 'AatroXiss' BEAUDESSON
 
 """ unit_test.py
 
@@ -13,7 +13,7 @@ __author__ = "Antoine 'AatroXiss' BEAUDESSON"
 __copyright__ = "Copyright 2021, Antoine 'AatroXiss' BEAUDESSON"
 __credits__ = ["Antoine 'AatroXiss' BEAUDESSON"]
 __license__ = ""
-__version__ = "0.0.3"
+__version__ = "0.0.4"
 __maintainer__ = "Antoine 'AatroXiss' BEAUDESSON"
 __email__ = "antoine.beaudesson@gmail.com"
 __status__ = "Development"
@@ -62,7 +62,7 @@ class TestIndex():
 
     # Happy paths => hp / Sad paths => sp
 
-    def test_status_code_200_template(self, client):
+    def test_get_index_status_code_200(self, client):
         """
         Test that the page is loaded correctly.
         we know that because the page has the status code 200.
@@ -73,7 +73,14 @@ class TestIndex():
         assert response.status_code == 200
         assert ("GUDLFT Registration") in response.data.decode()
 
-    def test_hp_registered_user_login(self, client):
+    def test_post_index_status_code_405(self, client):
+        """
+        Test that the index page returns a 405 status code on a post request
+        """
+        response = client.post('/')
+        assert response.status_code == 405
+
+    def test_post_hp_registered_user_login(self, client):
         """
         Test where a user logs in with a registered email.
         We know the user has successfully logged in because
@@ -86,7 +93,7 @@ class TestIndex():
         assert response.status_code == 200
         assert ("Welcome, " + email) in response.data.decode()
 
-    def test_sp_unregistered_user_login(self, client):
+    def test_post_sp_unregistered_user_login(self, client):
         """
         Test where a user logs in with an unregistered email.
         We know the user has successfully not logged in because
@@ -99,7 +106,7 @@ class TestIndex():
         assert response.status_code == 200
         assert ("Error: email is not registered") in response.data.decode()
 
-    def test_sp_no_email_user_login(self, client):
+    def test_post_sp_no_email_user_login(self, client):
         """
         Test where a user logs in with no email.
         We know the user has successfully not logged in because

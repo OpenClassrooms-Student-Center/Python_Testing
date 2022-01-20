@@ -5,6 +5,12 @@ lib
 .envrc
 __pycache__
 
+# pytest cache
+.pytest_cache/
+
+# coverage
+.coverage
+
 # virtualenv
 .venv/
 
@@ -13,4 +19,3 @@ __pycache__
 
 # test
 tests/performance_test/
-test_server.py
