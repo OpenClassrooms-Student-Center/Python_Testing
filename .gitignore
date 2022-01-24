@@ -2,6 +2,20 @@ bin
 include
 lib
 .Python
-tests/
 .envrc
 __pycache__
+
+# pytest cache
+.pytest_cache/
+
+# coverage
+.coverage
+
+# virtualenv
+.venv/
+
+# Visual studio code
+.vscode/
+
+# test
+tests/performance_test/
