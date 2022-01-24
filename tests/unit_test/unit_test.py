@@ -13,7 +13,7 @@ __author__ = "Antoine 'AatroXiss' BEAUDESSON"
 __copyright__ = "Copyright 2021, Antoine 'AatroXiss' BEAUDESSON"
 __credits__ = ["Antoine 'AatroXiss' BEAUDESSON"]
 __license__ = ""
-__version__ = "0.0.6"
+__version__ = "0.0.7"
 __maintainer__ = "Antoine 'AatroXiss' BEAUDESSON"
 __email__ = "antoine.beaudesson@gmail.com"
 __status__ = "Development"
@@ -71,7 +71,17 @@ class TestIndex():
 
         response = client.get('/')
         assert response.status_code == 200
-        assert ("GUDLFT Registration") in response.data.decode()
+
+    def test_get_index_should_return_expected_content(self, client):
+        """
+        Test that the index page returns the right content
+        we know that because the page has the right content because
+        the title of the page is GUDLFT Registration"""
+
+        response = client.get('/')
+        data = response.data.decode()
+        assert ("GUDLFT Registration") in data
+        assert ("Please enter your secretary email to continue:") in data
 
     def test_post_index_status_code_405(self, client):
         """
@@ -134,6 +144,14 @@ class TestShowSummary():
         assert response.status_code == 200
         assert ("GUDLFT Registration") in response.data.decode()
 
+    def test_post_should_return_302_on_get_method(self, client):
+        """
+        Test that the page returns a 302 status code on a get request
+        when no email is provided
+        """
+        response = client.get('/showSummary')
+        assert response.status_code == 302
+
     def test_competition_list(self, client):
         """
         Test that the competition list is correctly is loaded.
@@ -170,6 +188,46 @@ class TestBook():
         response = client.get('/book/' + competition_name + '/' + club_name)
         assert response.status_code == 200
         assert ("Booking for " + competition_name) in response.data.decode()
+
+    def test_hp_book_should_return_expected_content(self, client):
+        """
+        Test that the page returns the right content
+        we know that because the page has the right content because
+        the club name is displayed and the places are displayed
+        """
+
+        competition_name = server.loadCompetitions()[0]['name']
+        club_name = server.loadClubs()[0]['name']
+        response = client.get('/book/' + competition_name + '/' + club_name)
+        data = response.data.decode()
+        assert ("Spring Festial") in data
+        assert ("Places available: 13") in data
+        assert ("How many places") in data
+
+    def test_sp_post_book_should_return_status_code_405(self, client):
+        """
+        Test that the page returns a 405 status code on a post request
+        """
+
+        competition_name = server.loadCompetitions()[0]['name']
+        club_name = server.loadClubs()[0]['name']
+        response = client.post('/book/' + competition_name + '/' + club_name)
+        assert response.status_code == 405
+
+    def test_hp_post_book_no_booking_for_past_competition(self, client):
+        """
+        Test that the page does not allow booking for past competitions
+        we know that because the page is correct
+        because the error message is displayed and the great booking message
+        is not displayed
+        """
+
+        past_competition_name = server.loadCompetitions()[0]['name']
+        club_name = server.loadClubs()[0]['name']
+        r = client.post('/book/' + past_competition_name + '/' + club_name)
+        data = r.data.decode()
+        assert ("Error: you can't book a place for past competitions") in data
+        assert ("Great-booking complete!") not in data
 
 
 class TestPurchasePlaces():
