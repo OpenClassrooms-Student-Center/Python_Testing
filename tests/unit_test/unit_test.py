@@ -33,6 +33,8 @@ NUMBER_OF_CLUBS = 3
 NUMBER_OF_COMPETITIONS = 2
 WRONG_EMAIL = "wrong@gmail.com"
 EMPTY_EMAIL = ""
+WRONG_COMPETITION = "wrong"
+WRONG_CLUB = "wrong"
 
 
 class TestDatabases():
@@ -144,14 +146,6 @@ class TestShowSummary():
         assert response.status_code == 200
         assert ("GUDLFT Registration") in response.data.decode()
 
-    def test_post_should_return_302_on_get_method(self, client):
-        """
-        Test that the page returns a 302 status code on a get request
-        when no email is provided
-        """
-        response = client.get('/showSummary')
-        assert response.status_code == 302
-
     def test_competition_list(self, client):
         """
         Test that the competition list is correctly is loaded.
@@ -169,9 +163,9 @@ class TestShowSummary():
 
         for competition in competition:
             if datetime.strptime(competition['date'], '%Y-%m-%d %H:%M:%S') > datetime.now():  # noqa
-                assert competition['name'] in response.data.decode()
+                assert competition['date'] in response.data.decode()
             else:
-                assert competition['name'] not in response.data.decode()
+                assert competition['date'] not in response.data.decode()
 
 
 class TestBook():
@@ -201,18 +195,8 @@ class TestBook():
         response = client.get('/book/' + competition_name + '/' + club_name)
         data = response.data.decode()
         assert ("Spring Festial") in data
-        assert ("Places available: 13") in data
+        assert ("Places available: 25") in data
         assert ("How many places") in data
-
-    def test_sp_post_book_should_return_status_code_405(self, client):
-        """
-        Test that the page returns a 405 status code on a post request
-        """
-
-        competition_name = server.loadCompetitions()[0]['name']
-        club_name = server.loadClubs()[0]['name']
-        response = client.post('/book/' + competition_name + '/' + club_name)
-        assert response.status_code == 405
 
     def test_hp_post_book_no_booking_for_past_competition(self, client):
         """
@@ -224,10 +208,28 @@ class TestBook():
 
         past_competition_name = server.loadCompetitions()[0]['name']
         club_name = server.loadClubs()[0]['name']
-        r = client.post('/book/' + past_competition_name + '/' + club_name)
+        r = client.get('/book/' + past_competition_name + '/' + club_name)
         data = r.data.decode()
         assert ("Error: you can't book a place for past competitions") in data
         assert ("Great-booking complete!") not in data
+
+    def test_sp_post_if_club_does_not_exist(self, client):
+        """
+        """
+        competition_name = server.loadCompetitions()[0]['name']
+        club_name = WRONG_CLUB
+        response = client.get('/book/' + competition_name + '/' + club_name)
+        data = response.data.decode()
+        assert ("Something went wrong-please try again") in data
+
+    def test_sp_post_if_competition_does_not_exist(self, client):
+        """
+        """
+        competition_name = WRONG_COMPETITION
+        club_name = server.loadClubs()[0]['name']
+        response = client.get('/book/' + competition_name + '/' + club_name)
+        data = response.data.decode()
+        assert ("Something went wrong-please try again") in data
 
 
 class TestPurchasePlaces():
@@ -262,13 +264,23 @@ class TestPurchasePlaces():
         Error: there are no places available
         """
 
-        competition_name = server.loadCompetitions()[0]['name']
+        competition_name = server.loadCompetitions()[1]['name']
         club_name = server.loadClubs()[0]['name']
+        club_name2 = server.loadClubs()[1]['name']
+
+        client.post(
+            '/purchasePlaces',
+            data={
+                'places': '2',
+                'competition': competition_name,
+                'club': club_name2
+            }
+        )
 
         response = client.post(
             '/purchasePlaces',
             data={
-                'places': '13',
+                'places': '12',
                 'competition': competition_name,
                 'club': club_name
             }
