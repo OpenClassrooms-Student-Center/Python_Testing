@@ -18,4 +18,4 @@ __pycache__
 .vscode/
 
 # test
-tests/performance_test/
+# tests/performance_test/
