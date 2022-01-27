@@ -12,7 +12,7 @@ __author__ = "Antoine 'AatroXiss' BEAUDESSON"
 __copyright__ = "Copyright 2021, Antoine 'AatroXiss' BEAUDESSON"
 __credits__ = ["Antoine 'AatroXiss' BEAUDESSON"]
 __license__ = ""
-__version__ = "0.1.4"
+__version__ = "0.1.5"
 __maintainer__ = "Antoine 'AatroXiss' BEAUDESSON"
 __email__ = "antoine.beaudesson@gmail.com"
 __status__ = "Development"
@@ -79,8 +79,12 @@ def show_summary():
             competitions=competitions
         )
     except IndexError:
-        flash("Error: email is not registered")
-        return render_template('index.html')
+        if email == "":
+            flash("Error: field is empty")
+            return render_template('index.html')
+        else:
+            flash("Error: email is not registered")
+            return render_template('index.html')
 
 
 @app.route('/book/<competition>/<club>')
