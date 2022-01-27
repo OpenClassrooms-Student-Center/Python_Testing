@@ -12,7 +12,7 @@ __author__ = "Antoine 'AatroXiss' BEAUDESSON"
 __copyright__ = "Copyright 2021, Antoine 'AatroXiss' BEAUDESSON"
 __credits__ = ["Antoine 'AatroXiss' BEAUDESSON"]
 __license__ = ""
-__version__ = "0.1.0"
+__version__ = "0.1.2"
 __maintainer__ = "Antoine 'AatroXiss' BEAUDESSON"
 __email__ = "antoine.beaudesson@gmail.com"
 __status__ = "Development"
@@ -23,7 +23,7 @@ __status__ = "Development"
 from locust import HttpUser, task
 
 # local application imports
-from server import loadClubs, loadCompetitions
+from server import load_clubs, load_competitions
 
 # other imports
 
@@ -40,8 +40,8 @@ Objective:
     - host: http://127.0.0.1:5000
 """
 
-clubs = loadClubs()
-competitions = loadCompetitions()
+clubs = load_clubs()
+competitions = load_competitions()
 
 
 class ProjectPerftest(HttpUser):

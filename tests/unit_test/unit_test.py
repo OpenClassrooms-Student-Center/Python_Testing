@@ -13,7 +13,7 @@ __author__ = "Antoine 'AatroXiss' BEAUDESSON"
 __copyright__ = "Copyright 2021, Antoine 'AatroXiss' BEAUDESSON"
 __credits__ = ["Antoine 'AatroXiss' BEAUDESSON"]
 __license__ = ""
-__version__ = "0.1.0"
+__version__ = "0.1.2"
 __maintainer__ = "Antoine 'AatroXiss' BEAUDESSON"
 __email__ = "antoine.beaudesson@gmail.com"
 __status__ = "Development"
@@ -46,7 +46,7 @@ class TestDatabases():
         listOfClubs has the same number of clubs as the
         clubs.json file"""
 
-        listOfClubs = server.loadClubs()
+        listOfClubs = server.load_clubs()
         assert len(listOfClubs) == NUMBER_OF_CLUBS
 
     def test_load_competitions(self):
@@ -56,7 +56,7 @@ class TestDatabases():
         listOfCompetitions has the same number of competitions as the
         competitions.json file"""
 
-        listOfCompetitions = server.loadCompetitions()
+        listOfCompetitions = server.load_competitions()
         assert len(listOfCompetitions) == NUMBER_OF_COMPETITIONS
 
 
@@ -103,7 +103,7 @@ class TestShowSummary():
         We know that the template is correct because the welcome message
         is displayed with the user's email"""
 
-        email = server.loadClubs()[0]['email']
+        email = server.load_clubs()[0]['email']
         response = client.post('/showSummary', data={'email': email})
         assert response.status_code == 200
         assert ("Welcome, " + email) in response.data.decode()
@@ -141,7 +141,7 @@ class TestShowSummary():
         We also know that the page has the right template because
         the title of the page is GUDLFT Registration"""
 
-        email = server.loadClubs()[0]['email']
+        email = server.load_clubs()[0]['email']
         response = client.post('/showSummary', data={'email': email})
         assert response.status_code == 200
         assert ("GUDLFT Registration") in response.data.decode()
@@ -156,9 +156,9 @@ class TestShowSummary():
         If it is in the past, it is not displayed in the list
         """
 
-        email = server.loadClubs()[0]['email']
+        email = server.load_clubs()[0]['email']
 
-        competition = server.loadCompetitions()
+        competition = server.load_competitions()
         response = client.post('/showSummary', data={'email': email})
 
         for competition in competition:
@@ -177,8 +177,8 @@ class TestBook():
         We also know that the page has the right template because
         the page has the title booking for"""
 
-        competition_name = server.loadCompetitions()[0]['name']
-        club_name = server.loadClubs()[0]['name']
+        competition_name = server.load_competitions()[0]['name']
+        club_name = server.load_clubs()[0]['name']
         response = client.get('/book/' + competition_name + '/' + club_name)
         assert response.status_code == 200
         assert ("Booking for " + competition_name) in response.data.decode()
@@ -190,8 +190,8 @@ class TestBook():
         the club name is displayed and the places are displayed
         """
 
-        competition_name = server.loadCompetitions()[0]['name']
-        club_name = server.loadClubs()[0]['name']
+        competition_name = server.load_competitions()[0]['name']
+        club_name = server.load_clubs()[0]['name']
         response = client.get('/book/' + competition_name + '/' + club_name)
         data = response.data.decode()
         assert ("Spring Festial") in data
@@ -206,8 +206,8 @@ class TestBook():
         is not displayed
         """
 
-        past_competition_name = server.loadCompetitions()[0]['name']
-        club_name = server.loadClubs()[0]['name']
+        past_competition_name = server.load_competitions()[0]['name']
+        club_name = server.load_clubs()[0]['name']
         r = client.get('/book/' + past_competition_name + '/' + club_name)
         data = r.data.decode()
         assert ("Error: you can't book a place for past competitions") in data
@@ -216,7 +216,7 @@ class TestBook():
     def test_sp_post_if_club_does_not_exist(self, client):
         """
         """
-        competition_name = server.loadCompetitions()[0]['name']
+        competition_name = server.load_competitions()[0]['name']
         club_name = WRONG_CLUB
         response = client.get('/book/' + competition_name + '/' + club_name)
         data = response.data.decode()
@@ -226,7 +226,7 @@ class TestBook():
         """
         """
         competition_name = WRONG_COMPETITION
-        club_name = server.loadClubs()[0]['name']
+        club_name = server.load_clubs()[0]['name']
         response = client.get('/book/' + competition_name + '/' + club_name)
         data = response.data.decode()
         assert ("Something went wrong-please try again") in data
@@ -240,8 +240,8 @@ class TestPurchasePlaces():
         we can now that because the page contains the error message
         Error: you cannot book more than 12 places
         """
-        competition_name = server.loadCompetitions()[0]['name']
-        club_name = server.loadClubs()[0]['name']
+        competition_name = server.load_competitions()[0]['name']
+        club_name = server.load_clubs()[0]['name']
 
         response = client.post(
             '/purchasePlaces',
@@ -264,9 +264,9 @@ class TestPurchasePlaces():
         Error: there are no places available
         """
 
-        competition_name = server.loadCompetitions()[1]['name']
-        club_name = server.loadClubs()[0]['name']
-        club_name2 = server.loadClubs()[1]['name']
+        competition_name = server.load_competitions()[1]['name']
+        club_name = server.load_clubs()[0]['name']
+        club_name2 = server.load_clubs()[1]['name']
 
         client.post(
             '/purchasePlaces',
@@ -297,9 +297,9 @@ class TestPurchasePlaces():
         Error: you do not have enough points
         """
 
-        competition_name = server.loadCompetitions()[0]['name']
-        club_name = server.loadClubs()[0]['name']
-        club_points = int(server.loadClubs()[0]['points']) + 1
+        competition_name = server.load_competitions()[0]['name']
+        club_name = server.load_clubs()[0]['name']
+        club_points = int(server.load_clubs()[0]['points']) + 1
 
         response = client.post(
             '/purchasePlaces',
@@ -313,9 +313,9 @@ class TestPurchasePlaces():
         assert ("Error: you do not have enough points") in response.data.decode()  # noqa
 
     def test_hp_book_succeeded_points_are_deducted(self, client):
-        competition_name = server.loadCompetitions()[0]['name']
-        club_name = server.loadClubs()[0]['name']
-        club_points = int(server.loadClubs()[0]['points'])
+        competition_name = server.load_competitions()[0]['name']
+        club_name = server.load_clubs()[0]['name']
+        club_points = int(server.load_clubs()[0]['points'])
 
         response = client.post(
             '/purchasePlaces',
@@ -325,7 +325,7 @@ class TestPurchasePlaces():
                 'club': club_name
             }
         )
-        club_points_left = int(server.loadClubs()[0]['points'])
+        club_points_left = int(server.load_clubs()[0]['points'])
         assert response.status_code == 200
         assert ("Great-booking complete!") in response.data.decode()
         assert (club_points_left == 0)
