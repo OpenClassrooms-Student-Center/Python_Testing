@@ -12,7 +12,7 @@ __author__ = "Antoine 'AatroXiss' BEAUDESSON"
 __copyright__ = "Copyright 2021, Antoine 'AatroXiss' BEAUDESSON"
 __credits__ = ["Antoine 'AatroXiss' BEAUDESSON"]
 __license__ = ""
-__version__ = "0.1.1"
+__version__ = "0.1.2"
 __maintainer__ = "Antoine 'AatroXiss' BEAUDESSON"
 __email__ = "antoine.beaudesson@gmail.com"
 __status__ = "Development"
@@ -37,23 +37,23 @@ from flask import (
 # constants
 
 
-def loadClubs():
+def load_clubs():
     with open('clubs.json') as c:
-        listOfClubs = json.load(c)['clubs']
-        return listOfClubs
+        list_of_clubs = json.load(c)['clubs']
+        return list_of_clubs
 
 
-def loadCompetitions():
+def load_competitions():
     with open('competitions.json') as comps:
-        listOfCompetitions = json.load(comps)['competitions']
-        return listOfCompetitions
+        list_of_competitions = json.load(comps)['competitions']
+        return list_of_competitions
 
 
 app = Flask(__name__)
 app.secret_key = 'something_special'
 
-competitions = loadCompetitions()
-clubs = loadClubs()
+competitions = load_competitions()
+clubs = load_clubs()
 
 
 @app.route('/')
@@ -62,8 +62,8 @@ def index():
 
 
 @app.route('/showSummary', methods=['POST'])
-def showSummary():
-    club = [club for club in clubs if club['email'] == request.form['email']][0]  # noqa
+def show_summary():
+    club = [c for c in clubs if c['email'] == request.form['email']][0]
     return render_template(
         'welcome.html',
         club=club,
@@ -73,13 +73,13 @@ def showSummary():
 
 @app.route('/book/<competition>/<club>')
 def book(competition, club):
-    foundClub = [c for c in clubs if c['name'] == club][0]
-    foundCompetition = [c for c in competitions if c['name'] == competition][0]
-    if foundClub and foundCompetition:
+    found_club = [c for c in clubs if c['name'] == club][0]
+    found_competition = [c for c in competitions if c['name'] == competition][0]  # noqa
+    if found_club and found_competition:
         return render_template(
             'booking.html',
-            club=foundClub,
-            competition=foundCompetition
+            club=found_club,
+            competition=found_competition
         )
     else:
         flash("Something went wrong-please try again")
@@ -91,11 +91,11 @@ def book(competition, club):
 
 
 @app.route('/purchasePlaces', methods=['POST'])
-def purchasePlaces():
+def purchase_places():
     competition = [c for c in competitions if c['name'] == request.form['competition']][0]  # noqa
     club = [c for c in clubs if c['name'] == request.form['club']][0]
-    placesRequired = int(request.form['places'])
-    competition['numberOfPlaces'] = int(competition['numberOfPlaces'])-placesRequired  # noqa
+    places_required = int(request.form['places'])
+    competition['numberOfPlaces'] = int(competition['numberOfPlaces'])-places_required  # noqa
     flash('Great-booking complete!')
     return render_template(
         'welcome.html',
