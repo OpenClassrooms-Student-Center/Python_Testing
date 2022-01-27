@@ -12,7 +12,7 @@ __author__ = "Antoine 'AatroXiss' BEAUDESSON"
 __copyright__ = "Copyright 2021, Antoine 'AatroXiss' BEAUDESSON"
 __credits__ = ["Antoine 'AatroXiss' BEAUDESSON"]
 __license__ = ""
-__version__ = "0.1.2"
+__version__ = "0.1.5"
 __maintainer__ = "Antoine 'AatroXiss' BEAUDESSON"
 __email__ = "antoine.beaudesson@gmail.com"
 __status__ = "Development"
@@ -63,12 +63,28 @@ def index():
 
 @app.route('/showSummary', methods=['POST'])
 def show_summary():
-    club = [c for c in clubs if c['email'] == request.form['email']][0]
-    return render_template(
-        'welcome.html',
-        club=club,
-        competitions=competitions
-    )
+    """
+    Allow user to login in the site if the email is in the database
+
+    :return: Ok if the email is in the DB, else throw an error
+    """
+
+    email = request.form['email']
+
+    try:
+        club = [club for club in clubs if club['email'] == email][0]
+        return render_template(
+            'welcome.html',
+            club=club,
+            competitions=competitions
+        )
+    except IndexError:
+        if email == "":
+            flash("Error: field is empty")
+            return render_template('index.html')
+        else:
+            flash("Error: email is not registered")
+            return render_template('index.html')
 
 
 @app.route('/book/<competition>/<club>')
