@@ -12,7 +12,7 @@ __author__ = "Antoine 'AatroXiss' BEAUDESSON"
 __copyright__ = "Copyright 2021, Antoine 'AatroXiss' BEAUDESSON"
 __credits__ = ["Antoine 'AatroXiss' BEAUDESSON"]
 __license__ = ""
-__version__ = "0.1.5"
+__version__ = "0.1.6"
 __maintainer__ = "Antoine 'AatroXiss' BEAUDESSON"
 __email__ = "antoine.beaudesson@gmail.com"
 __status__ = "Development"
@@ -111,13 +111,21 @@ def purchase_places():
     competition = [c for c in competitions if c['name'] == request.form['competition']][0]  # noqa
     club = [c for c in clubs if c['name'] == request.form['club']][0]
     places_required = int(request.form['places'])
-    competition['numberOfPlaces'] = int(competition['numberOfPlaces'])-places_required  # noqa
-    flash('Great-booking complete!')
-    return render_template(
-        'welcome.html',
-        club=club,
-        competitions=competitions
-    )
+    if places_required > int(club['points']):
+        flash('Error: you do not have enough points')
+        return render_template(
+            'booking.html',
+            club=club,
+            competition=competition
+        )
+    else:
+        competition['numberOfPlaces'] = int(competition['numberOfPlaces'])-places_required  # noqa
+        flash('Great-booking complete!')
+        return render_template(
+            'welcome.html',
+            club=club,
+            competitions=competitions
+        )
 
 
 # TODO: Add route for points display
