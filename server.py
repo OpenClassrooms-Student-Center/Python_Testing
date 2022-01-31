@@ -12,7 +12,7 @@ __author__ = "Antoine 'AatroXiss' BEAUDESSON"
 __copyright__ = "Copyright 2021, Antoine 'AatroXiss' BEAUDESSON"
 __credits__ = ["Antoine 'AatroXiss' BEAUDESSON"]
 __license__ = ""
-__version__ = "0.1.8"
+__version__ = "0.1.9"
 __maintainer__ = "Antoine 'AatroXiss' BEAUDESSON"
 __email__ = "antoine.beaudesson@gmail.com"
 __status__ = "Development"
@@ -111,8 +111,16 @@ def purchase_places():
     competition = [c for c in competitions if c['name'] == request.form['competition']][0]  # noqa
     club = [c for c in clubs if c['name'] == request.form['club']][0]
     places_required = int(request.form['places'])
+    places_remaining = int(competition['numberOfPlaces'])
     if places_required > int(club['points']):
         flash('Error: you do not have enough points')
+        return render_template(
+            'booking.html',
+            club=club,
+            competition=competition
+        )
+    elif places_required > places_remaining:
+        flash('Error: there are not enough places available')
         return render_template(
             'booking.html',
             club=club,
