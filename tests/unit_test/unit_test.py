@@ -13,7 +13,7 @@ __author__ = "Antoine 'AatroXiss' BEAUDESSON"
 __copyright__ = "Copyright 2021, Antoine 'AatroXiss' BEAUDESSON"
 __credits__ = ["Antoine 'AatroXiss' BEAUDESSON"]
 __license__ = ""
-__version__ = "0.1.9"
+__version__ = "0.2.0"
 __maintainer__ = "Antoine 'AatroXiss' BEAUDESSON"
 __email__ = "antoine.beaudesson@gmail.com"
 __status__ = "Development"
@@ -320,15 +320,14 @@ class TestPurchasePlaces():
         response = client.post(
             '/purchasePlaces',
             data={
-                'places': club_points,
+                'places': club_points - 1,
                 'competition': competition_name,
                 'club': club_name
             }
         )
-        club_points_left = int(server.load_clubs()[0]['points'])
         assert response.status_code == 200
         assert ("Great-booking complete!") in response.data.decode()
-        assert (club_points_left == 0)
+        assert ('Points available: 1') in response.data.decode()
 
 
 class TestLogout():

@@ -12,7 +12,7 @@ __author__ = "Antoine 'AatroXiss' BEAUDESSON"
 __copyright__ = "Copyright 2021, Antoine 'AatroXiss' BEAUDESSON"
 __credits__ = ["Antoine 'AatroXiss' BEAUDESSON"]
 __license__ = ""
-__version__ = "0.1.9"
+__version__ = "0.2.0"
 __maintainer__ = "Antoine 'AatroXiss' BEAUDESSON"
 __email__ = "antoine.beaudesson@gmail.com"
 __status__ = "Development"
@@ -136,6 +136,7 @@ def purchase_places():
     else:
         competition['numberOfPlaces'] = int(competition['numberOfPlaces'])-places_required  # noqa
         flash('Great-booking complete!')
+        club['points'] = int(club['points'])-places_required
         return render_template(
             'welcome.html',
             club=club,
