@@ -13,7 +13,7 @@ __author__ = "Antoine 'AatroXiss' BEAUDESSON"
 __copyright__ = "Copyright 2021, Antoine 'AatroXiss' BEAUDESSON"
 __credits__ = ["Antoine 'AatroXiss' BEAUDESSON"]
 __license__ = ""
-__version__ = "0.1.2"
+__version__ = "0.1.9"
 __maintainer__ = "Antoine 'AatroXiss' BEAUDESSON"
 __email__ = "antoine.beaudesson@gmail.com"
 __status__ = "Development"
@@ -286,7 +286,7 @@ class TestPurchasePlaces():
             }
         )
         assert response.status_code == 200
-        assert ("Error: there are no places available") in response.data.decode()  # noqa
+        assert ("Error: there are not enough places available") in response.data.decode()  # noqa
 
     def test_sp_book_no_enough_points(self, client):
         """
