@@ -16,13 +16,14 @@
        </ul>
     {% endif%}
     Points available: {{club['points']}}
-    <h3>Competitions:</h3>
+    <h3>Competitions: {{date}}{{date}}{{date}}</h3>
     <ul>
         {% for comp in competitions%}
         <li>
             {{comp['name']}}<br />
             Date: {{comp['date']}}</br>
             Number of Places: {{comp['numberOfPlaces']}}
+            <p>{{date }}, {{comp['date']}}</p>
             {%if comp['numberOfPlaces']|int >0%}
             <a href="{{ url_for('book',competition=comp['name'],club=club['name']) }}">Book Places</a>
             {%endif%}
