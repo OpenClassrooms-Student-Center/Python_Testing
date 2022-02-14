@@ -33,8 +33,8 @@ def create_app(config={}):
     clubs_json = 'clubs.json'
     competitions_json = 'competitions.json'
     if app.config["TESTING"] == True:
-        clubs_json = 'test_data_clubs.json'
-        competitions_json = 'test_data_comp.json'
+        clubs_json = 'tests/test_data_clubs.json'
+        competitions_json = 'tests/test_data_comp.json'
     competitions = competition(competitions_json)
     clubs = loadClubs(clubs_json)
 
@@ -63,23 +63,30 @@ def create_app(config={}):
             flash("Something went wrong-please try again")
             return render_template('welcome.html', club=club,clubs=clubs, competition=competition)
 
-    @app.route('/purchasePlaces',methods=['POST'])
+    @app.route('/purchasePlaces', methods=['POST'])
     def purchasePlaces():
-        
-        competition = [c for c in competitions if c['name'] == request.form['competition']][0]
+        competition = [c for c in competitions if c['name']
+                       == request.form['competition']][0]
         club = [c for c in clubs if c['name'] == request.form['club']][0]
         placesRequired = int(request.form['places'])
         if placesRequired > 12:
             flash("you cannot book more than 12 places")
-            return render_template('welcome.html', club=club,clubs=clubs, competitions=competitions)
-        if (placesRequired * 3) > int(club['points']):
-            flash("you don't have enough points !")
-            return render_template('welcome.html', club=club,clubs=clubs, competitions=competitions)
+            return render_template('welcome.html', club=club,
+                                   clubs=clubs, competitions=competitions)
+        elif (placesRequired * 3) > int(club['points']):
+            flash("you dont have enough points !")
+            return render_template('welcome.html', club=club,
+                                   clubs=clubs, competitions=competitions)
+        elif placesRequired > int(competition['numberOfPlaces']):
+            flash("not enought places !")
+            return render_template('welcome.html', club=club,
+                                   clubs=clubs, competitions=competitions)
         else:
             competition['numberOfPlaces'] = int(competition['numberOfPlaces'])-placesRequired
             club['points'] = int(club['points']) - (placesRequired * 3)
             flash('Great-booking complete!')
-            return render_template('welcome.html', club=club,clubs=clubs, competitions=competitions)
+            return render_template('welcome.html', club=club, clubs=clubs,
+                                   competitions=competitions)
 
     # TODO: Add route for points display
 

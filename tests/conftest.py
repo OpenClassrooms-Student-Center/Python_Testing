@@ -11,28 +11,37 @@ def client():
 
 @pytest.fixture
 def test_club():
-    return loadClubs('test_data_clubs.json')
-
-
-@pytest.fixture
-def test_club_with_enought_points(test_club):
-    return test_club[2]
-
-
-@pytest.fixture
-def test_club_with_not_enought_points(test_club):
-    return test_club[0]
+    return loadClubs('tests/test_data_clubs.json')
 
 
 @pytest.fixture
 def test_comp():
-    return loadCompetitions('test_data_comp.json')
+    return loadCompetitions('tests/test_data_comp.json')
 
 
 @pytest.fixture
-def past_competition(test_comp):
-    return test_comp[1]
+def test_valid_data():
+    data = {
+        'competition': 'Spring Festival',
+        'club': 'She Lifts',
+        'places': 2,
+    }
+    return data
 
 @pytest.fixture
-def futur_competition():
-    return test_comp[0]
+def test_not_enought_points():
+    data = {
+        'competition': 'Spring Festival',
+        'club': 'Simply Lift',
+        'places': 2,
+    }
+    return data
+
+@pytest.fixture
+def test_not_enought_places():
+    data = {
+        'competition': 'Test Festival',
+        'club': 'She Lifts',
+        'places': 5,
+    }
+    return data

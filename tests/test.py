@@ -11,7 +11,7 @@ class TestJson:
     def test_find_competition(self, test_comp):
         assert test_comp[0]["name"] == "Spring Festival"
         assert test_comp[0]["date"] == "2023-03-27 10:00:00"
-        assert test_comp[0]["numberOfPlaces"] == "25"
+        assert test_comp[0]["numberOfPlaces"] == "45"
 
 
 class TestAuth():
@@ -42,9 +42,12 @@ class TestBook:
         expected = [
             {"name": "Spring Festival",
                 "date": "2023-03-27 10:00:00",
-                "numberOfPlaces": "25"}
+                "numberOfPlaces": "45"},
+            {"name": "Test Festival",
+             "date": "2023-03-27 10:00:00",
+             "numberOfPlaces": "2"}
             ]
-        futur = competition('test_data_comp.json')
+        futur = competition('tests/test_data_comp.json')
         assert futur == expected
 
     def test_valid__endpoint(self, client):
@@ -60,3 +63,27 @@ class TestBook:
         response = client.get(endpoint)
         assert response.status_code == 200 and \
             b'Something went wrong-please try again' in response.data
+
+
+class TestPurchasesPlace():
+
+    def test_registration_competition(self, client, test_valid_data):
+        response = client.post('/purchasePlaces', data=test_valid_data)
+        assert response.status_code == 200 and \
+            b'Great-booking complete!' in response.data
+
+    def test_registration_competition_place_limited(self, client, test_valid_data):
+        test_valid_data['places'] = 13
+        response = client.post('/purchasePlaces', data=test_valid_data)
+        assert response.status_code == 200 and \
+               b'you cannot book more than 12 places' in response.data
+
+    def test_purchase_not_enought_points(self, client, test_not_enought_points):
+        response = client.post('/purchasePlaces', data=test_not_enought_points)
+        assert response.status_code == 200 and \
+               b"you dont have enough points !" in response.data
+
+    def test_purchase_not_enought_places(self, client, test_not_enought_places):
+        response = client.post('/purchasePlaces', data=test_not_enought_places)
+        assert response.status_code == 200 and \
+               b'not enought places !' in response.data
