@@ -20,7 +20,7 @@
     <ul>
         {% for comp in competitions%}
         <li>
-            {{comp['name']}}<br />
+            {{comp['name']}}<br/>
             Date: {{comp['date']}}</br>
             Number of Places: {{comp['numberOfPlaces']}}
             {%if comp['numberOfPlaces']|int >0%}
@@ -28,6 +28,16 @@
             {%endif%}
         </li>
         <hr />
+        {% endfor %}
+    </ul>
+
+    <h3>Clubs</h3>
+    <ul>
+        {% for club in clubs %}
+        <li>
+            Club : {{club['name']}}<br/>
+            Point du club : {{club['points']}}<br/>
+        </li>
         {% endfor %}
     </ul>
     {%endwith%}
