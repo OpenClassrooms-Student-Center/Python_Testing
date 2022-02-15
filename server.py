@@ -37,16 +37,24 @@ def index():
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 
 
 
 >>>>>>> bug#4
+=======
+
+>>>>>>> bug#5
 @app.route('/showSummary',methods=['POST'])
 def showSummary():
     try:
         club = [club for club in clubs if club['email'] == request.form['email']][0]
+<<<<<<< HEAD
         return render_template('welcome.html',club=club,competitions=competitions)
+=======
+        return render_template('welcome.html',club=club,clubs=clubs, competitions=competitions)
+>>>>>>> bug#5
     except IndexError:
         return render_template('index.html')
 
@@ -57,10 +65,10 @@ def book(competition,club):
     points = foundClub['points']
     foundCompetition = [c for c in competitions if c['name'] == competition][0]
     if foundClub and foundCompetition:
-        return render_template('booking.html',club=foundClub,competition=foundCompetition)
+        return render_template('booking.html',club=foundClub,clubs=clubs,competition=foundCompetition)
     else:
         flash("Something went wrong-please try again")
-        return render_template('welcome.html', club=club, competitions=competitions)
+        return render_template('welcome.html', club=club,clubs=clubs, competitions=competitions)
 
 
 @app.route('/purchasePlaces',methods=['POST'])
@@ -70,15 +78,15 @@ def purchasePlaces():
     placesRequired = int(request.form['places'])
     if placesRequired > 12:
         flash("you cannot book more than 12 places")
-        return render_template('welcome.html', club=club, competitions=competitions)
+        return render_template('welcome.html', club=club,clubs=clubs, competitions=competitions)
     if placesRequired > int(club['points']):
         flash("you don't have enough points !")
-        return render_template('welcome.html', club=club, competitions=competitions)
+        return render_template('welcome.html', club=club,clubs=clubs, competitions=competitions)
     else:
         competition['numberOfPlaces'] = int(competition['numberOfPlaces'])-placesRequired
         club['points'] = int(club['points']) - placesRequired
         flash('Great-booking complete!')
-        return render_template('welcome.html', club=club, competitions=competitions)
+        return render_template('welcome.html', club=club,clubs=clubs, competitions=competitions)
 
 
 # TODO: Add route for points display
