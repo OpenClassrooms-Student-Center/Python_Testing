@@ -18,6 +18,7 @@ def loadCompetitions():
 app = Flask(__name__)
 app.secret_key = 'something_special'
 
+
 def competition():
     comps = loadCompetitions()
     now = datetime.now() # current date and time
@@ -48,7 +49,6 @@ def showSummary():
 @app.route('/book/<competition>/<club>')
 def book(competition,club):
     foundClub = [c for c in clubs if c['name'] == club][0]
-    points = foundClub['points']
     foundCompetition = [c for c in competitions if c['name'] == competition][0]
     if foundClub and foundCompetition:
         return render_template('booking.html',club=foundClub,clubs=clubs,competition=foundCompetition)
@@ -65,12 +65,12 @@ def purchasePlaces():
     if placesRequired > 12:
         flash("you cannot book more than 12 places")
         return render_template('welcome.html', club=club,clubs=clubs, competitions=competitions)
-    if placesRequired > int(club['points']):
+    if (placesRequired * 3) > int(club['points']):
         flash("you don't have enough points !")
         return render_template('welcome.html', club=club,clubs=clubs, competitions=competitions)
     else:
         competition['numberOfPlaces'] = int(competition['numberOfPlaces'])-placesRequired
-        club['points'] = int(club['points']) - placesRequired
+        club['points'] = int(club['points']) - (placesRequired * 3)
         flash('Great-booking complete!')
         return render_template('welcome.html', club=club,clubs=clubs, competitions=competitions)
 
