@@ -1,23 +1,34 @@
 import json
 from flask import Flask,render_template,request,redirect,flash,url_for
+from datetime import datetime
 
 
 def loadClubs():
     with open('clubs.json') as c:
-         listOfClubs = json.load(c)['clubs']
-         return listOfClubs
+        listOfClubs = json.load(c)['clubs']
+        return listOfClubs
 
 
 def loadCompetitions():
     with open('competitions.json') as comps:
-         listOfCompetitions = json.load(comps)['competitions']
-         return listOfCompetitions
+        listOfCompetitions = json.load(comps)['competitions']
+        return listOfCompetitions
 
 
 app = Flask(__name__)
 app.secret_key = 'something_special'
 
-competitions = loadCompetitions()
+def competition():
+    comps = loadCompetitions()
+    now = datetime.now() # current date and time
+    competitions = list()
+    for comp in comps:
+        date_time_comp = datetime.strptime(comp["date"], '%Y-%m-%d %H:%M:%S')
+        if now < date_time_comp:
+            competitions.append(comp)
+    return competitions
+
+competitions = competition()
 clubs = loadClubs()
 
 @app.route('/')
@@ -25,9 +36,12 @@ def index():
     return render_template('index.html')
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 
->>>>>>> bug#1
+
+
+>>>>>>> bug#4
 @app.route('/showSummary',methods=['POST'])
 def showSummary():
     try:
