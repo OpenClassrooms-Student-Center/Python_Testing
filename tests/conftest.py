@@ -28,6 +28,7 @@ def test_valid_data():
     }
     return data
 
+
 @pytest.fixture
 def test_not_enought_points():
     data = {
@@ -37,6 +38,7 @@ def test_not_enought_points():
     }
     return data
 
+
 @pytest.fixture
 def test_not_enought_places():
     data = {
@@ -45,3 +47,10 @@ def test_not_enought_places():
         'places': 5,
     }
     return data
+
+
+@pytest.fixture
+def webdriver():
+    from selenium import webdriver
+    driver = webdriver.Chrome('tests_functional/chromedriver')
+    yield driver

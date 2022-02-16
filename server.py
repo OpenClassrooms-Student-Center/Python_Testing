@@ -32,22 +32,25 @@ def create_app(config={}):
     app.secret_key = 'something_special'
     clubs_json = 'clubs.json'
     competitions_json = 'competitions.json'
-    if app.config["TESTING"] == True:
+    if app.config["TESTING"]:
         clubs_json = 'tests/test_data_clubs.json'
         competitions_json = 'tests/test_data_comp.json'
     competitions = competition(competitions_json)
     clubs = loadClubs(clubs_json)
 
-
     @app.route('/')
     def index():
         return render_template('index.html')
 
-    @app.route('/showSummary',methods=['POST'])
+    @app.route('/showSummary', methods=['POST'])
     def showSummary():
         try:
-            club = [club for club in clubs if club['email'] == request.form['email']][0]
-            return render_template('welcome.html',club=club,clubs=clubs, competitions=competitions)
+            club = [club for club in clubs if club['email']
+                    == request.form['email']][0]
+            return render_template('welcome.html',
+                                   club=club,
+                                   clubs=clubs,
+                                   competitions=competitions)
         except IndexError:
             flash("Your address mail is not valid !")
             return render_template('index.html')
@@ -56,12 +59,17 @@ def create_app(config={}):
     def book(competition, club):
         try:
             foundClub = [c for c in clubs if c['name'] == club][0]
-            foundCompetition = [c for c in competitions if c['name'] == competition][0]
-            return render_template('booking.html', club=foundClub,
-                                competition=foundCompetition)
+            foundCompetition = [c for c in competitions if c['name']
+                                == competition][0]
+            return render_template('booking.html',
+                                   club=foundClub,
+                                   competition=foundCompetition)
         except IndexError:
             flash("Something went wrong-please try again")
-            return render_template('welcome.html', club=club,clubs=clubs, competition=competition)
+            return render_template('welcome.html',
+                                   club=club,
+                                   clubs=clubs,
+                                   competition=competition)
 
     @app.route('/purchasePlaces', methods=['POST'])
     def purchasePlaces():
@@ -82,7 +90,8 @@ def create_app(config={}):
             return render_template('welcome.html', club=club,
                                    clubs=clubs, competitions=competitions)
         else:
-            competition['numberOfPlaces'] = int(competition['numberOfPlaces'])-placesRequired
+            competition['numberOfPlaces'] = int(competition['numberOfPlaces'])
+            -placesRequired
             club['points'] = int(club['points']) - (placesRequired * 3)
             flash('Great-booking complete!')
             return render_template('welcome.html', club=club, clubs=clubs,
@@ -90,7 +99,7 @@ def create_app(config={}):
 
     @app.route('/clubs')
     def clubs_page():
-        return render_template('clubs.html',clubs=clubs)
+        return render_template('clubs.html', clubs=clubs)
 
     @app.route('/logout')
     def logout():
