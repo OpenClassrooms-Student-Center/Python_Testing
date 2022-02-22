@@ -18,7 +18,9 @@ class ProjectPerfTest(HttpUser):
 
     @task
     def purchasePlaces(self):
-        data = {"club": "Simply Lift", "competition": "Spring Festival", "places": 1}
+        data = {"club": "Simply Lift",
+                "competition": "Spring Festival",
+                "places": 1}
         self.client.post("/purchasePlaces", data=data)
 
     @task
