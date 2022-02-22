@@ -1,12 +1,14 @@
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
 
-validation = "Great-booking complete!"
 
 class TestFunctional():
+
     def test_open_chrome_window(self):
-        self.browser = webdriver.Chrome("tests/tests_functional/chromedriver.exe")
+        service = Service("tests/tests_functional/chromedriver.exe")
+        self.browser = webdriver.Chrome(service=service)
 
         self.browser.get("http://127.0.0.1:5000/")
         email = self.browser.find_element(By.NAME, "email")
@@ -18,6 +20,5 @@ class TestFunctional():
         nb_places.send_keys("1")
         input_booking = self.browser.find_element(By.TAG_NAME, "button")
         input_booking.click()
-        # valid_booking = self.browser.find_element(By., "Great-booking complete!")
-
-        # assert valid_booking == validation
+        logout = self.browser.find_element(By.LINK_TEXT, "Logout")
+        logout.click()
