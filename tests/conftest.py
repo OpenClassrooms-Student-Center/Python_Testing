@@ -28,6 +28,7 @@ def test_valid_data():
     }
     return data
 
+
 @pytest.fixture
 def test_not_enought_points():
     data = {
@@ -36,6 +37,7 @@ def test_not_enought_points():
         'places': 2,
     }
     return data
+
 
 @pytest.fixture
 def test_not_enought_places():
