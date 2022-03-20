@@ -34,3 +34,11 @@ def test_sould_not_purshase_more_than_I_own(client):
             }
             response = client.post('/purchasePlaces', data=mock)
             assert response.status_code == 403
+
+def test_sould_not_purshase_more_than_12_places(client):
+    response = client.post('/purchasePlaces', data={
+        "club": "Simply Lift",
+        "competition": "Spring Festival",
+        "places": 13
+    })
+    assert response.status_code == 403
