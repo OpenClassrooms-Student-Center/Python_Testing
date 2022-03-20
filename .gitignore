@@ -2,6 +2,9 @@ bin
 include
 lib
 .Python
-tests/
 .envrc
+docs/
+env/
+launch_flask.bat
 __pycache__
+launch_test.bat 
