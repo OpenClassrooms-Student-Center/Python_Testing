@@ -7,3 +7,7 @@ def test_loadClubs():
 
 def test_loadCompetitions():
     assert loadCompetitions("./tests/unit_test/fixture_files/fixture_load.json") == competition()
+
+def test_sould_login_in_out(client):
+    response = client.get("/logout")
+    assert response.status_code == 302
