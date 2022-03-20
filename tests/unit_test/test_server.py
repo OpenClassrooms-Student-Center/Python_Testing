@@ -21,3 +21,16 @@ def test_sould_connect_with_email_exists(client):
 def test_sould_no_connect_with_email_does_not_exists(client):
     response = client.post("/showSummary", data={'email': "not_exists_email@test.com"})
     assert response.status_code == 401
+
+def test_sould_not_purshase_more_than_I_own(client):
+    competitions = loadCompetitions()
+    clubs = loadClubs()
+    for com in competitions:
+        for cl in clubs:
+            mock = {
+                "club": cl.get('name'),
+                "competition": com.get('name'),
+                "places": int(cl.get('points')) + 1
+            }
+            response = client.post('/purchasePlaces', data=mock)
+            assert response.status_code == 403
