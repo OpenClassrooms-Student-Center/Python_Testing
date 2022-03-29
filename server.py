@@ -2,14 +2,18 @@ import json
 from flask import Flask,render_template,request,redirect,flash,url_for
 
 
-def loadClubs():
-    with open('clubs.json') as c:
+PATH_COMPETITIONS = "Sample_Data/competitions.json"
+PATH_CLUBS = "Sample_Data/clubs.json"
+
+
+def load_clubs():
+    with open(PATH_CLUBS) as c:
          listOfClubs = json.load(c)['clubs']
          return listOfClubs
 
 
-def loadCompetitions():
-    with open('competitions.json') as comps:
+def load_competitions():
+    with open(PATH_COMPETITIONS) as comps:
          listOfCompetitions = json.load(comps)['competitions']
          return listOfCompetitions
 
@@ -17,17 +21,23 @@ def loadCompetitions():
 app = Flask(__name__)
 app.secret_key = 'something_special'
 
-competitions = loadCompetitions()
-clubs = loadClubs()
+competitions = load_competitions()
+clubs = load_clubs()
+
 
 @app.route('/')
 def index():
     return render_template('index.html')
 
+
 @app.route('/showSummary',methods=['POST'])
 def showSummary():
-    club = [club for club in clubs if club['email'] == request.form['email']][0]
-    return render_template('welcome.html',club=club,competitions=competitions)
+    try:
+        club = [club for club in clubs if club['email'] == request.form['email']][0]
+        return render_template('welcome.html', club=club, competitions=competitions)
+    except IndexError:
+        message = "Aucune adresse de club ne correspond"
+        return render_template('index.html', message=message)
 
 
 @app.route('/book/<competition>/<club>')
