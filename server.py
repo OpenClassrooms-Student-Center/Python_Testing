@@ -60,10 +60,13 @@ def purchasePlaces():
     placesRequired = int(request.form['places'])
     if today < competition['date']:
         if (int(club['points']) >= placesRequired):
-            competition['numberOfPlaces'] = int(
-                competition['numberOfPlaces'])-placesRequired
-            club['points'] = int(club["points"]) - placesRequired
-            flash('Great, booking complete!')
+            if placesRequired <= 12:
+                competition['numberOfPlaces'] = int(
+                    competition['numberOfPlaces'])-placesRequired
+                club['points'] = int(club["points"]) - placesRequired
+                flash('Great, booking complete!')
+            else:
+                flash('Sorry, you can only book up to 12 places.')
         else:
             flash('Sorry, you do not have enough points.')
     else:
