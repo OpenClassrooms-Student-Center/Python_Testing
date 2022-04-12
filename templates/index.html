@@ -12,5 +12,11 @@
         <input type="email" name="email" id=""/>
         <button type="submit">Enter</button>
     </form>
+
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+                {{ messages[0] }}
+        {% endif %}
+    {% endwith %}
 </body>
 </html>
