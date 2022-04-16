@@ -71,10 +71,12 @@ def purchasePlaces():
             flash('Sorry, you do not have enough points.')
     else:
         flash('Sorry, the competition has already started.')
-    return render_template('welcome.html', club=club, competitions=competitions)
+    return render_template('welcome.html', clubs=clubs, club=club, competitions=competitions)
 
 
-# TODO: Add route for points display
+@app.route('/clubs')
+def clubsPointsPage():
+    return render_template('clubs.html', clubs=clubs)
 
 
 @app.route('/logout')
