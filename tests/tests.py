@@ -76,3 +76,10 @@ def test_12_points_limit(client):
     data = response.data.decode()
     assert response.status_code == 200
     assert 'Sorry, you can only book up to 12 places.' in data
+
+
+def test_club_page(client):
+    response = client.get('/clubs')
+    assert response.status_code == 200
+    data = response.data.decode()
+    assert 'Welcome' in data
