@@ -53,6 +53,7 @@ def book(competition, club):
 
 @app.route("/purchasePlaces", methods=["POST"])
 def purchasePlaces():
+    MAX_PLACES = 12
     competition = [c for c in competitions if c["name"] == request.form["competition"]][
         0
     ]
@@ -60,6 +61,8 @@ def purchasePlaces():
     placesRequired = int(request.form["places"])
     if placesRequired > int(club["points"]):
         flash("Your club does not have enough points to participate.")
+    elif placesRequired > MAX_PLACES:
+        flash("You cannot book more than 12 places.")
     else:
         competition["numberOfPlaces"] = (
             int(competition["numberOfPlaces"]) - placesRequired

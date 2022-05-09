@@ -39,5 +39,5 @@ def mock_loadCompetitions():
 
 @pytest.fixture
 def mock_clubs_and_competitions(mocker, mock_loadClubs, mock_loadCompetitions):
-    mocker.patch.object(server, "competitions", mock_loadCompetitions)
     mocker.patch.object(server, "clubs", mock_loadClubs)
+    mocker.patch.object(server, "competitions", mock_loadCompetitions)

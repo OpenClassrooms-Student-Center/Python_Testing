@@ -32,3 +32,13 @@ def test_clubs_purchase_places_without_enough_points(
     data = response.data.decode()
     assert response.status_code == 200
     assert "Your club does not have enough points to participate." in data
+
+
+def test_clubs_purchase_more_than_twelve_places(client, mock_clubs_and_competitions):
+    response = client.post(
+        "/purchasePlaces",
+        data={"club": "Simply Lift", "competition": "Fall Classic", "places": "13"},
+    )
+    data = response.data.decode()
+    assert response.status_code == 200
+    assert "You cannot book more than 12 places." in data
