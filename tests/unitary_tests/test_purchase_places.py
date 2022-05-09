@@ -11,7 +11,7 @@ def test_clubs_purchase_places_working(client, mock_clubs_and_competitions):
     """
     response = client.post(
         "/purchasePlaces",
-        data={"club": "Iron Temple", "competition": "Fall Classic", "places": "4"},
+        data={"club": "Iron Temple", "competition": "Spring Boxing", "places": "4"},
     )
     data = response.data.decode()
     assert response.status_code == 200
@@ -42,3 +42,13 @@ def test_clubs_purchase_more_than_twelve_places(client, mock_clubs_and_competiti
     data = response.data.decode()
     assert response.status_code == 200
     assert "You cannot book more than 12 places." in data
+
+
+def tests_clubs_purchase_outdated_competition(client, mock_clubs_and_competitions):
+    response = client.post(
+        "/purchasePlaces",
+        data={"club": "Wing chun", "competition": "Fall Classic", "places": "1"},
+    )
+    data = response.data.decode()
+    assert response.status_code == 200
+    assert "Purchase not allowed - Outdated competition." in data

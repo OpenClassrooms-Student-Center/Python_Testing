@@ -57,12 +57,15 @@ def purchasePlaces():
     competition = [c for c in competitions if c["name"] == request.form["competition"]][
         0
     ]
+    date_competition = datetime.strptime(competition["date"], "%Y-%m-%d %H:%M:%S")
     club = [c for c in clubs if c["name"] == request.form["club"]][0]
     placesRequired = int(request.form["places"])
     if placesRequired > int(club["points"]):
         flash("Your club does not have enough points to participate.")
     elif placesRequired > MAX_PLACES:
         flash("You cannot book more than 12 places.")
+    elif datetime.now() > date_competition:
+        flash("Purchase not allowed - Outdated competition.")
     else:
         competition["numberOfPlaces"] = (
             int(competition["numberOfPlaces"]) - placesRequired
