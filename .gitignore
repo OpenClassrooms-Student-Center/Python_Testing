@@ -2,6 +2,8 @@ bin
 include
 lib
 .Python
-tests/
-.envrc
+envrc
 __pycache__
+.flake8
+.coverage
+.pytest_cache

@@ -49,3 +49,34 @@
     We also like to show how well we're testing, so there's a module called 
     [coverage](https://coverage.readthedocs.io/en/coverage-5.1/) you should add to your project.
 
+
+## Testing
+
+to do a general test for all issues, type in your terminal
+```
+pytest
+```
+
+## Performance tests
+
+### Locust
+
+```
+cd tests/performance_tests
+locust
+```
+
+In your browser : [Locust server](http://localhost:8089/)
+
+- Parameters : 
+    - Number of local users to simulate : 6
+    - Spawn rate : 1
+    - Host : http://127.0.0.1:5000
+
+### Coverage
+
+In your terminal:
+```
+coverage run -m pytest
+coverage html
+```
