@@ -1,5 +1,4 @@
 import json
-from xml.dom import ValidationErr
 from flask import Flask,render_template,request,redirect,flash,url_for
 
 
@@ -49,13 +48,27 @@ def book(competition,club):
 
 @app.route('/purchasePlaces',methods=['POST'])
 def purchasePlaces():
+
+    # 1. Check if the number of points entered if superior to the current maximum number of points
+    # 2. Correctly deduct number from the club ['points'] category
+
     competition = [c for c in competitions if c['name'] == request.form['competition']][0]
     club = [c for c in clubs if c['name'] == request.form['club']][0]
+    
     placesRequired = int(request.form['places'])
-    competition['numberOfPlaces'] = int(competition['numberOfPlaces'])-placesRequired
-    flash('Great-booking complete!')
-    return render_template('welcome.html', club=club, competitions=competitions)
+    clubPoints = int(club['points'])
+    
+    if placesRequired <= clubPoints:
+        # Update competition "numberOfPlaces" and club "points"
+        competition['numberOfPlaces'] = int(competition['numberOfPlaces'])-placesRequired
+        club['points'] = int(club['points'])-placesRequired
 
+        flash('Great-booking complete!')
+        return render_template('welcome.html', club=club, competitions=competitions)
+    else:
+        message = "The input number exceed the maximum of places for this club."
+        return render_template('booking.html', club=club,competition=competition,bookFormErrorMsg=message)
+        
 
 # TODO: Add route for points display
 
