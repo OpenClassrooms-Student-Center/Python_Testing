@@ -1,4 +1,5 @@
 import json
+from xml.dom import ValidationErr
 from flask import Flask,render_template,request,redirect,flash,url_for
 
 
@@ -26,8 +27,13 @@ def index():
 
 @app.route('/showSummary',methods=['POST'])
 def showSummary():
-    club = [club for club in clubs if club['email'] == request.form['email']][0]
-    return render_template('welcome.html',club=club,competitions=competitions)
+
+    for club in clubs:
+        if club['email'] == request.form['email']:
+            return render_template('welcome.html',club=club,competitions=competitions)    
+    
+    message = 'Sorry, the email could not be found.'
+    return render_template('index.html', loginFormErrorMsg=message)
 
 
 @app.route('/book/<competition>/<club>')
