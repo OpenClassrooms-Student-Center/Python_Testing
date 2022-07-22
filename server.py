@@ -1,6 +1,7 @@
 import json
 from flask import Flask,render_template,request,redirect,flash,url_for
 
+from functions import date_is_passed
 
 def loadClubs():
     with open('clubs.json') as c:
@@ -45,6 +46,10 @@ def book(competition,club):
 def purchasePlaces():
     competition = [c for c in competitions if c['name'] == request.form['competition']][0]
     club = [c for c in clubs if c['name'] == request.form['club']][0]
+    if date_is_passed(competition['date']):
+        flash('You cannot buy a place for a competition that has already passed.')
+        render_template('booking.html', club=club, competition=competition)
+
     placesRequired = int(request.form['places'])
     competition['numberOfPlaces'] = int(competition['numberOfPlaces'])-placesRequired
     flash('Great-booking complete!')
