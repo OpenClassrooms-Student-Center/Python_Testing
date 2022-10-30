@@ -56,7 +56,7 @@ def purchasePlaces():
     competition_date = datetime.fromisoformat(competition['date'])
     if competition_date < tomorrow:
         flash('too late- booking is closed!')
-        return render_template('booking.html', club=club, competition=competition)
+        return render_template('welcome.html', club=club, competition=competition)
     else:
         if placesRequired <= int(club['points']):
             if placesRequired <= 12:

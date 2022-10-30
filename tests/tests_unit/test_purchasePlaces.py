@@ -33,6 +33,21 @@ class MockRequest12places:
         data = {"form": self.form}
         return data
 
+class MockRequest3places:
+    """
+    Mocks Request Object
+    """
+
+    def __init__(self):
+        self.form = {'places': '3',
+                     'competition':'Fall Classic',
+                     'club':'Iron Temple'}
+
+    @staticmethod  # defines verbose response in terminal?
+    def form_data(self):
+        data = {"form": self.form}
+        return data
+
 class MockRequestInThePast3places:
     """
     Mocks Request Object
@@ -125,7 +140,7 @@ def test_purchase_more_than_clubs_remaining_places(monkeypatch):
     def mock_post(*args, **kwarg):
         return MockRequest12places()
 
-    # monkey patch une saisie de 13 places réservées pour l'Iron Temple qui n'a que 4 points:
+    # monkey patch une saisie de 12 places réservées pour l'Iron Temple qui n'a que 4 points:
     monkeypatch.setattr(server, 'request', mock_post())
 
     # remplace render_template par fonction mock_render_template
@@ -135,10 +150,33 @@ def test_purchase_more_than_clubs_remaining_places(monkeypatch):
 
     monkeypatch.setattr(server, 'flash', str)
 
-    expected_value = ['booking.html']
+    expected_value = '4'
+    result = purchasePlaces()
+    assert result[1]['points'] == expected_value
+
+def test_points_number_update(monkeypatch):
+
+    monkeypatch.setattr(server, 'loadClubs', mockloadClubs())
+
+    monkeypatch.setattr(server, 'loadCompetitions', mockloadCompetitions())
+
+    def mock_post(*args, **kwarg):
+        return MockRequest3places()
+
+    # monkey patch une saisie de 12 places réservées pour l'Iron Temple qui n'a que 4 points:
+    monkeypatch.setattr(server, 'request', mock_post())
+
+    # remplace render_template par fonction mock_render_template
+    # qui retourne une liste, pour juste pouvoir vérifier le titre du fichier template retourné
+    # vérifie que va bien chercher le fichier 'booking.html' en cas de réservation de trop de places
+    monkeypatch.setattr(server, 'render_template', mock_render_template)
+
+    monkeypatch.setattr(server, 'flash', str)
+
     result = purchasePlaces()
 
-    assert result[0] == expected_value[0]
+    assert result[1]['points'] == 1
+
 
 def test_purchase_places_for_a_past_competition(monkeypatch):
 
@@ -158,7 +196,7 @@ def test_purchase_places_for_a_past_competition(monkeypatch):
 
     monkeypatch.setattr(server, 'flash', str)
 
-    expected_value = ['booking.html']
+    expected_value = ['welcome.html']
     result = purchasePlaces()
 
     assert result[0] == expected_value[0]

@@ -30,7 +30,7 @@ def mockloadCompetitions():
         },
         {
             "name": "Fall Classic",
-            "date": "2020-10-22 13:30:00",
+            "date": "2023-10-22 13:30:00",
             "numberOfPlaces": "13"
         }]
     return list_of_competitions
