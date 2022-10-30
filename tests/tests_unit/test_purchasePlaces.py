@@ -3,7 +3,7 @@ from Python_Testing.server import purchasePlaces, clubs
 from flask import Flask, render_template, request, flash
 
 
-class MockRequest:
+class MockRequest13places:
     """
     Mocks Request Object
     """
@@ -33,6 +33,21 @@ class MockRequest12places:
         data = {"form": self.form}
         return data
 
+class MockRequestInThePast3places:
+    """
+    Mocks Request Object
+    """
+
+    def __init__(self):
+        self.form = {'places': '3',
+                     'competition':'Spring Festival',
+                     'club':'Iron Temple'}
+
+    @staticmethod  # defines verbose response in terminal?
+    def form_data(self):
+        data = {"form": self.form}
+        return data
+
 def mockloadCompetitions():
     """
     Mocks data loading from database
@@ -45,7 +60,7 @@ def mockloadCompetitions():
         },
         {
             "name": "Fall Classic",
-            "date": "2020-10-22 13:30:00",
+            "date": "2023-10-22 13:30:00",
             "numberOfPlaces": "13"
         }]
     return list_of_competitions
@@ -76,17 +91,12 @@ def mock_render_template(file_name, club, competitions=1, competition=1):
     return_list = [file_name, club, competitions, competition]
     return return_list
 
-def test_return_object_competitions():
-    server.loadCompetitions = mockloadCompetitions()
-    result = server.competitions
-    assert result == mockloadCompetitions()
-
 def test_purchase_more_than_12_places_in_one_competition(monkeypatch):
 
     monkeypatch.setattr(server, 'loadCompetitions', mockloadCompetitions())
 
     def mock_post(*args, **kwarg):
-        return MockRequest()
+        return MockRequest13places()
 
     # monkey patch une saisie de 13 places réservées:
     monkeypatch.setattr(server, 'request', mock_post())
@@ -130,7 +140,28 @@ def test_purchase_more_than_clubs_remaining_places(monkeypatch):
 
     assert result[0] == expected_value[0]
 
+def test_purchase_places_for_a_past_competition(monkeypatch):
 
+    monkeypatch.setattr(server, 'loadCompetitions', mockloadCompetitions())
+
+    def mock_post(*args, **kwarg):
+        return MockRequestInThePast3places()
+
+    # monkey patch une saisie de 3 places réservées pour la competition Spring Festival
+    # qui a eu lieu dans le passé:
+    monkeypatch.setattr(server, 'request', mock_post())
+
+    # remplace render_template par fonction mock_render_template
+    # qui retourne une liste, pour juste pouvoir vérifier le titre du fichier template retourné
+    # vérifie que va bien chercher le fichier 'booking.html' en cas de réservation de trop de places
+    monkeypatch.setattr(server, 'render_template', mock_render_template)
+
+    monkeypatch.setattr(server, 'flash', str)
+
+    expected_value = ['booking.html']
+    result = purchasePlaces()
+
+    assert result[0] == expected_value[0]
 
 # def purchasePlaces():
     # competition = [c for c in competitions if c['name'] == request.form['competition']][0]

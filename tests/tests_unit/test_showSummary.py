@@ -26,15 +26,6 @@ def mockloadClubs():
     return list_of_clubs
 
 
-def test_return_object_clubs():
-    server.loadClubs = mockloadClubs()
-    result = server.clubs
-    assert result == mockloadClubs()
-
-
-# def mockrequestForm():
-# return {"email" : "test@email"}
-
 class MockRequest:
     """
     Mocks Request Object
