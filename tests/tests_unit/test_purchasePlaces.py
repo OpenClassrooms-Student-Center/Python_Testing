@@ -18,6 +18,21 @@ class MockRequest:
         data = {"form": self.form}
         return data
 
+class MockRequest12places:
+    """
+    Mocks Request Object
+    """
+
+    def __init__(self):
+        self.form = {'places': '12',
+                     'competition':'Fall Classic',
+                     'club':'Iron Temple'}
+
+    @staticmethod  # defines verbose response in terminal?
+    def form_data(self):
+        data = {"form": self.form}
+        return data
+
 def mockloadCompetitions():
     """
     Mocks data loading from database
@@ -35,6 +50,32 @@ def mockloadCompetitions():
         }]
     return list_of_competitions
 
+def mockloadClubs():
+    """
+    Mocks data loading from database
+    """
+    list_of_clubs = [
+        {
+            "name": "Simply Lift",
+            "email": "john@simplylift.co",
+            "points": "13"
+        },
+        {
+            "name": "Iron Temple",
+            "email": "admin@irontemple.com",
+            "points": "4"
+        },
+        {"name": "She Lifts",
+         "email": "kate@shelifts.co.uk",
+         "points": "12"
+         }]
+
+    return list_of_clubs
+
+def mock_render_template(file_name, club, competitions=1, competition=1):
+    return_list = [file_name, club, competitions, competition]
+    return return_list
+
 def test_return_object_competitions():
     server.loadCompetitions = mockloadCompetitions()
     result = server.competitions
@@ -47,18 +88,16 @@ def test_purchase_more_than_12_places_in_one_competition(monkeypatch):
     def mock_post(*args, **kwarg):
         return MockRequest()
 
-    # monkey patch une saisie de 50 places réservées:
+    # monkey patch une saisie de 13 places réservées:
     monkeypatch.setattr(server, 'request', mock_post())
 
     # flash function needs an active HTTP request,
     # so mocks it with print function for testing purposes:
     monkeypatch.setattr(server, 'flash', str)
 
-    def mock_render_template(file_name, club, competitions):
-        return_list = [file_name, club, competitions]
-        return return_list
 
-    # remplace render_template par fonction list, pour juste pouvoir vérifier le titre du fichier template retourné
+    # remplace render_template par fonction mock_render_template
+    # qui retourne une liste, pour juste pouvoir vérifier le titre du fichier template retourné
     # vérifie que va bien chercher le fichier 'booking.html' en cas de réservation de trop de places
     monkeypatch.setattr(server, 'render_template', mock_render_template)
 
@@ -66,6 +105,32 @@ def test_purchase_more_than_12_places_in_one_competition(monkeypatch):
     result = purchasePlaces()
 
     assert result[0] == expected_value[0]
+
+def test_purchase_more_than_clubs_remaining_places(monkeypatch):
+
+    monkeypatch.setattr(server, 'loadClubs', mockloadClubs())
+
+    monkeypatch.setattr(server, 'loadCompetitions', mockloadCompetitions())
+
+    def mock_post(*args, **kwarg):
+        return MockRequest12places()
+
+    # monkey patch une saisie de 13 places réservées pour l'Iron Temple qui n'a que 4 points:
+    monkeypatch.setattr(server, 'request', mock_post())
+
+    # remplace render_template par fonction mock_render_template
+    # qui retourne une liste, pour juste pouvoir vérifier le titre du fichier template retourné
+    # vérifie que va bien chercher le fichier 'booking.html' en cas de réservation de trop de places
+    monkeypatch.setattr(server, 'render_template', mock_render_template)
+
+    monkeypatch.setattr(server, 'flash', str)
+
+    expected_value = ['booking.html']
+    result = purchasePlaces()
+
+    assert result[0] == expected_value[0]
+
+
 
 # def purchasePlaces():
     # competition = [c for c in competitions if c['name'] == request.form['competition']][0]
