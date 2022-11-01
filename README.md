@@ -16,32 +16,31 @@
 
     * [Virtual environment](https://virtualenv.pypa.io/en/stable/installation.html)  
         This ensures you'll be able to install the correct packages without interfering with Python on your machine.  
-        Before you begin, please ensure you have this installed globally. 
 
 
 3. Installation
 
-    - After cloning, change into the directory and type <code>python -m venv env</code>.  
+    - After cloning, change into the directory and type `python -m venv env`.  
     This will then set up a a virtual python environment within that directory.
 
-    - Next, type <code>source bin/activate</code>.  
+    - Next, type `source env/bin/activate`.  
     You should see that your command prompt has changed to the name of the folder.  
     This means that you can install packages in here without affecting affecting files outside.  
-    *To deactivate, type <code>deactivate</code>*
+    *To deactivate, type `deactivate`*
 
     - Rather than hunting around for the packages you need, you can install in one step.  
-    Type <code>pip install -r requirements.txt</code>.  
+    Type `pip install -r requirements.txt`.  
     This will install all the packages listed in the respective file. If you install a package, make sure others know by updating the requirements.txt file.  
-    An easy way to do this is <code>pip freeze > requirements.txt</code>
+    An easy way to do this is `pip freeze > requirements.txt`
 
     - To launch the server, you can set an environmental variable to the python file.  
-    Type <code>export FLASK_APP=server.py</code>  
+    Type `export FLASK_APP=server.py`  
     Check [here](https://flask.palletsprojects.com/en/1.1.x/quickstart/#a-minimal-application) for more details
 
-    - If you have set the environmental variable, you can launch the server with the command :  
-    <code>flask run</code>  
-    If you haven't set the variable, use the command :  
-        <code>flask --app server run</code>
+    - If you had set the environmental variable, you would launch the server with the command :  
+    `flask run`  
+    If you hadn't set the variable, you would use the command :  
+        `flask --app server run`
 
     - Now open your browser with this address to test the application :  
     http://127.0.0.1:5000
@@ -60,7 +59,6 @@
 
 5. Testing
 
-    You are free to use whatever testing framework you like-the main thing is that you can show what tests you are using.
-
-    We also like to show how well we're testing, so there's a module called 
-    [coverage](https://coverage.readthedocs.io/en/coverage-5.1/) you should add to your project.
+    Pytest and pytest-flask have been installed with the file requirements.txt.
+    To run a test, open a terminal, move to the folder Python_Testing/, active the virtual environment and enter the command :  
+    `pytest -v`
