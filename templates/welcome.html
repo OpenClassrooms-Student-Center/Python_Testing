@@ -16,6 +16,17 @@
        </ul>
     {% endif%}
     Points available: {{club['points']}}
+        <br />
+        <ul>
+        {% for other_club in clubs%}
+            <h4>Other Clubs:</h4>
+        <li>
+            {{other_club['name']}}<br />
+            Number of points: {{other_club['points']}}
+        </li>
+        <hr />
+        {% endfor %}
+    </ul>
     <h3>Competitions:</h3>
     <ul>
         {% for comp in competitions%}
@@ -26,16 +37,6 @@
             {%if comp['numberOfPlaces']|int >0%}
             <a href="{{ url_for('book',competition=comp['name'],club=club['name']) }}">Book Places</a>
             {%endif%}
-        </li>
-        <hr />
-        {% endfor %}
-    </ul>
-        <h3>Other Clubs' points:</h3>
-    <ul>
-        {% for other_club in clubs%}
-        <li>
-            {{other_club['name']}}<br />
-            Number of points: {{other_club['points']}}
         </li>
         <hr />
         {% endfor %}

@@ -58,7 +58,7 @@ def book(competition,club):
                                competitions=competitions)
 
 
-@app.route('/purchasePlaces',methods=['POST'])
+@app.route('/purchasePlaces', methods=['POST'])
 def purchasePlaces():
     competition = [c for c in competitions if c['name'] ==
                    request.form['competition']][0]
@@ -75,19 +75,24 @@ def purchasePlaces():
                                competition=competition)
     else:
         if placesRequired <= int(club['points']):
-            if placesRequired <= 12:
-                competition['numberOfPlaces'] = \
-                    int(competition['numberOfPlaces'])-placesRequired
-                flash('Great-booking complete!')
-                club['points'] = int(club['points'])-placesRequired
-                return render_template('welcome.html',
-                                       club=club,
-                                       competitions=competitions)
-            elif placesRequired > 12:
-                flash('vous ne pouvez pas réserver plus de 12 places')
-                return render_template('booking.html',
-                                       club=club,
-                                       competition=competition)
+            if placesRequired <= int(competition['numberOfPlaces']):
+                if placesRequired <= 12:
+                    competition['numberOfPlaces'] = \
+                        int(competition['numberOfPlaces'])-placesRequired
+                    flash('Great-booking complete!')
+                    club['points'] = int(club['points'])-placesRequired
+                    return render_template('welcome.html',
+                                           club=club,
+                                           competitions=competitions)
+                elif placesRequired > 12:
+                    flash('vous ne pouvez pas réserver plus de 12 places')
+                    return render_template('booking.html',
+                                           club=club,
+                                           competition=competition)
+            flash('il ne reste pas assez de places pour cette competition')
+            return render_template('booking.html',
+                                   club=club,
+                                   competition=competition)
         elif placesRequired >= int(club['points']):
             flash('vous n\'avez pas assez de points')
             return render_template('booking.html',
