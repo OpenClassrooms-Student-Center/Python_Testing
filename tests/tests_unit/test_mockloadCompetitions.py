@@ -2,7 +2,7 @@ from Python_Testing import server
 
 def mockloadCompetitions():
     """
-    Mocks data loading from database
+    Mocks data loading from database, discounted after test_booking
     """
     list_of_competitions = [
         {
@@ -13,7 +13,7 @@ def mockloadCompetitions():
         {
             "name": "Fall Classic",
             "date": "2023-10-22 13:30:00",
-            "numberOfPlaces": "13"
+            "numberOfPlaces": 10
         }]
     return list_of_competitions
 

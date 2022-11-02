@@ -18,6 +18,7 @@ class MockRequest13places:
         data = {"form": self.form}
         return data
 
+
 class MockRequest12places:
     """
     Mocks Request Object
@@ -32,6 +33,7 @@ class MockRequest12places:
     def form_data(self):
         data = {"form": self.form}
         return data
+
 
 class MockRequest3places:
     """
@@ -48,6 +50,7 @@ class MockRequest3places:
         data = {"form": self.form}
         return data
 
+
 class MockRequestInThePast3places:
     """
     Mocks Request Object
@@ -63,9 +66,10 @@ class MockRequestInThePast3places:
         data = {"form": self.form}
         return data
 
+
 def mockloadCompetitions():
     """
-    Mocks data loading from database
+    Mocks data loading from database, discounted after test_booking
     """
     list_of_competitions = [
         {
@@ -76,13 +80,14 @@ def mockloadCompetitions():
         {
             "name": "Fall Classic",
             "date": "2023-10-22 13:30:00",
-            "numberOfPlaces": "13"
+            "numberOfPlaces": "10"
         }]
     return list_of_competitions
 
+
 def mockloadClubs():
     """
-    Mocks data loading from database
+    Mocks data loading from database, , discounted after test_booking
     """
     list_of_clubs = [
         {
@@ -102,9 +107,11 @@ def mockloadClubs():
 
     return list_of_clubs
 
+
 def mock_render_template(file_name, club, competitions=1, competition=1):
     return_list = [file_name, club, competitions, competition]
     return return_list
+
 
 def test_purchase_more_than_12_places_in_one_competition(monkeypatch):
 
@@ -131,6 +138,7 @@ def test_purchase_more_than_12_places_in_one_competition(monkeypatch):
 
     assert result[0] == expected_value[0]
 
+
 def test_purchase_more_than_clubs_remaining_places(monkeypatch):
 
     monkeypatch.setattr(server, 'loadClubs', mockloadClubs())
@@ -150,9 +158,10 @@ def test_purchase_more_than_clubs_remaining_places(monkeypatch):
 
     monkeypatch.setattr(server, 'flash', str)
 
-    expected_value = '4'
+    expected_value = 1
     result = purchasePlaces()
     assert result[1]['points'] == expected_value
+
 
 def test_points_number_update(monkeypatch):
 
@@ -200,11 +209,3 @@ def test_purchase_places_for_a_past_competition(monkeypatch):
     result = purchasePlaces()
 
     assert result[0] == expected_value[0]
-
-# def purchasePlaces():
-    # competition = [c for c in competitions if c['name'] == request.form['competition']][0]
-    # club = [c for c in clubs if c['name'] == request.form['club']][0]
-    # placesRequired = int(request.form['places'])
-    # competition['numberOfPlaces'] = int(competition['numberOfPlaces'])-placesRequired
-    # flash('Great-booking complete!')
-    # return render_template('welcome.html', club=club, competitions=competitions)

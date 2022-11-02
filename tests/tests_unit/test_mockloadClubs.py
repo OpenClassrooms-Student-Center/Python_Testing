@@ -3,7 +3,7 @@ from Python_Testing import server
 
 def mockloadClubs():
     """
-    Mocks data loading from database
+    Mocks data loading from database, discounted after test_booking
     """
     list_of_clubs = [
         {
@@ -14,7 +14,7 @@ def mockloadClubs():
         {
             "name": "Iron Temple",
             "email": "admin@irontemple.com",
-            "points": "4"
+            "points": 1
         },
         {"name": "She Lifts",
          "email": "kate@shelifts.co.uk",
