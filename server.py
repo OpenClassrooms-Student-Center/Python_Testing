@@ -22,8 +22,11 @@ def create_app(config):
 
     @app.route('/showSummary', methods=['POST'])
     def showSummary():
-        club = [club for club in load_json('clubs') if club['email'] == request.form['email']][0]
-        return render_template('welcome.html', club=club, competitions=load_json('competitions'))
+        club = [club for club in load_json('clubs') if club['email'] == request.form['email']]
+        if club:
+            return render_template('welcome.html', club=club[0], competitions=load_json('competitions'))
+        else:
+            return render_template('index.html', unknowed_email=request.form['email'])
 
     @app.route('/book/<competition>/<club>')
     def book(competition, club):
