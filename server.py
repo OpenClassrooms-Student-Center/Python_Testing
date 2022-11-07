@@ -3,13 +3,31 @@ from flask import Flask, render_template, request, redirect, flash, url_for
 
 
 def load_json(file_name):
+    """ Open the file database/file_name.json, extract and return a list of dicts
+        This list is itself in a dict, inside the field {file_name} """
     with open(f'database/{file_name}.json') as file:
         return json.load(file)[file_name]
 
 
 def save_json(file_name, data):
+    """ Open/create the file database/file_name.json with the list of dicts 'data'
+        This list will be saved in a dict, in the field {file_name} """
     with open(f'database/{file_name}.json', 'w') as file:
         json.dump({file_name: data}, file)
+
+
+def update_json(file_name, data):
+    """ Update an entry in the '/database/file_name.json
+        If the file already contains an entry with the field 'name', the latter will be erase.
+        Otherwise, it just adds 'data' and save the file. """
+    tab = load_json(file_name)
+    for entry in tab:
+        if entry['name'] == data['name']:
+            tab.remove(entry)
+            break
+
+    tab.insert(0, data)
+    save_json(file_name, tab)
 
 
 def create_app(config):

@@ -5,3 +5,5 @@ lib
 .Python
 .envrc
 __pycache__
+test_clubs.json
+test_competitions.json
