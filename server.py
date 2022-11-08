@@ -64,11 +64,15 @@ def create_app(config):
     def purchasePlaces():
         competition = [c for c in load_json('competitions') if c['name'] == request.form['competition']][0]
         club = [c for c in load_json('clubs') if c['name'] == request.form['club']][0]
-        placesRequired = int(request.form['places'])
 
         # Remove used points for competition and club
+        placesRequired = int(request.form['places'])
         competition['numberOfPlaces'] = int(competition['numberOfPlaces']) - placesRequired
         club['points'] = int(club['points']) - placesRequired
+
+        # Save
+        update_json('competitions', competition)
+        update_json('clubs', club)
 
         flash('Great-booking complete!')
         return render_template('welcome.html', club=club, competitions=load_json('competitions'))
