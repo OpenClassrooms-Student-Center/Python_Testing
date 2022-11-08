@@ -37,7 +37,7 @@ class MockedJson():
             json.dump({file_name: data}, file)
 
     @staticmethod
-    def generate_a_new_test_file(file_name, monkeypatch):
+    def generate_a_new_test_file(file_name):
         """ Use 'load_mocked_json()' and save data
             into a real file named '<test_file_name>.json' """
 
@@ -54,8 +54,8 @@ class TestJson:
 
     def test_save_clubs(self, monkeypatch):
 
-        # Create a new clubs test file, then monkeypatch, then monkeypatch the json functions
-        MockedJson.generate_a_new_test_file('clubs', monkeypatch)
+        # Create a new clubs test file, then monkeypatch the json functions
+        MockedJson.generate_a_new_test_file('clubs')
         MockedJson.monkeypatch_json_functions(monkeypatch)
 
         # Load the mocked list of clubs and add a new one
@@ -75,7 +75,7 @@ class TestJson:
 
     def test_save_competitions(self, monkeypatch):
 
-        MockedJson.generate_a_new_test_file('competitions', monkeypatch)
+        MockedJson.generate_a_new_test_file('competitions')
         MockedJson.monkeypatch_json_functions(monkeypatch)
 
         mocked_comp = server.load_json('competitions')
@@ -93,7 +93,7 @@ class TestJson:
     def test_update_a_club(self, monkeypatch):
 
         # Generate a test file with the mocked club, then monkeypatch the json functions
-        MockedJson.generate_a_new_test_file('clubs', monkeypatch)
+        MockedJson.generate_a_new_test_file('clubs')
         MockedJson.monkeypatch_json_functions(monkeypatch)
 
         # Take the first (and the only) entry and update it
@@ -111,7 +111,7 @@ class TestJson:
 
     def test_update_a_competition(self, monkeypatch):
 
-        MockedJson.generate_a_new_test_file('competitions', monkeypatch)
+        MockedJson.generate_a_new_test_file('competitions')
         MockedJson.monkeypatch_json_functions(monkeypatch)
 
         comp_to_update = server.load_json('competitions')[0]
@@ -128,7 +128,7 @@ class TestJson:
     def test_add_a_club(self, monkeypatch):
 
         # Generate a test file with the mocked club, then monkeypatch the json functions
-        MockedJson.generate_a_new_test_file('clubs', monkeypatch)
+        MockedJson.generate_a_new_test_file('clubs')
         MockedJson.monkeypatch_json_functions(monkeypatch)
 
         # Create and add a new club
@@ -143,7 +143,7 @@ class TestJson:
 
     def test_add_a_competition(self, monkeypatch):
 
-        MockedJson.generate_a_new_test_file('competitions', monkeypatch)
+        MockedJson.generate_a_new_test_file('competitions')
         MockedJson.monkeypatch_json_functions(monkeypatch)
 
         new_competition = {'name': 'new_competition', 'date': '1970-06-06 04:04:00', 'numberOfPlaces': '88'}
