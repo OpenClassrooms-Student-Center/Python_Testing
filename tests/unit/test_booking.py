@@ -6,8 +6,8 @@ class TestBooking:
     def test_connection(self, client, monkeypatch):
 
         # Create test files, then monkeypatch the json functions
-        MockedJson.generate_a_new_test_file('clubs', monkeypatch)
-        MockedJson.generate_a_new_test_file('competitions', monkeypatch)
+        MockedJson.generate_a_new_test_file('clubs')
+        MockedJson.generate_a_new_test_file('competitions')
         MockedJson.monkeypatch_json_functions(monkeypatch)
 
         # Connection
@@ -18,8 +18,8 @@ class TestBooking:
     def test_book_a_competition_ok(self, client, monkeypatch):
 
         # Create test files, then monkeypatch the json functions
-        MockedJson.generate_a_new_test_file('clubs', monkeypatch)
-        MockedJson.generate_a_new_test_file('competitions', monkeypatch)
+        MockedJson.generate_a_new_test_file('clubs')
+        MockedJson.generate_a_new_test_file('competitions')
         MockedJson.monkeypatch_json_functions(monkeypatch)
 
         response = client.post("/purchasePlaces", data={"competition": "name_test_competition",
