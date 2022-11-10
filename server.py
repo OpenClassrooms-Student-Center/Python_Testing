@@ -4,6 +4,7 @@ from flask import Flask, render_template, request, redirect, flash, url_for
 
 COMPETITION_PLACES_SUCCESFULLY_BOOKED_MESSAGE = "Great-booking complete!"
 NOT_ENOUGH_POINTS_MESSAGE = "Not enough points !"
+UNABLE_TO_BOOK_MORE_THAN_12_PLACES_MESSAGE = "You are unable to book more than 12 places!"
 
 
 def loadClubs():
@@ -63,13 +64,20 @@ def purchasePlaces():
     club_points = int(club["points"])
     number_of_competition_places = int(competition["numberOfPlaces"])
     placesRequired = int(request.form["places"])
+
     if placesRequired > club_points:
         flash(NOT_ENOUGH_POINTS_MESSAGE)
         return render_template("welcome.html", club=club, competitions=competitions)
+
     else:
-        competition["numberOfPlaces"] = number_of_competition_places - placesRequired
-        flash(COMPETITION_PLACES_SUCCESFULLY_BOOKED_MESSAGE)
-        return render_template("welcome.html", club=club, competitions=competitions)
+        if placesRequired > 12:
+            flash(UNABLE_TO_BOOK_MORE_THAN_12_PLACES_MESSAGE)
+            return render_template("welcome.html", club=club, competitions=competitions)
+
+        else:
+            competition["numberOfPlaces"] = number_of_competition_places - placesRequired
+            flash(COMPETITION_PLACES_SUCCESFULLY_BOOKED_MESSAGE)
+            return render_template("welcome.html", club=club, competitions=competitions)
 
 
 # TODO: Add route for points display
