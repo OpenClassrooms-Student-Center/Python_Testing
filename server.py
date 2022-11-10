@@ -1,10 +1,12 @@
 import json
 from flask import Flask, render_template, request, redirect, flash, url_for
+from datetime import datetime
 
 
 COMPETITION_PLACES_SUCCESFULLY_BOOKED_MESSAGE = "Great-booking complete!"
 NOT_ENOUGH_POINTS_MESSAGE = "Not enough points !"
 UNABLE_TO_BOOK_MORE_THAN_12_PLACES_MESSAGE = "You are unable to book more than 12 places!"
+PAST_COMPETITION_ERROR_MESSAGE = "You are unable to book places from past competitions !"
 
 
 def loadClubs():
@@ -46,10 +48,17 @@ def showSummary():
 def book(competition, club):
     foundClub = [c for c in clubs if c["name"] == club][0]
     foundCompetition = [c for c in competitions if c["name"] == competition][0]
+    competition_date = datetime.strptime(foundCompetition["date"], "%Y-%m-%d %H:%M:%S")
     if foundClub and foundCompetition:
-        return render_template(
-            "booking.html", club=foundClub, competition=foundCompetition
-        )
+        if competition_date > datetime.today():
+            return render_template(
+                "booking.html", club=foundClub, competition=foundCompetition
+            )
+        else:
+            flash(PAST_COMPETITION_ERROR_MESSAGE)
+            return render_template(
+                "welcome.html", club=foundClub, competitions=competitions
+            )
     else:
         flash("Something went wrong-please try again")
         return render_template("welcome.html", club=club, competitions=competitions)
