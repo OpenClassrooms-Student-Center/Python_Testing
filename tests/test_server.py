@@ -1,5 +1,5 @@
 from server import (COMPETITION_PLACES_SUCCESFULLY_BOOKED_MESSAGE,
-                    NOT_ENOUGH_POINTS_MESSAGE, clubs, competitions)
+                    NOT_ENOUGH_POINTS_MESSAGE, UNABLE_TO_BOOK_MORE_THAN_12_PLACES_MESSAGE, clubs, competitions)
 
 club_name = clubs[0]["name"]
 club_email = clubs[0]["email"]
@@ -27,7 +27,7 @@ def test_book_competition_places_with_enough_amount_of_points(client):
         data={
             "competition": competition_name,
             "club": club_name,
-            "places": club_points,
+            "places": 1,
         },
     )
 
@@ -49,3 +49,31 @@ def test_book_competition_places_with_not_enough_points(client):
 
     data = response.data.decode()
     assert NOT_ENOUGH_POINTS_MESSAGE in data
+
+
+def test_book_12_places_or_less(client):
+    response = client.post(
+        "/purchasePlaces",
+        data={
+            "competition": competition_name,
+            "club": club_name,
+            "places": 12,
+        },
+    )
+
+    data = response.data.decode()
+    assert COMPETITION_PLACES_SUCCESFULLY_BOOKED_MESSAGE in data
+
+
+def test_book_more_than_12_places(client):
+    response = client.post(
+        "/purchasePlaces",
+        data={
+            "competition": competition_name,
+            "club": club_name,
+            "places": 13,
+        },
+    )
+
+    data = response.data.decode()
+    assert UNABLE_TO_BOOK_MORE_THAN_12_PLACES_MESSAGE in data
