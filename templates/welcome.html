@@ -11,14 +11,7 @@
     <div class='content'>
         <h2>Welcome, {{club['email']}} </h2><a href="{{url_for('logout')}}">Logout</a>
 
-        {% with messages = get_flashed_messages() %}
-        {% if messages %}
-            <ul>
-           {% for message in messages %}
-                <li>{{ message }}</li>
-            {% endfor %}
-           </ul>
-        {% endif%}
+        {% include 'builtin/flash.html' %}
 
         Points available: {{ club['points'] }}
 
@@ -37,7 +30,6 @@
             <hr />
             {% endfor %}
         </ul>
-        {%endwith%}
     </div>
 
 {% endblock %}

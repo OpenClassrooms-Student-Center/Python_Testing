@@ -1,5 +1,11 @@
 import json
-from flask import Flask, render_template, request, redirect, flash, url_for
+from flask import (Flask,
+                   render_template,
+                   request,
+                   redirect,
+                   flash,
+                   url_for,
+                   get_flashed_messages)
 
 
 def load_json(file_name):
