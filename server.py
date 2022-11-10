@@ -30,6 +30,15 @@ def update_json(file_name, data):
     save_json(file_name, tab)
 
 
+def maximum_points_allowed(competition, club):
+    """ Return the maximum avaliable places for this club """
+
+    if int(competition['numberOfPlaces']) <= int(club['points']):
+        return competition['numberOfPlaces']
+    else:
+        return club['points']
+
+
 def create_app(config):
     app = Flask(__name__)
     app.secret_key = 'something_special'
@@ -49,13 +58,10 @@ def create_app(config):
         foundCompetition = [c for c in load_json('competitions') if c['name'] == competition][0]
         if foundClub and foundCompetition:
 
-            # Add a maximum for the number input
-            if int(foundCompetition['numberOfPlaces']) <= int(foundClub['points']):
-                maxi = foundCompetition['numberOfPlaces']
-            else:
-                maxi = foundClub['points']
-
-            return render_template('booking.html', club=foundClub, competition=foundCompetition, maximum_allowed=maxi)
+            return render_template('booking.html',
+                                   club=foundClub,
+                                   competition=foundCompetition,
+                                   maximum_allowed=maximum_points_allowed(foundCompetition, foundClub))
         else:
             flash("Something went wrong-please try again")
             return render_template('welcome.html', club=club, competitions=load_json('competitions'))
@@ -67,15 +73,22 @@ def create_app(config):
 
         # Remove used points for competition and club
         placesRequired = int(request.form['places'])
-        competition['numberOfPlaces'] = int(competition['numberOfPlaces']) - placesRequired
-        club['points'] = int(club['points']) - placesRequired
 
-        # Save
-        update_json('competitions', competition)
-        update_json('clubs', club)
+        if placesRequired <= int(maximum_points_allowed(competition, club)) and placesRequired > 0:
 
-        flash('Great-booking complete!')
-        return render_template('welcome.html', club=club, competitions=load_json('competitions'))
+            competition['numberOfPlaces'] = int(competition['numberOfPlaces']) - placesRequired
+            club['points'] = int(club['points']) - placesRequired
+
+            # Save
+            update_json('competitions', competition)
+            update_json('clubs', club)
+
+            flash('Great-booking complete!')
+            return render_template('welcome.html', club=club, competitions=load_json('competitions'))
+
+        else:
+            flash(f"You are allowed to book {maximum_points_allowed(competition, club)} places maximum")
+            return render_template('welcome.html', club=club, competitions=load_json('competitions'))
 
     # TODO: Add route for points display
 
