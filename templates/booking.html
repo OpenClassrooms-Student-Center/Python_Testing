@@ -10,6 +10,9 @@
 
     <div class='content'>
         <h2>{{competition['name']}}</h2>
+
+        {% include 'builtin/flash.html' %}
+
         Places available: {{competition['numberOfPlaces']}}
 
         <form action="/purchasePlaces" method="post">
