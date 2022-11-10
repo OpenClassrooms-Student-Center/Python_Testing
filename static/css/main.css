@@ -12,3 +12,21 @@ h1 {
     margin: 0 auto;
     width: 400px;
 }
+
+/* Messages */
+.flashes {
+    list-style-type: none;
+    font-weight: bold;
+    text-align: center;
+    padding: 0;
+}
+
+.flash_error {
+    color : red;
+}
+.flash_warning {
+    color : yellow;
+}
+.flash_info {
+    color : green;
+}
