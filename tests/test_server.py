@@ -106,3 +106,10 @@ def test_update_club_points_after_booking(client):
 
     data = response.data.decode()
     assert data.find(f"Points available: {club_points - booked_places}")
+
+
+# Display test
+def test_display_list_of_clubs(client):
+    response = client.get("/list_of_clubs")
+    data = response.data.decode()
+    assert club_name, club_points in data
