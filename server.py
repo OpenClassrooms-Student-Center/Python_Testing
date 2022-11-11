@@ -5,7 +5,7 @@ from datetime import datetime
 
 COMPETITION_PLACES_SUCCESFULLY_BOOKED_MESSAGE = "Great-booking complete!"
 NOT_ENOUGH_POINTS_MESSAGE = "Not enough points !"
-UNABLE_TO_BOOK_MORE_THAN_12_PLACES_MESSAGE = "You are unable to book more than 12 places!"
+UNABLE_TO_BOOK_MORE_THAN_12_PLACES_MESSAGE = "You are unable to book more than 12 places"
 PAST_COMPETITION_ERROR_MESSAGE = "You are unable to book places from past competitions !"
 
 
@@ -84,7 +84,9 @@ def purchasePlaces():
             return render_template("welcome.html", club=club, competitions=competitions)
 
         else:
+            club["points"] = club_points - placesRequired
             competition["numberOfPlaces"] = number_of_competition_places - placesRequired
+
             flash(COMPETITION_PLACES_SUCCESFULLY_BOOKED_MESSAGE)
             return render_template("welcome.html", club=club, competitions=competitions)
 
