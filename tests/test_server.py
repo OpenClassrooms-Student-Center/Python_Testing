@@ -1,7 +1,6 @@
 from server import (COMPETITION_PLACES_SUCCESFULLY_BOOKED_MESSAGE,
-                    NOT_ENOUGH_POINTS_MESSAGE, UNABLE_TO_BOOK_MORE_THAN_12_PLACES_MESSAGE,
-                    PAST_COMPETITION_ERROR_MESSAGE,
-                    clubs,
+                    NOT_ENOUGH_POINTS_MESSAGE, PAST_COMPETITION_ERROR_MESSAGE,
+                    UNABLE_TO_BOOK_MORE_THAN_12_PLACES_MESSAGE, clubs,
                     competitions)
 
 club_name = clubs[0]["name"]
@@ -79,7 +78,7 @@ def test_book_more_than_12_places(client):
     )
 
     data = response.data.decode()
-    assert UNABLE_TO_BOOK_MORE_THAN_12_PLACES_MESSAGE in data
+    assert data.find(UNABLE_TO_BOOK_MORE_THAN_12_PLACES_MESSAGE)
 
 
 def test_able_to_book_upcoming_competition(client):
@@ -92,3 +91,18 @@ def test_unable_to_book_past_competition(client):
     response = client.get(f"/book/{competitions[1]['name']}/{clubs[1]['name']}")
     data = response.data.decode()
     assert PAST_COMPETITION_ERROR_MESSAGE in data
+
+
+def test_update_club_points_after_booking(client):
+    booked_places = 5
+    response = client.post(
+        "/purchasePlaces",
+        data={
+            "competition": competition_name,
+            "club": club_name,
+            "places": booked_places,
+        },
+    )
+
+    data = response.data.decode()
+    assert data.find(f"Points available: {club_points - booked_places}")
