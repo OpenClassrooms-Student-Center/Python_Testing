@@ -1,7 +1,7 @@
 body, html {
+    background-color: #f3f4f7;
     margin: 0;
     font-family: sans-serif;
-    /* background-color: lightblue; */
 }
 
 h1 {
@@ -22,11 +22,11 @@ h1 {
 }
 
 .flash_error {
-    color : red;
+    color: #f85a40;
 }
 .flash_warning {
-    color : yellow;
+    color: #ffc845;
 }
 .flash_info {
-    color : green;
+    color: #30c39e;
 }

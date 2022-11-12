@@ -8,6 +8,9 @@ from flask import (Flask,
                    get_flashed_messages)
 
 
+MAXIMUM_POINTS_PER_COMP = 12
+
+
 def load_json(file_name):
     """ Open the file database/file_name.json, extract and return a list of dicts
         This list is itself in a dict, inside the field {file_name} """
@@ -37,15 +40,17 @@ def update_json(file_name, data):
 
 
 def maximum_points_allowed(competition, club):
-    """ Return the maximum avaliable places for this club """
+    """ Return the maximum avaliable places for this club and this competition """
 
-    if int(competition['numberOfPlaces']) <= int(club['points']):
-        return competition['numberOfPlaces']
-    else:
-        return club['points']
+    nb_authorised_places = MAXIMUM_POINTS_PER_COMP
+    if club['id'] in competition:
+        nb_authorised_places -= int(competition[club['id']])
+
+    return min(int(competition['numberOfPlaces']), int(club['points']), nb_authorised_places)
 
 
 def create_app(config):
+
     app = Flask(__name__)
     app.secret_key = 'something_special'
 
@@ -69,7 +74,7 @@ def create_app(config):
                                    competition=foundCompetition,
                                    maximum_allowed=maximum_points_allowed(foundCompetition, foundClub))
         else:
-            flash("Something went wrong-please try again")
+            flash("Something went wrong-please try again", 'flash_error')
             return render_template('welcome.html', club=club, competitions=load_json('competitions'))
 
     @app.route('/purchasePlaces', methods=['POST'])
@@ -77,24 +82,36 @@ def create_app(config):
         competition = [c for c in load_json('competitions') if c['name'] == request.form['competition']][0]
         club = [c for c in load_json('clubs') if c['name'] == request.form['club']][0]
 
-        # Remove used points for competition and club
-        placesRequired = int(request.form['places'])
+        try:
+            placesRequired = int(request.form['places'])
 
-        if placesRequired <= int(maximum_points_allowed(competition, club)) and placesRequired > 0:
+            if placesRequired > 0 and placesRequired <= int(maximum_points_allowed(competition, club)):
 
-            competition['numberOfPlaces'] = int(competition['numberOfPlaces']) - placesRequired
-            club['points'] = int(club['points']) - placesRequired
+                # Remove used points from club and competition
+                competition['numberOfPlaces'] = int(competition['numberOfPlaces']) - placesRequired
+                club['points'] = int(club['points']) - placesRequired
 
-            # Save
-            update_json('competitions', competition)
-            update_json('clubs', club)
+                # Also save the club id and its number of places to respect the limitation (MAXIMUM_POINTS_PER_COMP)
+                if club['id'] in competition:
+                    competition[club['id']] += placesRequired
+                else:
+                    competition[club['id']] = placesRequired
 
-            flash('Great-booking complete!')
-            return render_template('welcome.html', club=club, competitions=load_json('competitions'))
+                # Save
+                update_json('competitions', competition)
+                update_json('clubs', club)
 
-        else:
-            flash(f"You are allowed to book {maximum_points_allowed(competition, club)} places maximum")
-            return render_template('welcome.html', club=club, competitions=load_json('competitions'))
+                flash('Great-booking complete!', 'flash_green')
+                return render_template('welcome.html', club=club, competitions=load_json('competitions'))
+
+            else:
+                flash(f"You are allowed to book {maximum_points_allowed(competition, club)} places maximum",
+                      'flash_warning')
+
+        except ValueError:
+            flash('Invalid value', 'flash_error')
+
+        return render_template('welcome.html', club=club, competitions=load_json('competitions'))
 
     # TODO: Add route for points display
 
