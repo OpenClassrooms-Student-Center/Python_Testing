@@ -1,0 +1,29 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GUDLFT Board Club's points</title>
+</head>
+<body>
+    <h1> GUDLFT</h1>
+    <center>
+        <h2>Board of all Clubs's points</h2>
+        {% if all_clubs|length < 1 %}
+            <p> Sorry, this section has no clubs to display</p>
+        {%else%}
+            <table>
+                <tr>
+                    <th>Club name</th>
+                    <th>points available</th>
+                </tr>
+                {%for club in all_clubs %}
+                <tr>
+                    <td>{{club['name']}}</td>
+                    <td>{{club['points']}}</td>
+                </tr>
+                {%endfor%}
+            </table>
+        {%endif%}
+    </center>
+</body>
+</html>

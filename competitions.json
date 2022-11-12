@@ -9,6 +9,16 @@
             "name": "Fall Classic",
             "date": "2020-10-22 13:30:00",
             "numberOfPlaces": "13"
+        },
+        {
+            "name": "Winter Competition",
+            "date": "2022-12-01 14:00:00",
+            "numberOfPlaces": "8"
+        },
+        {
+            "name": "College League",
+            "date": "2023-01-15 11:35:00",
+            "numberOfPlaces": "78"
         }
     ]
 }
