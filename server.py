@@ -53,6 +53,7 @@ def create_app(config):
 
     app = Flask(__name__)
     app.secret_key = 'something_special'
+    app.jinja_env.globals['maximum_points_allowed'] = maximum_points_allowed
 
     @app.route('/')
     def index():
@@ -69,8 +70,8 @@ def create_app(config):
         foundCompetition = [c for c in load_json('competitions') if c['name'] == competition][0]
 
         maximum = maximum_points_allowed(foundCompetition, foundClub)
-        if maximum_points_allowed == 0:
-            flash("You cannot book a new place")
+        if maximum == 0:
+            flash("You cannot book a new place", "flash_warning")
 
         if foundClub and foundCompetition:
 
@@ -90,7 +91,10 @@ def create_app(config):
         try:
             placesRequired = int(request.form['places'])
 
-            if placesRequired > 0 and placesRequired <= int(maximum_points_allowed(competition, club)):
+            if placesRequired <= 0:
+                raise ValueError
+
+            elif placesRequired <= int(maximum_points_allowed(competition, club)):
 
                 # Remove used points from club and competition
                 competition['numberOfPlaces'] = int(competition['numberOfPlaces']) - placesRequired

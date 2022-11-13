@@ -26,19 +26,19 @@ class TestBookingLimits:
         # Competition : 41 places  | Club : 22 points | Booked : 0
         response = client.get('/book/name_test_competition/name_test_club')
         assert response.status_code == 200
-        assert 'min="0" max="12"' in response.text
+        assert 'min="1" max="12"' in response.text
 
         # Competition : 41 places  | Club : 5 points | Booked : 0
         response = client.get('/book/name_test_competition/name test club 2')
-        assert 'min="0" max="5"' in response.text
+        assert 'min="1" max="5"' in response.text
 
         # Competition : 8 places  | Club : 22 points | Booked : 2
         response = client.get('/book/name test competition 2/name_test_club')
-        assert 'min="0" max="8"' in response.text
+        assert 'min="1" max="8"' in response.text
 
         # Competition : 8 places  | Club : 5 points | Booked : 11
         response = client.get('/book/name test competition 2/name test club 2')
-        assert 'min="0" max="1"' in response.text
+        assert 'min="1" max="1"' in response.text
 
     def test_booking_ok(self, client, monkeypatch):
         """ Check a regular booking """
@@ -54,7 +54,7 @@ class TestBookingLimits:
         assert response.status_code == 200
         assert "Welcome, test@mail.com" in response.text
         assert "Points available: 17" in response.text
-        assert "Number of Places: 36" in response.text
+        assert "Remaining places: 36" in response.text
 
     def test_book_with_10000_places(self, client, monkeypatch):
 
@@ -63,7 +63,7 @@ class TestBookingLimits:
         MockedJson.monkeypatch_json_functions(monkeypatch)
 
         response = client.get('/book/name_test_competition/name test club 2')
-        assert 'min="0" max="5"' in response.text
+        assert 'min="1" max="5"' in response.text
 
         response = client.post("/purchasePlaces", data={"competition": "name_test_competition",
                                                         "club": "name test club 2",
@@ -72,7 +72,7 @@ class TestBookingLimits:
         assert response.status_code == 200
         assert "Welcome, test2@mail.com" in response.text
         assert "Points available: 5" in response.text
-        assert "Number of Places: 41" in response.text
+        assert "Remaining places: 41" in response.text
         assert "You are allowed to book 5 places maximum" in response.text
 
     def test_book_with_a_negative_number(self, client, monkeypatch):
@@ -88,8 +88,8 @@ class TestBookingLimits:
         assert response.status_code == 200
         assert "Welcome, test@mail.com" in response.text
         assert "Points available: 22" in response.text
-        assert "Number of Places: 41" in response.text
-        assert "You are allowed to book 12 places maximum" in response.text
+        assert "Remaining places: 41" in response.text
+        assert "Invalid value" in response.text
 
     def test_book_more_places_than_available(self, client, monkeypatch):
 
@@ -104,7 +104,7 @@ class TestBookingLimits:
                                                         "places": 10})
 
         assert "Points available: 22" in response.text
-        assert "Number of Places: 8" in response.text
+        assert "Remaining places: 8" in response.text
         assert "You are allowed to book 8 places maximum" in response.text
 
     def test_book_more_places_than_club_points(self, client, monkeypatch):
@@ -120,7 +120,7 @@ class TestBookingLimits:
                                                         "places": 10})
 
         assert "Points available: 5" in response.text
-        assert "Number of Places: 41" in response.text
+        assert "Remaining places: 41" in response.text
         assert "You are allowed to book 5 places maximum" in response.text
 
     def test_book_more_than_12_places_in_several_steps(self, client, monkeypatch):
@@ -136,7 +136,8 @@ class TestBookingLimits:
                                                         "places": 6})
 
         assert "Points available: 16" in response.text
-        assert "Number of Places: 35" in response.text
+        assert "Remaining places: 35" in response.text
+        assert "Already booked by your club: 6" in response.text
 
         # Competition : 35 places  | Club : 16 points | Booked : 6
         # Book 10 places will fail
@@ -145,7 +146,8 @@ class TestBookingLimits:
                                                         "places": 10})
 
         assert "Points available: 16" in response.text
-        assert "Number of Places: 35" in response.text
+        assert "Remaining places: 35" in response.text
+        assert "Already booked by your club: 6" in response.text
         assert "You are allowed to book 6 places maximum" in response.text
 
         # Competition : 35 places  | Club : 16 points | Booked : 6
@@ -155,7 +157,8 @@ class TestBookingLimits:
                                                         "places": 6})
 
         assert "Points available: 10" in response.text
-        assert "Number of Places: 29" in response.text
+        assert "Remaining places: 29" in response.text
+        assert "Already booked by your club: 12" in response.text
 
         # Competition : 29 places  | Club : 10 points | Booked : 12 (maximum)
         # Book 8 places (will fail)
@@ -164,5 +167,6 @@ class TestBookingLimits:
                                                         "places": 8})
 
         assert "Points available: 10" in response.text
-        assert "Number of Places: 29" in response.text
+        assert "Remaining places: 29" in response.text
+        assert "Already booked by your club: 12" in response.text
         assert "You are allowed to book 0 places maximum" in response.text
