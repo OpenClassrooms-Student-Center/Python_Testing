@@ -67,12 +67,17 @@ def create_app(config):
     def book(competition, club):
         foundClub = [c for c in load_json('clubs') if c['name'] == club][0]
         foundCompetition = [c for c in load_json('competitions') if c['name'] == competition][0]
+
+        maximum = maximum_points_allowed(foundCompetition, foundClub)
+        if maximum_points_allowed == 0:
+            flash("You cannot book a new place")
+
         if foundClub and foundCompetition:
 
             return render_template('booking.html',
                                    club=foundClub,
                                    competition=foundCompetition,
-                                   maximum_allowed=maximum_points_allowed(foundCompetition, foundClub))
+                                   maximum_allowed=maximum)
         else:
             flash("Something went wrong-please try again", 'flash_error')
             return render_template('welcome.html', club=club, competitions=load_json('competitions'))
@@ -101,7 +106,7 @@ def create_app(config):
                 update_json('competitions', competition)
                 update_json('clubs', club)
 
-                flash('Great-booking complete!', 'flash_green')
+                flash('Great-booking complete!', 'flash_info')
                 return render_template('welcome.html', club=club, competitions=load_json('competitions'))
 
             else:
