@@ -102,7 +102,7 @@ def create_app(config):
 
                 # Also save the club id and its number of places to respect the limitation (MAXIMUM_POINTS_PER_COMP)
                 if club['id'] in competition:
-                    competition[club['id']] += placesRequired
+                    competition[club['id']] = int(competition[club['id']]) + placesRequired
                 else:
                     competition[club['id']] = placesRequired
 

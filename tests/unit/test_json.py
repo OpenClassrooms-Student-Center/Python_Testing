@@ -23,7 +23,7 @@ class MockedJson():
                      "date": "2020-03-27 10:00:00",
                      "numberOfPlaces": "41"},
                     {"name": "name test competition 2",
-                     "date": "2023-01-01 10:00:00",
+                     "date": "2025-01-01 10:00:00",
                      "numberOfPlaces": "8",
                      "2": "11",  # 11 places booked by the club 2
                      "1": "2"}]
