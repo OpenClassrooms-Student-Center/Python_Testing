@@ -75,7 +75,7 @@ class TestBookingLimits:
         assert "Remaining places: 41" in response.text
         assert "You are allowed to book 5 places maximum" in response.text
 
-    def test_book_with_a_negative_number(self, client, monkeypatch):
+    def test_book_with_a_negative_number_or_text(self, client, monkeypatch):
 
         MockedJson.generate_a_new_test_file('clubs')
         MockedJson.generate_a_new_test_file('competitions')
@@ -89,6 +89,20 @@ class TestBookingLimits:
         assert "Welcome, test@mail.com" in response.text
         assert "Points available: 22" in response.text
         assert "Remaining places: 41" in response.text
+        assert "Invalid value" in response.text
+
+        response = client.post("/purchasePlaces", data={"competition": "name_test_competition",
+                                                        "club": "name_test_club",
+                                                        "places": ""})
+
+        assert response.status_code == 200
+        assert "Invalid value" in response.text
+
+        response = client.post("/purchasePlaces", data={"competition": "name_test_competition",
+                                                        "club": "name_test_club",
+                                                        "places": "aaaaaa"})
+
+        assert response.status_code == 200
         assert "Invalid value" in response.text
 
     def test_book_more_places_than_available(self, client, monkeypatch):
