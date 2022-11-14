@@ -1,4 +1,5 @@
 import json
+from datetime import datetime
 from flask import (Flask,
                    render_template,
                    request,
@@ -49,11 +50,18 @@ def maximum_points_allowed(competition, club):
     return min(int(competition['numberOfPlaces']), int(club['points']), nb_authorised_places)
 
 
+def is_competition_pass_the_deadline(comp):
+    """ Return true if the competition datetime is inferior than the current datetime """
+
+    return datetime.fromisoformat(comp['date']) < datetime.now()
+
+
 def create_app(config):
 
     app = Flask(__name__)
     app.secret_key = 'something_special'
     app.jinja_env.globals['maximum_points_allowed'] = maximum_points_allowed
+    app.jinja_env.globals['is_competition_pass_the_deadline'] = is_competition_pass_the_deadline
 
     @app.route('/')
     def index():
@@ -91,7 +99,10 @@ def create_app(config):
         try:
             placesRequired = int(request.form['places'])
 
-            if placesRequired <= 0:
+            if is_competition_pass_the_deadline(competition):
+                flash(f"This competition is closed {competition['date']}", 'flash_warning')
+
+            elif placesRequired <= 0:
                 raise ValueError
 
             elif placesRequired <= int(maximum_points_allowed(competition, club)):

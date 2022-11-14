@@ -9,24 +9,39 @@ class MockedJson():
         """ Used to mock load_json() by returning a false list with one dict (a club or a competition) """
 
         if 'clubs' in file_name:
-            return [{"id": "1",
+            return [{
+                     "id": "1",
                      "name": "name_test_club",
                      "email": "test@mail.com",
-                     "points": "22"},
-                    {"id": "2",
+                     "points": "22"
+                    },
+                    {
+                     "id": "2",
                      "name": "name test club 2",
                      "email": "test2@mail.com",
-                     "points": "5"}]
+                     "points": "5"
+                     }]
 
         elif 'competitions' in file_name:
-            return [{"name": "name_test_competition",
-                     "date": "2020-03-27 10:00:00",
-                     "numberOfPlaces": "41"},
-                    {"name": "name test competition 2",
+            return [{
+                     "name": "name_test_competition",
+                     "date": "2027-03-27 10:00:00",
+                     "numberOfPlaces": "41"
+                     },
+                    {
+                     "name": "name test competition 2",
                      "date": "2025-01-01 10:00:00",
                      "numberOfPlaces": "8",
                      "2": "11",  # 11 places booked by the club 2
-                     "1": "2"}]
+                     "1": "2"
+                     },
+                    {
+                     "name": "name_test_competition_3",
+                     "date": "2020-05-05 10:00:00",
+                     "numberOfPlaces": "15",
+                     "2": "3",
+                     "1": "9"
+                     }]
         else:
             return []
 
