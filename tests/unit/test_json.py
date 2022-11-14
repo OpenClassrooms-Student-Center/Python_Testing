@@ -16,7 +16,11 @@ class MockedJson():
                     {"id": "2",
                      "name": "name test club 2",
                      "email": "test2@mail.com",
-                     "points": "5"}]
+                     "points": "5"},
+                    {"id": "3",
+                     "name": "name_test_club_3",
+                     "email": "test3@mail.com",
+                     "points": "0"}]
 
         elif 'competitions' in file_name:
             return [{"name": "name_test_competition",
@@ -26,7 +30,12 @@ class MockedJson():
                      "date": "2023-01-01 10:00:00",
                      "numberOfPlaces": "8",
                      "2": "11",  # 11 places booked by the club 2
-                     "1": "2"}]
+                     "1": "2"},
+                    {"name": "name_test_competition_3",
+                     "date": "2023-05-05 10:00:00",
+                     "numberOfPlaces": "14",
+                     "1": 12,
+                     "2": 4}]
         else:
             return []
 
