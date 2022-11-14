@@ -27,7 +27,7 @@ class TestBookingDates:
         MockedJson.monkeypatch_json_functions(monkeypatch)
 
         # Competition : 15 places  | Club : 22 points | Booked : 17 | Date limit : 2020-03-27 10:00:00
-        response = client.post("/purchasePlaces", data={"competition": "name_test_competition_3",
+        response = client.post("/purchasePlaces", data={"competition": "name_test_competition_4",
                                                         "club": "name_test_club",
                                                         "places": 2})
 
