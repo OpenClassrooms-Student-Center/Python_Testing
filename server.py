@@ -56,6 +56,17 @@ def is_competition_pass_the_deadline(comp):
     return datetime.fromisoformat(comp['date']) < datetime.now()
 
 
+def find_or_raise(json, name):
+
+    """ load the mentioned json and return the first entry with 'name'
+        Raise a NameError if not found """
+    list_elem = [e for e in load_json(json) if e['name'] == name]
+
+    if list_elem:
+        return list_elem[0]
+    else:
+        raise NameError
+
 def create_app(config):
 
     app = Flask(__name__)
@@ -63,12 +74,14 @@ def create_app(config):
     app.jinja_env.globals['maximum_points_allowed'] = maximum_points_allowed
     app.jinja_env.globals['is_competition_pass_the_deadline'] = is_competition_pass_the_deadline
 
+
     @app.route('/')
     def index():
         return render_template('index.html')
 
     @app.route('/showSummary', methods=['POST'])
     def show_summary():
+
         clubs = [club for club in load_json('clubs') if club['email'] == request.form['email']]
         if clubs:
             return redirect(url_for('show_competitions', club=clubs[0]['name']))
@@ -78,79 +91,97 @@ def create_app(config):
 
     @app.route('/showCompetitions/<club>')
     def show_competitions(club):
-        found_club = [c for c in load_json('clubs') if c['name'] == club][0]
-        return render_template('welcome.html', club=found_club, competitions=load_json('competitions'))
+
+        try:
+            found_club = find_or_raise('clubs', club)
+            return render_template('welcome.html', club=found_club, competitions=load_json('competitions'))
+
+        except NameError:
+            flash(f"Sorry, '{club}' wasn't found", "flash_error")
+            return redirect(url_for('index'))
 
     @app.route('/book/<competition>/<club>')
     def book(competition, club):
-        foundClub = [c for c in load_json('clubs') if c['name'] == club][0]
-        foundCompetition = [c for c in load_json('competitions') if c['name'] == competition][0]
 
-        maximum = maximum_points_allowed(foundCompetition, foundClub)
-        if maximum == 0:
-            flash("You cannot book a new place", "flash_warning")
+        try:
+            found_competition = find_or_raise('competitions', competition)
+            found_club = find_or_raise('clubs', club)
 
-        if foundClub and foundCompetition:
+            maximum = maximum_points_allowed(found_competition, found_club)
+            if maximum == 0:
+                flash("You cannot book a new place", "flash_warning")
 
             return render_template('booking.html',
-                                   club=foundClub,
-                                   competition=foundCompetition,
+                                   club=found_club,
+                                   competition=found_competition,
                                    maximum_allowed=maximum)
-        else:
-            flash("Something went wrong-please try again", 'flash_error')
-            return render_template('welcome.html', club=club, competitions=load_json('competitions'))
+
+        except NameError:
+            flash(f"Sorry, '{club}' or '{competition}' wasn't found", "flash_error")
+            return redirect(url_for('index'))
 
     @app.route('/purchasePlaces', methods=['POST'])
     def purchase_places():
-        competition = [c for c in load_json('competitions') if c['name'] == request.form['competition']][0]
-        club = [c for c in load_json('clubs') if c['name'] == request.form['club']][0]
 
         try:
-            placesRequired = int(request.form['places'])
+            found_comp = find_or_raise('competitions', request.form['competition'])
+            found_club = find_or_raise('clubs', request.form['club'])
 
-            if is_competition_pass_the_deadline(competition):
-                flash(f"This competition is closed {competition['date']}", 'flash_warning')
+            try:
+                placesRequired = int(request.form['places'])
 
-            elif placesRequired <= 0:
-                raise ValueError
+                if is_competition_pass_the_deadline(found_comp):
+                    flash(f"This competition is closed {found_comp['date']}", 'flash_warning')
 
-            elif placesRequired <= int(maximum_points_allowed(competition, club)):
+                elif placesRequired <= 0:
+                    raise ValueError
 
-                # Remove used points from club and competition
-                competition['numberOfPlaces'] = int(competition['numberOfPlaces']) - placesRequired
-                club['points'] = int(club['points']) - placesRequired
+                elif placesRequired <= int(maximum_points_allowed(found_comp, found_club)):
 
-                # Also save the club id and its number of places to respect the limitation (MAXIMUM_POINTS_PER_COMP)
-                if club['id'] in competition:
-                    competition[club['id']] = int(competition[club['id']]) + placesRequired
+                    # Remove used points from club and competition
+                    found_comp['numberOfPlaces'] = int(found_comp['numberOfPlaces']) - placesRequired
+                    found_club['points'] = int(found_club['points']) - placesRequired
+
+                    # Also save the club id and its number of places to respect the limits (MAXIMUM_POINTS_PER_COMP)
+                    if found_club['id'] in found_comp:
+                        found_comp[found_club['id']] = int(found_comp[found_club['id']]) + placesRequired
+                    else:
+                        found_comp[found_club['id']] = placesRequired
+
+                    # Save
+                    update_json('competitions', found_comp)
+                    update_json('clubs', found_club)
+
+                    flash('Great-booking complete!', 'flash_info')
+                    return render_template('welcome.html', club=found_club, competitions=load_json('competitions'))
+
                 else:
-                    competition[club['id']] = placesRequired
+                    flash(f"You are allowed to book {maximum_points_allowed(found_comp, found_club)} places maximum",
+                          'flash_warning')
 
-                # Save
-                update_json('competitions', competition)
-                update_json('clubs', club)
+            except ValueError:
+                flash('Invalid value', 'flash_error')
 
-                flash('Great-booking complete!', 'flash_info')
-                return render_template('welcome.html', club=club, competitions=load_json('competitions'))
+            return render_template('welcome.html', club=found_club, competitions=load_json('competitions'))
 
-            else:
-                flash(f"You are allowed to book {maximum_points_allowed(competition, club)} places maximum",
-                      'flash_warning')
-
-        except ValueError:
-            flash('Invalid value', 'flash_error')
-
-        return render_template('welcome.html', club=club, competitions=load_json('competitions'))
+        except NameError:
+            flash(f"Sorry, '{request.form['competition']}' or '{request.form['club']}' wasn't found", "flash_error")
+            return redirect(url_for('index'))
 
     @app.route('/show_clubs/<club>')
     def show_clubs(club):
 
-        # load clubs and sort them by name
-        clubs = load_json('clubs')
-        clubs.sort(key=lambda club: club['name'].lower())
+        try:
+            # load clubs and sort them by name
+            clubs = load_json('clubs')
+            clubs.sort(key=lambda club: club['name'].lower())
 
-        foundClub = [c for c in clubs if c['name'] == club][0]
-        return render_template('clubs.html', clubs=clubs, club=foundClub)
+            found_club = find_or_raise('clubs', club)
+            return render_template('clubs.html', clubs=clubs, club=found_club)
+
+        except NameError:
+            flash(f"Sorry, '{club}' or wasn't found", "flash_error")
+            return redirect(url_for('index'))
 
     @app.route('/logout')
     def logout():
