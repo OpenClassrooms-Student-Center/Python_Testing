@@ -68,13 +68,18 @@ def create_app(config):
         return render_template('index.html')
 
     @app.route('/showSummary', methods=['POST'])
-    def showSummary():
-        club = [club for club in load_json('clubs') if club['email'] == request.form['email']]
-        if club:
-            return render_template('welcome.html', club=club[0], competitions=load_json('competitions'))
+    def show_summary():
+        clubs = [club for club in load_json('clubs') if club['email'] == request.form['email']]
+        if clubs:
+            return redirect(url_for('show_competitions', club=clubs[0]['name']))
         else:
             flash(f"Sorry, '{request.form['email']}' wasn't found", "flash_error")
             return render_template('index.html')
+
+    @app.route('/showCompetitions/<club>')
+    def show_competitions(club):
+        found_club = [c for c in load_json('clubs') if c['name'] == club][0]
+        return render_template('welcome.html', club=found_club, competitions=load_json('competitions'))
 
     @app.route('/book/<competition>/<club>')
     def book(competition, club):
@@ -137,13 +142,15 @@ def create_app(config):
 
         return render_template('welcome.html', club=club, competitions=load_json('competitions'))
 
-    @app.route('/show_clubs')
-    def show_clubs():
+    @app.route('/show_clubs/<club>')
+    def show_clubs(club):
+
         # load clubs and sort them by name
         clubs = load_json('clubs')
         clubs.sort(key=lambda club: club['name'].lower())
 
-        return render_template('clubs.html', clubs=clubs)
+        foundClub = [c for c in clubs if c['name'] == club][0]
+        return render_template('clubs.html', clubs=clubs, club=foundClub)
 
     @app.route('/logout')
     def logout():

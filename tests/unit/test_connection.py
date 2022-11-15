@@ -30,7 +30,7 @@ class TestLoginClass:
         MockedJson.generate_a_new_test_file('clubs')
         MockedJson.monkeypatch_json_functions(monkeypatch)
 
-        response = client.post("/showSummary", data={"email": "test@mail.com"})
+        response = client.post("/showSummary", data={"email": "test@mail.com"}, follow_redirects=True)
 
         assert response.status_code == 200
         assert "Welcome, test@mail.com" in response.text

@@ -1,0 +1,10 @@
+<div class="navbar">
+    <span>
+        <a href="{{ url_for('logout') }}">Logout</a>
+    </span>
+    <span>
+        <!-- <a href="javascript:history.back()">Back</a> -->
+        <a href="{{ url_for('show_competitions', club=club['name']) }}">Competitions</a>
+        <a href="{{ url_for('show_clubs', club=club['name']) }}">Clubs</a>
+    </span>
+</div>

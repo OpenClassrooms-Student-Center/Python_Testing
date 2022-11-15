@@ -8,6 +8,8 @@
 
 {% block body %}
 
+    {% include 'builtin/navbar.html' %}
+
     <div class='content'>
         <h2>{{ competition['name'] }}</h2>
 
@@ -29,8 +31,6 @@
             <label for="places">How many places? </label><input type="number" name="places" value="1" min="1" max="{{ maximum_allowed }}"/>
             <button type="submit">Book</button>
         </form>
-
-        <p><a href="javascript:history.back()">Cancel</a></p>
     </div>
 
 {% endblock %}

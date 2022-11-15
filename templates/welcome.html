@@ -7,11 +7,10 @@
 
 
 {% block body %}
+    {% include 'builtin/navbar.html' %}
 
     <div class='content'>
         <h2>Welcome, {{ club['email'] }} </h2>
-        <p><a href="{{ url_for('logout') }}">Logout</a></p>
-        <p><a href="{{ url_for('show_clubs') }}">Clubs</a></p>
 
         {% include 'builtin/flash.html' %}
 

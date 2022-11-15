@@ -36,7 +36,7 @@ class TestUI:
         MockedJson.monkeypatch_json_functions(monkeypatch)
 
         # Club 1 : already booked 12 in the third competition
-        response = client.post("/showSummary", data={"email": "test@mail.com"})
+        response = client.get("/showCompetitions/name_test_club")
 
         assert response.status_code == 200
         assert '<a href="/book/name_test_competition/name_test_club">Book Places</a>' in response.text
@@ -44,7 +44,7 @@ class TestUI:
         assert '<a href="/book/name_test_competition_3/name_test_club">Book Places</a>' not in response.text
 
         # Club 2 : all competitions are available
-        response = client.post("/showSummary", data={"email": "test2@mail.com"})
+        response = client.get("/showCompetitions/name%20test%20club%202")
 
         assert response.status_code == 200
         assert '<a href="/book/name_test_competition/name%20test%20club%202">Book Places</a>' in response.text
@@ -52,7 +52,7 @@ class TestUI:
         assert '<a href="/book/name_test_competition_3/name%20test%20club%202">Book Places</a>' in response.text
 
         # Club 3 : 0 point left, no link displayed
-        response = client.post("/showSummary", data={"email": "test3@mail.com"})
+        response = client.get("/showCompetitions/name_test_club_3")
 
         assert response.status_code == 200
         assert '<a href="/book/name_test_competition/name_test_club_3">Book Places</a>' not in response.text
@@ -66,7 +66,7 @@ class TestUI:
         MockedJson.generate_a_new_test_file('competitions')
         MockedJson.monkeypatch_json_functions(monkeypatch)
 
-        response = client.post("/showSummary", data={"email": "test@mail.com"})
+        response = client.get("/showCompetitions/name_test_club")
 
         assert response.status_code == 200
         assert '<a href="/book/name_test_competition/name_test_club">Book Places</a>' in response.text
