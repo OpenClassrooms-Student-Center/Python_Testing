@@ -36,17 +36,3 @@ class TestBookingDates:
         assert "Points available: 22" in response.text
         assert "Remaining places: 15" in response.text
         assert "This competition is closed" in response.text
-
-    def test_check_booking_links(self, client, monkeypatch):
-        """ The third competition is passed, it has to be displayed, without the link to book though. """
-
-        MockedJson.generate_a_new_test_file('clubs')
-        MockedJson.generate_a_new_test_file('competitions')
-        MockedJson.monkeypatch_json_functions(monkeypatch)
-
-        response = client.post("/showSummary", data={"email": "test@mail.com"})
-
-        assert response.status_code == 200
-        assert '<a href="/book/name_test_competition/name_test_club">Book Places</a>' in response.text
-        assert '<a href="/book/name%20test%20competition%202/name_test_club">Book Places</a>' in response.text
-        assert '<a href="/book/name_test_competition_3/name_test_club">Book Places</a>' not in response.text
