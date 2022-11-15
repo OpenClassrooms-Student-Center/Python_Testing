@@ -15,7 +15,15 @@ class TestLoginClass:
 
         assert response.status_code == 200
         assert "Welcome to the GUDLFT" in response.text
-        assert "Sorry, wrong@wrong.co wasn't found" in response.text
+        assert "Sorry, &#39;wrong@wrong.co&#39; wasn&#39;t found" in response.text
+
+    def test_login_with_empty_field(self, client, monkeypatch):
+
+        response = client.post("/showSummary", data={"email": ""})
+
+        assert response.status_code == 200
+        assert "Welcome to the GUDLFT" in response.text
+        assert "Sorry, &#39;&#39; wasn&#39;t found" in response.text
 
     def test_login_success(self, client, monkeypatch):
 

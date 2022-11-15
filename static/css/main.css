@@ -1,14 +1,38 @@
 body, html {
+    background-color: #f3f4f7;
     margin: 0;
     font-family: sans-serif;
-    /* background-color: lightblue; */
 }
 
-h1 {
+h1, h2 {
     text-align: center;
 }
 
 .content {
     margin: 0 auto;
     width: 400px;
+}
+
+.list_comp, .list_clubs{
+    list-style-type: none;
+    text-align: center;
+    padding: 0;
+}
+
+/* Messages */
+.flashes {
+    list-style-type: none;
+    font-weight: bold;
+    text-align: center;
+    padding: 0;
+}
+
+.flash_error {
+    color: #f85a40;
+}
+.flash_warning {
+    color: #ffc845;
+}
+.flash_info {
+    color: #30c39e;
 }

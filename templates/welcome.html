@@ -9,35 +9,34 @@
 {% block body %}
 
     <div class='content'>
-        <h2>Welcome, {{club['email']}} </h2><a href="{{url_for('logout')}}">Logout</a>
+        <h2>Welcome, {{ club['email'] }} </h2>
+        <p><a href="{{ url_for('logout') }}">Logout</a></p>
+        <p><a href="{{ url_for('show_clubs') }}">Clubs</a></p>
 
-        {% with messages = get_flashed_messages() %}
-        {% if messages %}
-            <ul>
-           {% for message in messages %}
-                <li>{{ message }}</li>
-            {% endfor %}
-           </ul>
-        {% endif%}
+        {% include 'builtin/flash.html' %}
 
-        Points available: {{ club['points'] }}
+        <p>Points available: {{ club['points'] }}</p>
 
         <h3>Competitions:</h3>
-        <ul>
-            {% for comp in competitions%}
+        <ul class="list_comp">
+            {% for comp in competitions %}
             <li>
-                {{comp['name']}}<br />
-                Date: {{comp['date']}}</br>
-                Number of Places: {{comp['numberOfPlaces']}}
+                <ul class="list_comp">
+                    <li><b>{{ comp['name'] }}</b></li>
+                    <li>Date: {{ comp['date'] }}</li>
+                    <li>Remaining places: {{ comp['numberOfPlaces'] }}</li>
+                {% if club['id'] in comp %}
+                    <li>Already booked by your club: {{ comp[club['id']] }}</li>
+                {% endif %}
 
-                {%if comp['numberOfPlaces']|int > 0%}
-                    <a href="{{ url_for('book',competition=comp['name'],club=club['name']) }}">Book Places</a>
-                {%endif%}
+                {% if not is_competition_pass_the_deadline(comp) and maximum_points_allowed(comp, club) > 0 %}
+                    <li><a href="{{ url_for('book',competition=comp['name'],club=club['name']) }}">Book Places</a></li>
+                {% endif %}
+                </ul>
             </li>
             <hr />
             {% endfor %}
         </ul>
-        {%endwith%}
     </div>
 
 {% endblock %}

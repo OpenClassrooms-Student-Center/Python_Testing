@@ -9,14 +9,46 @@ class MockedJson():
         """ Used to mock load_json() by returning a false list with one dict (a club or a competition) """
 
         if 'clubs' in file_name:
-            return [{"name": "name_test_club",
+            return [{
+                     "id": "1",
+                     "name": "name_test_club",
                      "email": "test@mail.com",
-                     "points": "22"}]
+                     "points": "22"
+                    }, {
+                     "id": "2",
+                     "name": "name test club 2",
+                     "email": "test2@mail.com",
+                     "points": "5"
+                    }, {
+                     "id": "3",
+                     "name": "name_test_club_3",
+                     "email": "test3@mail.com",
+                     "points": "0"}]
 
         elif 'competitions' in file_name:
-            return [{"name": "name_test_competition",
-                     "date": "2020-03-27 10:00:00",
-                     "numberOfPlaces": "41"}]
+            return [{
+                     "name": "name_test_competition",
+                     "date": "2027-03-27 10:00:00",
+                     "numberOfPlaces": "41"
+                    }, {
+                     "name": "name test competition 2",
+                     "date": "2025-01-01 10:00:00",
+                     "numberOfPlaces": "8",
+                     "2": "11",  # 11 places booked by the club 2
+                     "1": "2"
+                    }, {
+                     "name": "name_test_competition_3",
+                     "date": "2023-05-05 10:00:00",
+                     "numberOfPlaces": "14",
+                     "1": 12,
+                     "2": 4
+                    }, {
+                     "name": "name_test_competition_4",
+                     "date": "2020-05-05 10:00:00",
+                     "numberOfPlaces": "15",
+                     "2": "3",
+                     "1": "9"
+                    }]
         else:
             return []
 
@@ -51,6 +83,7 @@ class MockedJson():
 
 
 class TestJson:
+    """ These tests are focus on the json database only """
 
     def test_save_clubs(self, monkeypatch):
 
@@ -70,8 +103,8 @@ class TestJson:
 
         assert clubs[0]['name'] == "name_test_club"
         assert clubs[0]['points'] == "22"
-        assert clubs[1]['name'] == "Super_Club"
-        assert clubs[1]['points'] == "555"
+        assert clubs[len(clubs) - 1]['name'] == "Super_Club"
+        assert clubs[len(clubs) - 1]['points'] == "555"
 
     def test_save_competitions(self, monkeypatch):
 
@@ -86,9 +119,9 @@ class TestJson:
 
         assert competitions[0]['name'] == "name_test_competition"
         assert competitions[0]['numberOfPlaces'] == "41"
-        assert competitions[1]['name'] == "Super_Competition"
-        assert competitions[1]['date'] == "1985-01-01 07:00:00"
-        assert competitions[1]['numberOfPlaces'] == "5000"
+        assert competitions[len(competitions) - 1]['name'] == "Super_Competition"
+        assert competitions[len(competitions) - 1]['date'] == "1985-01-01 07:00:00"
+        assert competitions[len(competitions) - 1]['numberOfPlaces'] == "5000"
 
     def test_update_a_club(self, monkeypatch):
 
@@ -96,7 +129,7 @@ class TestJson:
         MockedJson.generate_a_new_test_file('clubs')
         MockedJson.monkeypatch_json_functions(monkeypatch)
 
-        # Take the first (and the only) entry and update it
+        # Take the first entry and update it
         club_to_update = server.load_json('clubs')[0]
         club_to_update['email'] = 'updated@mail.com'
         club_to_update['points'] = '10000'
