@@ -68,7 +68,7 @@ def create_app(config):
         return render_template('index.html')
 
     @app.route('/showSummary', methods=['POST'])
-    def showSummary():
+    def show_summary():
         club = [club for club in load_json('clubs') if club['email'] == request.form['email']][0]
         return render_template('welcome.html', club=club, competitions=load_json('competitions'))
 
@@ -92,7 +92,7 @@ def create_app(config):
             return render_template('welcome.html', club=club, competitions=load_json('competitions'))
 
     @app.route('/purchasePlaces', methods=['POST'])
-    def purchasePlaces():
+    def purchase_places():
         competition = [c for c in load_json('competitions') if c['name'] == request.form['competition']][0]
         club = [c for c in load_json('clubs') if c['name'] == request.form['club']][0]
 
@@ -133,7 +133,13 @@ def create_app(config):
 
         return render_template('welcome.html', club=club, competitions=load_json('competitions'))
 
-    # TODO: Add route for points display
+    @app.route('/show_clubs')
+    def show_clubs():
+        # load clubs and sort them by name
+        clubs = load_json('clubs')
+        clubs.sort(key=lambda club: club['name'].lower())
+
+        return render_template('clubs.html', clubs=clubs)
 
     @app.route('/logout')
     def logout():

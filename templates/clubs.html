@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+
+{% block head %}
+    <title>List of clubs || GUDLFT</title>
+{% endblock %}
+
+
+{% block body %}
+
+    <div class='content'>
+        <h2>List of clubs</h2>
+        <p><a href="javascript:history.back()">Quit</a></p>
+
+        {% include 'builtin/flash.html' %}
+
+        <ul class="list_clubs">
+            {% for club in clubs %}
+            <li>
+                <ul class="list_comp">
+                    <li><b>{{ club['name'] }}</b></li>
+                    <li>{{ club['email'] }}</li>
+                    <li>Points: {{ club['points'] }}</li>
+                </ul>
+            </li>
+            <hr />
+            {% endfor %}
+        </ul>
+    </div>
+
+{% endblock %}

@@ -13,7 +13,7 @@ h1, h2 {
     width: 400px;
 }
 
-.list_comp {
+.list_comp, .list_clubs{
     list-style-type: none;
     text-align: center;
     padding: 0;
