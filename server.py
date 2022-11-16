@@ -57,8 +57,7 @@ def is_competition_pass_the_deadline(comp):
 
 
 def find_or_raise(json, name):
-
-    """ load the mentioned json and return the first entry with 'name'
+    """ load the mentioned json and return the first entry with the field 'name' equal to name
         Raise a NameError if not found """
     list_elem = [e for e in load_json(json) if e['name'] == name]
 
@@ -67,13 +66,13 @@ def find_or_raise(json, name):
     else:
         raise NameError
 
+
 def create_app(config):
 
     app = Flask(__name__)
     app.secret_key = 'something_special'
     app.jinja_env.globals['maximum_points_allowed'] = maximum_points_allowed
     app.jinja_env.globals['is_competition_pass_the_deadline'] = is_competition_pass_the_deadline
-
 
     @app.route('/')
     def index():
