@@ -1,9 +1,9 @@
-from tests.unit.test_json import MockedJson
+from tests.mocked_json import MockedJson
 
 
 class TestBookingDates:
 
-    def test_booking_ok(self, client, monkeypatch):
+    def test_booking_a_future_competition(self, client, monkeypatch):
 
         MockedJson.generate_a_new_test_file('clubs')
         MockedJson.generate_a_new_test_file('competitions')

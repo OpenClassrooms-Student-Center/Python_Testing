@@ -1,4 +1,4 @@
-from tests.unit.test_json import MockedJson
+from tests.mocked_json import MockedJson
 
 
 class TestPointsBalance:

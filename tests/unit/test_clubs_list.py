@@ -1,9 +1,9 @@
-from tests.unit.test_json import MockedJson
+from tests.mocked_json import MockedJson
 
 
 class TestClubsList:
 
-    def test_connection(self, client, monkeypatch):
+    def test_display_list(self, client, monkeypatch):
 
         # Create test files, then monkeypatch the json functions
         MockedJson.generate_a_new_test_file('clubs')
