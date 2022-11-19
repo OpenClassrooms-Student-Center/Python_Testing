@@ -64,7 +64,7 @@ def test_book_12_places_or_less(client):
     )
 
     data = response.data.decode()
-    assert COMPETITION_PLACES_SUCCESFULLY_BOOKED_MESSAGE in data
+    assert data.find(COMPETITION_PLACES_SUCCESFULLY_BOOKED_MESSAGE)
 
 
 def test_book_more_than_12_places(client):
