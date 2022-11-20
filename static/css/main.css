@@ -2,6 +2,7 @@ body, html {
     background-color: #f3f4f7;
     margin: 0;
     font-family: sans-serif;
+    text-align: center;
 }
 
 h1, h2 {
@@ -13,13 +14,14 @@ h1, h2 {
     width: 400px;
 }
 
-.list_comp, .list_clubs{
+.list_comp, .list_clubs {
     list-style-type: none;
     text-align: center;
     padding: 0;
 }
-/* Navbar */
 
+
+/* Navbar */
 .navbar {
     background-color: #037ef3;
     padding: 8px;

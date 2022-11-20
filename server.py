@@ -7,7 +7,8 @@ from flask import (Flask,
                    redirect,
                    flash,
                    url_for,
-                   get_flashed_messages)
+                   get_flashed_messages,
+                   session)
 
 # parser = argparse.ArgumentParser()
 # parser.add_argument('-m', '--maxi', type=int, required=False, help="Maximum points per competition (default : 12)")
@@ -82,57 +83,64 @@ def create_app(config):
 
     @app.route('/')
     def index():
+        session.clear()
         return render_template('index.html')
 
-    @app.route('/showSummary', methods=['POST'])
-    def show_summary():
-
+    @app.route('/login', methods=['POST'])
+    def login():
         clubs = [club for club in load_json('clubs') if club['email'] == request.form['email']]
         if clubs:
-            return redirect(url_for('show_competitions', club=clubs[0]['name']))
+            session['logged_club'] = clubs[0]
+            return redirect(url_for('show_competitions'))
+
         else:
             flash(f"Sorry, '{request.form['email']}' wasn't found", "flash_error")
             return render_template('index.html')
 
-    @app.route('/showCompetitions/<club>')
-    def show_competitions(club):
+    @app.route('/showCompetitions')
+    def show_competitions():
+        if 'logged_club' in session:
+            club = session['logged_club']
+            return render_template('competitions.html', club=club, competitions=load_json('competitions'))
 
-        try:
-            found_club = find_or_raise('clubs', club)
-            return render_template('welcome.html', club=found_club, competitions=load_json('competitions'))
+        else:
+            flash("This action needs to be logged", "flash_warning")
+            return redirect(url_for('/'))
 
-        except NameError:
-            flash(f"Sorry, '{club}' wasn't found", "flash_error")
-            return redirect(url_for('index'))
+    @app.route('/book/<competition>')
+    def book(competition):
 
-    @app.route('/book/<competition>/<club>')
-    def book(competition, club):
+        if 'logged_club' in session:
 
-        try:
-            found_competition = find_or_raise('competitions', competition)
-            found_club = find_or_raise('clubs', club)
+            try:
+                found_competition = find_or_raise('competitions', competition)
+                found_club = find_or_raise('clubs', session['logged_club']['name'])
 
-            maximum = maximum_points_allowed(found_competition, found_club)
-            if maximum == 0:
-                flash("You cannot book a new place", "flash_warning")
+                maximum = maximum_points_allowed(found_competition, found_club)
+                if maximum == 0:
+                    flash("You cannot book a new place", "flash_warning")
 
-            return render_template('booking.html',
-                                   club=found_club,
-                                   competition=found_competition,
-                                   maximum_allowed=maximum)
+                return render_template('booking.html',
+                                       club=found_club,
+                                       competition=found_competition,
+                                       maximum_allowed=maximum)
 
-        except NameError:
-            flash(f"Sorry, '{club}' or '{competition}' wasn't found", "flash_error")
-            return redirect(url_for('index'))
+            except NameError:
+                flash(f"Sorry, '{session['logged_club']['name']}' or '{competition}' wasn't found", "flash_error")
+
+        else:
+            flash("This action needs to be logged", "flash_warning")
+
+        return redirect(url_for('/'))
 
     @app.route('/purchasePlaces', methods=['POST'])
     def purchase_places():
 
-        try:
-            found_comp = find_or_raise('competitions', request.form['competition'])
-            found_club = find_or_raise('clubs', request.form['club'])
-
+        if 'logged_club' in session:
             try:
+                found_comp = find_or_raise('competitions', request.form['competition'])
+                found_club = find_or_raise('clubs', session['logged_club']['name'])
+
                 placesRequired = int(request.form['places'])
 
                 if is_competition_pass_the_deadline(found_comp):
@@ -167,29 +175,31 @@ def create_app(config):
             except ValueError:
                 flash('Invalid value', 'flash_error')
 
-            return render_template('welcome.html', club=found_club, competitions=load_json('competitions'))
+            except NameError:
+                flash(f"Sorry, '{request.form['competition']}' or '{request.form['club']}' wasn't found",
+                      "flash_error")
+                return redirect(url_for('index'))
 
-        except NameError:
-            flash(f"Sorry, '{request.form['competition']}' or '{request.form['club']}' wasn't found", "flash_error")
-            return redirect(url_for('index'))
+            return render_template('competitions.html', competitions=load_json('competitions'))
 
-    @app.route('/show_clubs/<club>')
-    def show_clubs(club):
+        else:
+            flash("This action needs to be logged", "flash_warning")
+            return redirect(url_for('/'))
 
-        try:
-            # load clubs and sort them by name
-            clubs = load_json('clubs')
-            clubs.sort(key=lambda club: club['name'].lower())
+    @app.route('/showClubs/')
+    def show_clubs():
+        # load clubs and sort them by name
+        clubs = load_json('clubs')
+        clubs.sort(key=lambda club: club['name'].lower())
 
-            found_club = find_or_raise('clubs', club)
-            return render_template('clubs.html', clubs=clubs, club=found_club)
-
-        except NameError:
-            flash(f"Sorry, '{club}' or wasn't found", "flash_error")
-            return redirect(url_for('index'))
+        if 'logged_club' in session:
+            return render_template('clubs.html', clubs=clubs, club=session['logged_club'])
+        else:
+            return render_template('clubs.html', clubs=clubs)
 
     @app.route('/logout')
     def logout():
+        session.clear()
         return redirect(url_for('index'))
 
     return app
