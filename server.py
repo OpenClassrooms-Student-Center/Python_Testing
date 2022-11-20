@@ -1,4 +1,5 @@
 import json
+import argparse
 from datetime import datetime
 from flask import (Flask,
                    render_template,
@@ -8,8 +9,13 @@ from flask import (Flask,
                    url_for,
                    get_flashed_messages)
 
+# parser = argparse.ArgumentParser()
+# parser.add_argument('-m', '--maxi', type=int, required=False, help="Maximum points per competition (default : 12)")
+# args = vars(parser.parse_args())
 
-MAXIMUM_POINTS_PER_COMP = 12
+
+# MAXIMUM_POINTS_PER_COMP = args['maxi'] if 'maxi' in args else 12
+# MAXIMUM_POINTS_PER_COMP = 12
 
 
 def load_json(file_name):
@@ -23,7 +29,7 @@ def save_json(file_name, data):
     """ Open/create the file database/file_name.json with the list of dicts 'data'
         This list will be saved in a dict, in the field {file_name} """
     with open(f'database/{file_name}.json', 'w') as file:
-        json.dump({file_name: data}, file)
+        json.dump({file_name: data}, file, indent=True)
 
 
 def update_json(file_name, data):
@@ -40,10 +46,10 @@ def update_json(file_name, data):
     save_json(file_name, tab)
 
 
-def maximum_points_allowed(competition, club):
+def maximum_points_allowed(competition, club, maxi_club_per_competition=12):
     """ Return the maximum avaliable places for this club and this competition """
 
-    nb_authorised_places = MAXIMUM_POINTS_PER_COMP
+    nb_authorised_places = maxi_club_per_competition
     if club['id'] in competition:
         nb_authorised_places -= int(competition[club['id']])
 
