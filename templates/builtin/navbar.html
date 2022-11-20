@@ -1,10 +1,16 @@
 <div class="navbar">
     <span>
-        <a href="{{ url_for('logout') }}">Logout</a>
+        {% if club %}
+            <a href="{{ url_for('logout') }}" title="Logout"> - {{ club['name'] }} - </a>
+        {% else %}
+            <a href="{{ url_for('index') }}" title="Logout"> Log in </a>
+        {% endif %}
     </span>
     <span>
         <!-- <a href="javascript:history.back()">Back</a> -->
+    {% if club %}
         <a href="{{ url_for('show_competitions', club=club['name']) }}">Competitions</a>
-        <a href="{{ url_for('show_clubs', club=club['name']) }}">Clubs</a>
+    {% endif %}
+        <a href="{{ url_for('show_clubs') }}">Clubs</a>
     </span>
 </div>

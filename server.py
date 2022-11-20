@@ -6,7 +6,8 @@ from flask import (Flask,
                    redirect,
                    flash,
                    url_for,
-                   get_flashed_messages)
+                   get_flashed_messages,
+                   session)
 
 
 MAXIMUM_POINTS_PER_COMP = 12
@@ -65,95 +66,117 @@ def create_app(config):
 
     @app.route('/')
     def index():
+        session.clear()
         return render_template('index.html')
 
-    @app.route('/showSummary', methods=['POST'])
-    def show_summary():
+    @app.route('/login', methods=['POST'])
+    def login():
         clubs = [club for club in load_json('clubs') if club['email'] == request.form['email']]
         if clubs:
-            return redirect(url_for('show_competitions', club=clubs[0]['name']))
+            session['logged_club'] = clubs[0]
+            return redirect(url_for('show_competitions'))
+
         else:
             flash(f"Sorry, '{request.form['email']}' wasn't found", "flash_error")
             return render_template('index.html')
 
-    @app.route('/showCompetitions/<club>')
-    def show_competitions(club):
-        found_club = [c for c in load_json('clubs') if c['name'] == club][0]
-        return render_template('welcome.html', club=found_club, competitions=load_json('competitions'))
+    @app.route('/showCompetitions')
+    def show_competitions():
+        if 'logged_club' in session:
+            club = session['logged_club']
+            return render_template('competitions.html', club=club, competitions=load_json('competitions'))
 
-    @app.route('/book/<competition>/<club>')
-    def book(competition, club):
-        foundClub = [c for c in load_json('clubs') if c['name'] == club][0]
-        foundCompetition = [c for c in load_json('competitions') if c['name'] == competition][0]
-
-        maximum = maximum_points_allowed(foundCompetition, foundClub)
-        if maximum == 0:
-            flash("You cannot book a new place", "flash_warning")
-
-        if foundClub and foundCompetition:
-
-            return render_template('booking.html',
-                                   club=foundClub,
-                                   competition=foundCompetition,
-                                   maximum_allowed=maximum)
         else:
-            flash("Something went wrong-please try again", 'flash_error')
-            return render_template('welcome.html', club=club, competitions=load_json('competitions'))
+            flash("This action needs to be logged", "flash_warning")
+            return redirect(url_for('/'))
+
+    @app.route('/book/<competition>')
+    def book(competition):
+
+        if 'logged_club' in session:
+
+            foundClub = [c for c in load_json('clubs') if c['name'] == session['logged_club']['name']][0]
+            foundCompetition = [c for c in load_json('competitions') if c['name'] == competition][0]
+
+            maximum = maximum_points_allowed(foundCompetition, foundClub)
+            if maximum == 0:
+                flash("You cannot book a new place", "flash_warning")
+
+            if foundClub and foundCompetition:
+
+                return render_template('booking.html',
+                                       club=foundClub,
+                                       competition=foundCompetition,
+                                       maximum_allowed=maximum)
+            else:
+                flash("Something went wrong-please try again", 'flash_error')
+                return render_template('competitions.html', club=foundClub, competitions=load_json('competitions'))
+
+        else:
+            flash("This action needs to be logged", "flash_warning")
+            return redirect(url_for('/'))
 
     @app.route('/purchasePlaces', methods=['POST'])
     def purchase_places():
-        competition = [c for c in load_json('competitions') if c['name'] == request.form['competition']][0]
-        club = [c for c in load_json('clubs') if c['name'] == request.form['club']][0]
 
-        try:
-            placesRequired = int(request.form['places'])
+        if 'logged_club' in session:
 
-            if is_competition_pass_the_deadline(competition):
-                flash(f"This competition is closed {competition['date']}", 'flash_warning')
+            club = [c for c in load_json('clubs') if c['name'] == session['logged_club']['name']][0]
+            competition = [c for c in load_json('competitions') if c['name'] == request.form['competition']][0]
 
-            elif placesRequired <= 0:
-                raise ValueError
+            try:
+                placesRequired = int(request.form['places'])
 
-            elif placesRequired <= int(maximum_points_allowed(competition, club)):
+                if is_competition_pass_the_deadline(competition):
+                    flash(f"This competition is closed {competition['date']}", 'flash_warning')
 
-                # Remove used points from club and competition
-                competition['numberOfPlaces'] = int(competition['numberOfPlaces']) - placesRequired
-                club['points'] = int(club['points']) - placesRequired
+                elif placesRequired <= 0:
+                    raise ValueError
 
-                # Also save the club id and its number of places to respect the limitation (MAXIMUM_POINTS_PER_COMP)
-                if club['id'] in competition:
-                    competition[club['id']] = int(competition[club['id']]) + placesRequired
+                elif placesRequired <= int(maximum_points_allowed(competition, club)):
+
+                    # Remove used points from club and competition
+                    competition['numberOfPlaces'] = int(competition['numberOfPlaces']) - placesRequired
+                    club['points'] = int(club['points']) - placesRequired
+
+                    # Also save the club id and its num of places to respect the limitation (MAXIMUM_POINTS_PER_COMP)
+                    if club['id'] in competition:
+                        competition[club['id']] = int(competition[club['id']]) + placesRequired
+                    else:
+                        competition[club['id']] = placesRequired
+
+                    # Save
+                    update_json('competitions', competition)
+                    update_json('clubs', club)
+
+                    flash('Great-booking complete!', 'flash_info')
+                    return render_template('competitions.html', club=club, competitions=load_json('competitions'))
+
                 else:
-                    competition[club['id']] = placesRequired
+                    flash(f"You are allowed to book {maximum_points_allowed(competition, club)} places maximum",
+                          'flash_warning')
 
-                # Save
-                update_json('competitions', competition)
-                update_json('clubs', club)
+            except ValueError:
+                flash('Invalid value', 'flash_error')
 
-                flash('Great-booking complete!', 'flash_info')
-                return render_template('welcome.html', club=club, competitions=load_json('competitions'))
+            return render_template('competitions.html', club=club, competitions=load_json('competitions'))
 
-            else:
-                flash(f"You are allowed to book {maximum_points_allowed(competition, club)} places maximum",
-                      'flash_warning')
+        else:
+            flash("This action needs to be logged", "flash_warning")
+            return redirect(url_for('/'))
 
-        except ValueError:
-            flash('Invalid value', 'flash_error')
-
-        return render_template('welcome.html', club=club, competitions=load_json('competitions'))
-
-    @app.route('/show_clubs/<club>')
-    def show_clubs(club):
+    @app.route('/showClubs/')
+    def show_clubs():
 
         # load clubs and sort them by name
         clubs = load_json('clubs')
         clubs.sort(key=lambda club: club['name'].lower())
 
-        foundClub = [c for c in clubs if c['name'] == club][0]
-        return render_template('clubs.html', clubs=clubs, club=foundClub)
+        return render_template('clubs.html', clubs=clubs)
 
     @app.route('/logout')
     def logout():
+        session.clear()
         return redirect(url_for('index'))
 
     return app

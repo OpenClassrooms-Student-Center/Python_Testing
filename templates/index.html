@@ -8,6 +8,8 @@
 
 {% block body %}
 
+    {% include 'builtin/navbar.html' %}
+
     <div class='content'>
         <h1>Welcome to the GUDLFT Registration Portal!</h1>
 
@@ -15,7 +17,7 @@
 
         <p>Please enter your secretary email to continue:</p>
 
-        <form action="showSummary" method="post">
+        <form action="login" method="post">
             <label for="email">Email:</label>
             <input type="email" name="email" id=""/>
             <button type="submit">Enter</button>
