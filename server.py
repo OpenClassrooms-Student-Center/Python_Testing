@@ -100,12 +100,16 @@ def create_app(config):
     @app.route('/showCompetitions')
     def show_competitions():
         if 'logged_club' in session:
-            club = session['logged_club']
-            return render_template('competitions.html', club=club, competitions=load_json('competitions'))
+
+            # Sort competitions by date
+            competitions = load_json('competitions')
+            competitions.sort(key=lambda club: club['date'], reverse=True)
+
+            return render_template('competitions.html', club=session['logged_club'], competitions=competitions)
 
         else:
             flash("This action needs to be logged", "flash_warning")
-            return redirect(url_for('/'))
+            return redirect(url_for('index'))
 
     @app.route('/book/<competition>')
     def book(competition):
@@ -127,11 +131,12 @@ def create_app(config):
 
             except NameError:
                 flash(f"Sorry, '{session['logged_club']['name']}' or '{competition}' wasn't found", "flash_error")
+                return redirect(url_for('show_competitions'))
 
         else:
             flash("This action needs to be logged", "flash_warning")
 
-        return redirect(url_for('/'))
+        return redirect(url_for('index'))
 
     @app.route('/purchasePlaces', methods=['POST'])
     def purchase_places():
@@ -165,8 +170,10 @@ def create_app(config):
                     update_json('competitions', found_comp)
                     update_json('clubs', found_club)
 
+                    # Update the logged club (To avoid a json load in showCompetitions)
+                    session['logged_club'] = found_club
+
                     flash('Great-booking complete!', 'flash_info')
-                    return render_template('welcome.html', club=found_club, competitions=load_json('competitions'))
 
                 else:
                     flash(f"You are allowed to book {maximum_points_allowed(found_comp, found_club)} places maximum",
@@ -176,17 +183,18 @@ def create_app(config):
                 flash('Invalid value', 'flash_error')
 
             except NameError:
-                flash(f"Sorry, '{request.form['competition']}' or '{request.form['club']}' wasn't found",
+                flash(f"Sorry, '{request.form['competition']}' or '{session['logged_club']['name']}' wasn't found",
                       "flash_error")
-                return redirect(url_for('index'))
 
-            return render_template('competitions.html', competitions=load_json('competitions'))
+            return render_template('competitions.html',
+                                   club=session['logged_club'],
+                                   competitions=load_json('competitions'))
 
         else:
             flash("This action needs to be logged", "flash_warning")
-            return redirect(url_for('/'))
+            return redirect(url_for('index'))
 
-    @app.route('/showClubs/')
+    @app.route('/showClubs')
     def show_clubs():
         # load clubs and sort them by name
         clubs = load_json('clubs')

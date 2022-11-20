@@ -9,7 +9,7 @@ class TestClubsList:
         MockedJson.generate_a_new_test_file('clubs')
         MockedJson.monkeypatch_json_functions(monkeypatch)
 
-        response = client.get('/show_clubs/name_test_club')
+        response = client.get('/showClubs')
 
         assert response.status_code == 200
         assert 'name_test_club' in response.text

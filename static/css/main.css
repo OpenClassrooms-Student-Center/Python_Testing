@@ -14,9 +14,8 @@ h1, h2 {
     width: 400px;
 }
 
-.list_comp, .list_clubs {
+.list_comp, .list_clubs, .list_booking_club {
     list-style-type: none;
-    text-align: center;
     padding: 0;
 }
 
@@ -25,7 +24,6 @@ h1, h2 {
 .navbar {
     background-color: #037ef3;
     padding: 8px;
-    text-align: center;
     font-weight: bold;
 }
 .navbar span {
@@ -42,7 +40,6 @@ h1, h2 {
 .flashes {
     list-style-type: none;
     font-weight: bold;
-    text-align: center;
     padding: 0;
 }
 

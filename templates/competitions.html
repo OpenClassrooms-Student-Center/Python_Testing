@@ -16,7 +16,7 @@
 
         <p>Points available: {{ club['points'] }}</p>
 
-        <h3>Competitions:</h3>
+        <h2>List of competitions</h2>
         <ul class="list_comp">
             {% for comp in competitions %}
             <li>
@@ -29,7 +29,7 @@
                 {% endif %}
 
                 {% if not is_competition_pass_the_deadline(comp) and maximum_points_allowed(comp, club) > 0 %}
-                    <li><a href="{{ url_for('book',competition=comp['name'],club=club['name']) }}">Book Places</a></li>
+                    <li><a href="{{ url_for('book',competition=comp['name']) }}">Book Places</a></li>
                 {% endif %}
                 </ul>
             </li>

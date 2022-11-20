@@ -15,18 +15,21 @@ class TestBooking:
         MockedJson.generate_a_new_test_file('competitions')
         MockedJson.monkeypatch_json_functions(monkeypatch)
 
-        # First, display the competition lists
-        response = client.get("/showCompetitions/name_test_club")
+        # First, login
+        response = client.post("/login", data={"email": "test@mail.com"}, follow_redirects=True)
         assert response.status_code == 200
         assert "Welcome, test@mail.com" in response.text
+
+        # Redirected to the competitions
+        assert "List of competitions" in response.text
 
         # Is competition 1 available with informations and the link to book ?
         assert "name_test_competition" in response.text
         assert "Date: 2027-03-27 10:00:00" in response.text
-        assert '<a href="/book/name_test_competition/name_test_club">Book Places</a>' in response.text
+        assert '<a href="/book/name_test_competition">Book Places</a>' in response.text
 
         # UI limitations
-        response = client.get('/book/name_test_competition/name_test_club')
+        response = client.get('/book/name_test_competition')
         assert 'name="places" value="1" min="1" max="12"' in response.text
 
         # Let's book -->
@@ -43,10 +46,10 @@ class TestBooking:
         assert "Points available: 16" in response.text
         assert "Remaining places: 35" in response.text
         assert "Already booked by your club: 6" in response.text
-        assert '<a href="/book/name_test_competition/name_test_club">Book Places</a>' in response.text
+        assert '<a href="/book/name_test_competition">Book Places</a>' in response.text
 
         # New UI limitations
-        response = client.get('/book/name_test_competition/name_test_club')
+        response = client.get('/book/name_test_competition')
         assert 'name="places" value="1" min="1" max="6"' in response.text
 
         # ----------------------------------------------------------------------------------------------------
@@ -62,10 +65,10 @@ class TestBooking:
         assert "Points available: 16" in response.text
         assert "Remaining places: 35" in response.text
         assert "Already booked by your club: 6" in response.text
-        assert '<a href="/book/name_test_competition/name_test_club">Book Places</a>' in response.text
+        assert '<a href="/book/name_test_competition">Book Places</a>' in response.text
 
         # Same UI limitations
-        response = client.get('/book/name_test_competition/name_test_club')
+        response = client.get('/book/name_test_competition')
         assert 'name="places" value="1" min="1" max="6"' in response.text
 
         # ----------------------------------------------------------------------------------------------------
@@ -82,10 +85,10 @@ class TestBooking:
         assert "Already booked by your club: 12" in response.text
 
         # The booking link must be hidden
-        assert '<a href="/book/name_test_competition/name_test_club">Book Places</a>' not in response.text
+        assert '<a href="/book/name_test_competition">Book Places</a>' not in response.text
 
         # New UI limitations
-        response = client.get('/book/name_test_competition/name_test_club')
+        response = client.get('/book/name_test_competition')
         assert 'name="places" value="1" min="1" max="0"' in response.text
 
         # ----------------------------------------------------------------------------------------------------
@@ -100,3 +103,19 @@ class TestBooking:
         assert "Points available: 10" in response.text
         assert "Remaining places: 29" in response.text
         assert "Already booked by your club: 12" in response.text
+
+        # ----------------------------------------------------------------------------------------------------
+        # Logout ---------------------------------------------------------------------------------------------
+        response = client.get("/logout", follow_redirects=True)
+
+        assert response.status_code == 200
+        assert "Welcome to the GUDLFT" in response.text
+
+        # ----------------------------------------------------------------------------------------------------
+        # ShowClubs (login not necessary) --------------------------------------------------------------------
+        response = client.get("/showClubs")
+
+        assert response.status_code == 200
+        assert 'name_test_club' in response.text
+        assert 'name test club 2' in response.text
+        assert 'name_test_club_3' in response.text

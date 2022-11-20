@@ -9,6 +9,10 @@ class TestBookingDates:
         MockedJson.generate_a_new_test_file('competitions')
         MockedJson.monkeypatch_json_functions(monkeypatch)
 
+        # Force logged club
+        with client.session_transaction() as session:
+            session["logged_club"] = MockedJson.load_mocked_json('clubs')[0]  # name_test_club
+
         # Competition : 8 places  | Club : 22 points | Booked : 2 | Date limit : 2025-01-01 10:00:00
         response = client.post("/purchasePlaces", data={"competition": "name test competition 2",
                                                         "club": "name_test_club",
@@ -25,6 +29,10 @@ class TestBookingDates:
         MockedJson.generate_a_new_test_file('clubs')
         MockedJson.generate_a_new_test_file('competitions')
         MockedJson.monkeypatch_json_functions(monkeypatch)
+
+        # Force logged club
+        with client.session_transaction() as session:
+            session["logged_club"] = MockedJson.load_mocked_json('clubs')[0]  # name_test_club
 
         # Competition : 15 places  | Club : 22 points | Booked : 17 | Date limit : 2020-03-27 10:00:00
         response = client.post("/purchasePlaces", data={"competition": "name_test_competition_4",

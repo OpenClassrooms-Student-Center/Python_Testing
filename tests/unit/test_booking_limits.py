@@ -3,22 +3,16 @@ from tests.mocked_json import MockedJson
 
 class TestBookingLimits:
 
-    def test_connection(self, client, monkeypatch):
-
-        # Create test files, then monkeypatch the json functions
-        MockedJson.generate_a_new_test_file('clubs')
-        MockedJson.generate_a_new_test_file('competitions')
-        MockedJson.monkeypatch_json_functions(monkeypatch)
-
-        response = client.get("/book/name_test_competition/name_test_club")
-        assert response.status_code == 200
-
     def test_booking_ok(self, client, monkeypatch):
         """ Check a regular booking """
 
         MockedJson.generate_a_new_test_file('clubs')
         MockedJson.generate_a_new_test_file('competitions')
         MockedJson.monkeypatch_json_functions(monkeypatch)
+
+        # Force logged club
+        with client.session_transaction() as session:
+            session["logged_club"] = MockedJson.load_mocked_json('clubs')[0]  # name_test_club
 
         response = client.post("/purchasePlaces", data={"competition": "name_test_competition",
                                                         "club": "name_test_club",
@@ -35,6 +29,9 @@ class TestBookingLimits:
         MockedJson.generate_a_new_test_file('competitions')
         MockedJson.monkeypatch_json_functions(monkeypatch)
 
+        with client.session_transaction() as session:
+            session["logged_club"] = MockedJson.load_mocked_json('clubs')[1]  # name test club 2
+
         response = client.post("/purchasePlaces", data={"competition": "name_test_competition",
                                                         "club": "name test club 2",
                                                         "places": 10000})
@@ -49,6 +46,9 @@ class TestBookingLimits:
         MockedJson.generate_a_new_test_file('clubs')
         MockedJson.generate_a_new_test_file('competitions')
         MockedJson.monkeypatch_json_functions(monkeypatch)
+
+        with client.session_transaction() as session:
+            session["logged_club"] = MockedJson.load_mocked_json('clubs')[0]  # name_test_club
 
         # Competition : 41 places  | Club : 22 points | Booked : 0
         response = client.post("/purchasePlaces", data={"competition": "name_test_competition",

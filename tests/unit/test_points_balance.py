@@ -10,8 +10,12 @@ class TestPointsBalance:
         MockedJson.generate_a_new_test_file('competitions')
         MockedJson.monkeypatch_json_functions(monkeypatch)
 
+        # Force logged club
+        with client.session_transaction() as session:
+            session["logged_club"] = MockedJson.load_mocked_json('clubs')[0]  # name_test_club
+
         # Competition : 8 places  | Club : 22 points | Booked : 2
-        response = client.get('/book/name%20test%20competition%202/name_test_club')
+        response = client.get('/book/name%20test%20competition%202')
 
         assert response.status_code == 200
         assert "Remaining places for this competition: 8" in response.text
