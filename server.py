@@ -65,7 +65,9 @@ def is_competition_pass_the_deadline(comp):
 
 def find_or_raise(json, name):
     """ load the mentioned json and return the first entry with the field 'name' equal to name
-        Raise a NameError if not found """
+        Raise a NameError if not found
+        Raise a json.JSONDecodeError if load_json fails
+    """
     list_elem = [e for e in load_json(json) if e['name'] == name]
 
     if list_elem:
@@ -83,29 +85,39 @@ def create_app(config):
 
     @app.route('/')
     def index():
-        session.clear()
         return render_template('index.html')
 
     @app.route('/login', methods=['POST'])
     def login():
-        clubs = [club for club in load_json('clubs') if club['email'] == request.form['email']]
-        if clubs:
-            session['logged_club'] = clubs[0]
-            return redirect(url_for('show_competitions'))
 
-        else:
-            flash(f"Sorry, '{request.form['email']}' wasn't found", "flash_error")
-            return render_template('index.html')
+        try:
+            clubs = [club for club in load_json('clubs') if club['email'] == request.form['email']]
+            if clubs:
+                session['logged_club'] = clubs[0]
+                return redirect(url_for('show_competitions'))
+
+            else:
+                flash(f"Sorry, '{request.form['email']}' wasn't found", "flash_error")
+                return redirect(url_for('index'))
+
+        except json.JSONDecodeError:
+            flash("Database access failed, please retry", "flash_error")
+            return redirect(url_for('index'))
 
     @app.route('/showCompetitions')
     def show_competitions():
+
         if 'logged_club' in session:
 
-            # Sort competitions by date
-            competitions = load_json('competitions')
-            competitions.sort(key=lambda club: club['date'], reverse=True)
+            try:
+                competitions = load_json('competitions')
+                competitions.sort(key=lambda club: club['date'], reverse=True)  # Sort competitions by date
 
-            return render_template('competitions.html', club=session['logged_club'], competitions=competitions)
+                return render_template('competitions.html', club=session['logged_club'], competitions=competitions)
+
+            except json.JSONDecodeError:
+                flash("Database access failed, please retry", "flash_error")
+                return redirect(url_for('index'))
 
         else:
             flash("This action needs to be logged", "flash_warning")
@@ -129,66 +141,75 @@ def create_app(config):
                                        competition=found_competition,
                                        maximum_allowed=maximum)
 
+            except json.JSONDecodeError:
+                flash("Database access failed, please retry", "flash_error")
+                return redirect(url_for('show_competitions'))
+
             except NameError:
                 flash(f"Sorry, '{session['logged_club']['name']}' or '{competition}' wasn't found", "flash_error")
                 return redirect(url_for('show_competitions'))
 
         else:
             flash("This action needs to be logged", "flash_warning")
-
-        return redirect(url_for('index'))
+            return redirect(url_for('index'))
 
     @app.route('/purchasePlaces', methods=['POST'])
     def purchase_places():
 
         if 'logged_club' in session:
+
             try:
-                found_comp = find_or_raise('competitions', request.form['competition'])
-                found_club = find_or_raise('clubs', session['logged_club']['name'])
+                try:
+                    found_comp = find_or_raise('competitions', request.form['competition'])
+                    found_club = find_or_raise('clubs', session['logged_club']['name'])
 
-                placesRequired = int(request.form['places'])
+                    placesRequired = int(request.form['places'])
 
-                if is_competition_pass_the_deadline(found_comp):
-                    flash(f"This competition is closed {found_comp['date']}", 'flash_warning')
+                    if is_competition_pass_the_deadline(found_comp):
+                        flash(f"This competition is closed {found_comp['date']}", 'flash_warning')
 
-                elif placesRequired <= 0:
-                    raise ValueError
+                    elif placesRequired <= 0:
+                        raise ValueError
 
-                elif placesRequired <= int(maximum_points_allowed(found_comp, found_club)):
+                    elif placesRequired <= int(maximum_points_allowed(found_comp, found_club)):
 
-                    # Remove used points from club and competition
-                    found_comp['numberOfPlaces'] = int(found_comp['numberOfPlaces']) - placesRequired
-                    found_club['points'] = int(found_club['points']) - placesRequired
+                        # Remove used points from club and competition
+                        found_comp['numberOfPlaces'] = int(found_comp['numberOfPlaces']) - placesRequired
+                        found_club['points'] = int(found_club['points']) - placesRequired
 
-                    # Also save the club id and its number of places to respect the limits (MAXIMUM_POINTS_PER_COMP)
-                    if found_club['id'] in found_comp:
-                        found_comp[found_club['id']] = int(found_comp[found_club['id']]) + placesRequired
+                        # Also save the club id and its number of places to respect the limits
+                        if found_club['id'] in found_comp:
+                            found_comp[found_club['id']] = int(found_comp[found_club['id']]) + placesRequired
+                        else:
+                            found_comp[found_club['id']] = placesRequired
+
+                        # Save
+                        update_json('competitions', found_comp)
+                        update_json('clubs', found_club)
+
+                        # Update the logged club (To avoid a json load in showCompetitions)
+                        session['logged_club'] = found_club
+
+                        flash('Great-booking complete!', 'flash_info')
+
                     else:
-                        found_comp[found_club['id']] = placesRequired
+                        flash(f"You are allowed to book {maximum_points_allowed(found_comp, found_club)} places maximum",
+                              'flash_warning')
 
-                    # Save
-                    update_json('competitions', found_comp)
-                    update_json('clubs', found_club)
+                except ValueError:
+                    flash('Invalid value', 'flash_error')
 
-                    # Update the logged club (To avoid a json load in showCompetitions)
-                    session['logged_club'] = found_club
+                except NameError:
+                    flash(f"Sorry, '{request.form['competition']}' or '{session['logged_club']['name']}' wasn't found",
+                          "flash_error")
 
-                    flash('Great-booking complete!', 'flash_info')
+                return render_template('competitions.html',
+                                       club=session['logged_club'],
+                                       competitions=load_json('competitions'))
 
-                else:
-                    flash(f"You are allowed to book {maximum_points_allowed(found_comp, found_club)} places maximum",
-                          'flash_warning')
-
-            except ValueError:
-                flash('Invalid value', 'flash_error')
-
-            except NameError:
-                flash(f"Sorry, '{request.form['competition']}' or '{session['logged_club']['name']}' wasn't found",
-                      "flash_error")
-
-            return render_template('competitions.html',
-                                   club=session['logged_club'],
-                                   competitions=load_json('competitions'))
+            except json.JSONDecodeError:
+                flash("Database access failed, please retry", "flash_error")
+                return redirect(url_for('show_competitions'))
 
         else:
             flash("This action needs to be logged", "flash_warning")
@@ -196,14 +217,23 @@ def create_app(config):
 
     @app.route('/showClubs')
     def show_clubs():
-        # load clubs and sort them by name
-        clubs = load_json('clubs')
-        clubs.sort(key=lambda club: club['name'].lower())
 
-        if 'logged_club' in session:
-            return render_template('clubs.html', clubs=clubs, club=session['logged_club'])
-        else:
-            return render_template('clubs.html', clubs=clubs)
+        try:
+            clubs = load_json('clubs')
+            clubs.sort(key=lambda club: club['name'].lower())  # Sort by name
+
+            if 'logged_club' in session:
+                return render_template('clubs.html', clubs=clubs, club=session['logged_club'])
+            else:
+                return render_template('clubs.html', clubs=clubs)
+
+        except json.JSONDecodeError:
+            flash("Database access failed, please retry", "flash_error")
+
+            if 'logged_club' in session:
+                return redirect(url_for('show_competitions'))
+            else:
+                return redirect(url_for('index'))
 
     @app.route('/logout')
     def logout():

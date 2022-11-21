@@ -11,7 +11,7 @@ class TestLoginClass:
 
     def test_login_fail(self, client):
 
-        response = client.post("/login", data={"email": "wrong@wrong.co"})
+        response = client.post("/login", data={"email": "wrong@wrong.co"}, follow_redirects=True)
 
         assert response.status_code == 200
         assert "Welcome to the GUDLFT" in response.text
@@ -19,7 +19,7 @@ class TestLoginClass:
 
     def test_login_with_empty_field(self, client):
 
-        response = client.post("/login", data={"email": ""})
+        response = client.post("/login", data={"email": ""}, follow_redirects=True)
 
         assert response.status_code == 200
         assert "Welcome to the GUDLFT" in response.text
