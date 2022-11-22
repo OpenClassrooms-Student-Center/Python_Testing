@@ -2,6 +2,7 @@ from locust import HttpUser, task
 from locust import events
 
 from server import update_json, load_json, save_json
+from server import create_app
 
 
 def _clean_json(file_name):
@@ -51,3 +52,16 @@ class TestLocust(HttpUser):
     @task
     def show_clubs(self):
         self.client.get("/showClubs")
+
+
+if __name__ == "__main__":
+    print("==================================================================================================\n"
+          "   Server launched with 100.000 points allowed per competition.\n"
+          "   A competition and a clubs will be create with the name '__Locust' (automatically deleted)\n"
+          "   Open database/clubs.json /competitions.json to see them and the number of validated bookings\n"
+          "\n"
+          "   Launch Locust in another terminal and open http://0.0.0.0:8089\n"
+          "==================================================================================================\n")
+
+    app = create_app({"LOCUST": True})
+    app.run()

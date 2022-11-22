@@ -1,5 +1,4 @@
 import json
-import argparse
 from datetime import datetime
 from flask import (Flask,
                    render_template,
@@ -9,14 +8,6 @@ from flask import (Flask,
                    url_for,
                    get_flashed_messages,
                    session)
-
-# parser = argparse.ArgumentParser()
-# parser.add_argument('-m', '--maxi', type=int, required=False, help="Maximum points per competition (default : 12)")
-# args = vars(parser.parse_args())
-
-
-# MAXIMUM_POINTS_PER_COMP = args['maxi'] if 'maxi' in args else 12
-# MAXIMUM_POINTS_PER_COMP = 12
 
 
 def load_json(file_name):
@@ -78,8 +69,12 @@ def find_or_raise(json, name):
 
 def create_app(config):
 
+    _MAX_POINTS_PER_COMP = 100000 if 'LOCUST' in config else 12
+
     app = Flask(__name__)
+    app.debug = True if 'DEBUG' in config else False
     app.secret_key = 'something_special'
+
     app.jinja_env.globals['maximum_points_allowed'] = maximum_points_allowed
     app.jinja_env.globals['is_competition_pass_the_deadline'] = is_competition_pass_the_deadline
 
@@ -132,7 +127,7 @@ def create_app(config):
                 found_competition = find_or_raise('competitions', competition)
                 found_club = find_or_raise('clubs', session['logged_club']['name'])
 
-                maximum = maximum_points_allowed(found_competition, found_club)
+                maximum = maximum_points_allowed(found_competition, found_club, _MAX_POINTS_PER_COMP)
                 if maximum == 0:
                     flash("You cannot book a new place", "flash_warning")
 
@@ -171,7 +166,7 @@ def create_app(config):
                     elif placesRequired <= 0:
                         raise ValueError
 
-                    elif placesRequired <= int(maximum_points_allowed(found_comp, found_club)):
+                    elif placesRequired <= int(maximum_points_allowed(found_comp, found_club, _MAX_POINTS_PER_COMP)):
 
                         # Remove used points from club and competition
                         found_comp['numberOfPlaces'] = int(found_comp['numberOfPlaces']) - placesRequired
@@ -193,14 +188,17 @@ def create_app(config):
                         flash('Great-booking complete!', 'flash_info')
 
                     else:
-                        flash(f"You are allowed to book {maximum_points_allowed(found_comp, found_club)} places maximum",
+                        flash(f"You are allowed to book "
+                              f"{maximum_points_allowed(found_comp, found_club, _MAX_POINTS_PER_COMP)} "
+                              "places maximum",
                               'flash_warning')
 
                 except ValueError:
                     flash('Invalid value', 'flash_error')
 
                 except NameError:
-                    flash(f"Sorry, '{request.form['competition']}' or '{session['logged_club']['name']}' wasn't found",
+                    flash(f"Sorry, '{request.form['competition']}' or "
+                          f"'{session['logged_club']['name']}' wasn't found",
                           "flash_error")
 
                 return render_template('competitions.html',
@@ -243,9 +241,6 @@ def create_app(config):
     return app
 
 
-# app = create_app({"TESTING": False})
-app = create_app({"TESTING": True})
-
-
 if __name__ == "__main__":
+    app = create_app({"DEBUG": True})
     app.run()

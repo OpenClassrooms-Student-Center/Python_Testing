@@ -4,5 +4,5 @@ from server import create_app
 
 @pytest.fixture()
 def app():
-    app = create_app("tests/flask_test.cfg")
+    app = create_app({'DEBUG': True})
     yield app
