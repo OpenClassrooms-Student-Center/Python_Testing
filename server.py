@@ -6,7 +6,6 @@ from flask import (Flask,
                    redirect,
                    flash,
                    url_for,
-                   get_flashed_messages,
                    session)
 
 
