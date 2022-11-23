@@ -8,7 +8,7 @@ def raise_json_decode(filename):
 
 class TestRedirectionAfterDatabaseRaise:
 
-    """ Test route behaviours with impossible access to database (raise a JSONDecodeError on each access) """
+    """ Test route behaviours with impossible access to database (raise a JSONDecodeError on each attempt) """
 
     def test_on_login(self, client, monkeypatch):
 
@@ -23,12 +23,12 @@ class TestRedirectionAfterDatabaseRaise:
         MockedJson.generate_a_new_test_file('clubs')
         MockedJson.monkeypatch_json_functions(monkeypatch)
 
-        # Connect
+        # Normal Connection
         response = client.post("/login", data={"email": "test@mail.com"}, follow_redirects=True)
         assert response.status_code == 200
         assert "Welcome, test@mail.com" in response.text
 
-        # Raise an error on each access
+        # Then raise an error on each access
         monkeypatch.setattr('server.load_json', raise_json_decode)
 
         # Go to route
@@ -41,11 +41,12 @@ class TestRedirectionAfterDatabaseRaise:
         MockedJson.generate_a_new_test_file('clubs')
         MockedJson.monkeypatch_json_functions(monkeypatch)
 
+        # Normal Connection
         response = client.post("/login", data={"email": "test@mail.com"}, follow_redirects=True)
         assert response.status_code == 200
         assert "Welcome, test@mail.com" in response.text
 
-        # Raise an error on each access
+        # Then raise an error on each access
         monkeypatch.setattr('server.load_json', raise_json_decode)
         monkeypatch.setattr('server.save_json', raise_json_decode)
 
@@ -59,12 +60,12 @@ class TestRedirectionAfterDatabaseRaise:
         MockedJson.generate_a_new_test_file('clubs')
         MockedJson.monkeypatch_json_functions(monkeypatch)
 
-        # Connect
+        # Normal Connection
         response = client.post("/login", data={"email": "test@mail.com"}, follow_redirects=True)
         assert response.status_code == 200
         assert "Welcome, test@mail.com" in response.text
 
-        # Raise an error on each access
+        # Then raise an error on each access
         monkeypatch.setattr('server.load_json', raise_json_decode)
         monkeypatch.setattr('server.save_json', raise_json_decode)
 
@@ -82,11 +83,12 @@ class TestRedirectionAfterDatabaseRaise:
         MockedJson.generate_a_new_test_file('clubs')
         MockedJson.monkeypatch_json_functions(monkeypatch)
 
+        # Normal Connection
         response = client.post("/login", data={"email": "test@mail.com"}, follow_redirects=True)
         assert response.status_code == 200
         assert "Welcome, test@mail.com" in response.text
 
-        # Raise an error on each access
+        # Then raise an error on each access
         monkeypatch.setattr('server.load_json', raise_json_decode)
         monkeypatch.setattr('server.save_json', raise_json_decode)
 
