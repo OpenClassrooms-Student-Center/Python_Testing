@@ -5,7 +5,7 @@
 
 Enhance a Python Web Application With Testing and Debugging
 
-![Logo gudlift](https://raw.githubusercontent.com/FLinguenheld/ocrp11/main/logos/gudlift.png "Logo")
+![Logo gudlift](https://raw.githubusercontent.com/FLinguenheld/Python_Testing/master/logos/gudlift.png "Logo")
 
 ****
 ### Description
