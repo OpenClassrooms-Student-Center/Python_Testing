@@ -1,9 +1,9 @@
-env
 bin
 include
 lib
 .Python
 .envrc
 __pycache__
+env/
 test_clubs.json
 test_competitions.json
