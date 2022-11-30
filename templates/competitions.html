@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+
+{% block head %}
+    <title>List of competitions || GUDLFT</title>
+{% endblock %}
+
+
+{% block body %}
+    {% include 'builtin/navbar.html' %}
+
+    <div class='content'>
+        <h2>Welcome, {{ club['email'] }} </h2>
+
+        {% include 'builtin/flash.html' %}
+
+        <p>Points available: {{ club['points'] }}</p>
+
+        <h2>List of competitions</h2>
+        <ul class="list_comp">
+            {% for comp in competitions %}
+            <li>
+                <ul class="list_comp">
+                    <li><b>{{ comp['name'] }}</b></li>
+                    <li>Date: {{ comp['date'] }}</li>
+                    <li>Remaining places: {{ comp['numberOfPlaces'] }}</li>
+                {% if club['id'] in comp %}
+                    <li>Already booked by your club: {{ comp[club['id']] }}</li>
+                {% endif %}
+
+                {% if not is_competition_pass_the_deadline(comp) and maximum_points_allowed(comp, club) > 0 %}
+                    <li><a href="{{ url_for('book',competition=comp['name']) }}">Book Places</a></li>
+                {% endif %}
+                </ul>
+            </li>
+            <hr />
+            {% endfor %}
+        </ul>
+    </div>
+
+{% endblock %}

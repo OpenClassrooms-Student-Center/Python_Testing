@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+
+{% block head %}
+    <title>List of clubs || GUDLFT</title>
+{% endblock %}
+
+
+{% block body %}
+
+    {% include 'builtin/navbar.html' %}
+
+    <div class='content'>
+        <h2>List of clubs</h2>
+
+        {% include 'builtin/flash.html' %}
+
+        <ul class="list_clubs">
+            {% for c in clubs %}
+            <li>
+                <ul class="list_comp">
+                    <li><b>{{ c['name'] }}</b></li>
+                    <li>{{ c['email'] }}</li>
+                    <li>Points: {{ c['points'] }}</li>
+                </ul>
+            </li>
+            <hr />
+            {% endfor %}
+        </ul>
+    </div>
+
+{% endblock %}
