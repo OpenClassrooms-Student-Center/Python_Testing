@@ -33,19 +33,6 @@ class TestNotMoreThanTwelvePoints:
         server.clubs = self.club
         server.booked_places = self.booked_places
 
-    def test_less_than_or_equal_twelve(self):
-
-        result = self.client.post(
-            "/purchasePlaces",
-            data={
-                "places": 7,
-                "club": self.club[0]["name"],
-                "competition": self.competition[0]["name"]
-            }
-        )
-
-        assert result.status_code == 200
-
     def test_more_than_twelve_at_once(self):
 
         result = self.client.post(
@@ -58,6 +45,21 @@ class TestNotMoreThanTwelvePoints:
         )
 
         assert result.status_code == 403
+        assert "more than 12 places in a competition." in result.data.decode()
+
+    def test_less_than_or_equal_twelve(self):
+
+        result = self.client.post(
+            "/purchasePlaces",
+            data={
+                "places": 7,
+                "club": self.club[0]["name"],
+                "competition": self.competition[0]["name"]
+            }
+        )
+
+        assert result.status_code == 200
+        assert "Great-booking complete!" in result.data.decode()
 
     def test_more_than_twelve_in_several_time(self):
 
@@ -71,3 +73,4 @@ class TestNotMoreThanTwelvePoints:
         )
 
         assert result.status_code == 403
+        assert "more than 12 places in a competition." in result.data.decode()
