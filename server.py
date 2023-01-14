@@ -31,7 +31,6 @@ app.secret_key = 'something_special'
 competitions = loadcompetitions()
 clubs = loadclubs()
 booked_places = initialize_booked_places(competitions, clubs)
-# past_competitions, future_competitions = sort_competitions_date(competitions)
 
 
 def update_booked_places(competition, club, bkd_places, placesrequired):
@@ -57,9 +56,9 @@ def showsummary():
         return render_template('welcome.html', club=club, competitions=competitions)
     except IndexError:
         if request.form['email'] == '':
-            flash("Please, enter your email.")
+            flash("Please, enter your email.", 'error')
         else:
-            flash("No account matches this email.")
+            flash("No account matches this email.", 'error')
         return render_template('index.html'), 403
 
 
@@ -69,11 +68,11 @@ def book(competition, club):
     try:
         foundcompetition = [c for c in competitions if c['name'] == competition][0]
         if datetime.strptime(foundcompetition['date'], '%Y-%m-%d %H:%M:%S') < datetime.now():
-            flash("This competition is over.")
+            flash("This competition is over.", 'error')
             return render_template('welcome.html', club=foundclub, competitions=competitions), 403
         return render_template('booking.html', club=foundclub, competition=foundcompetition)
     except IndexError:
-        flash("Something went wrong-please try again")
+        flash("Something went wrong-please try again", 'error')
         return render_template('welcome.html', club=club, competitions=competitions)
 
 
@@ -85,22 +84,22 @@ def purchaseplaces():
     try:
         placesrequired = int(request.form['places'])
         if placesrequired > int(club['points']):
-            flash('Sorry, you don\'t have enough points.')
+            flash('Sorry, you don\'t have enough points.', 'error')
             return render_template('booking.html', club=club, competition=competition), 403
         elif placesrequired > 12:
-            flash('Sorry, you can\'t book more than 12 places in a competition.')
+            flash('Sorry, you can\'t book more than 12 places in a competition.', 'error')
             return render_template('booking.html', club=club, competition=competition), 403
         else:
             try:
                 update_booked_places(competition, club, booked_places, placesrequired)
                 competition['numberOfPlaces'] = int(competition['numberOfPlaces']) - placesrequired
                 club['points'] = int(club['points']) - placesrequired
-                flash('Great-booking complete!')
+                flash('Great-booking complete!', 'succes')
                 return render_template('welcome.html', club=club, competitions=competitions), 200
             except ValueError as message:
                 flash(str(message))
     except ValueError:
-        flash('You must enter an integer.')
+        flash('You must enter an integer.', 'error')
     return render_template('booking.html', club=club, competition=competition), 403
 
 # TODO: Add route for points display
