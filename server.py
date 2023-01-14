@@ -1,4 +1,5 @@
 import json
+from datetime import datetime
 from flask import Flask, render_template, request, redirect, flash, url_for
 
 
@@ -30,6 +31,7 @@ app.secret_key = 'something_special'
 competitions = loadcompetitions()
 clubs = loadclubs()
 booked_places = initialize_booked_places(competitions, clubs)
+# past_competitions, future_competitions = sort_competitions_date(competitions)
 
 
 def update_booked_places(competition, club, bkd_places, placesrequired):
@@ -64,10 +66,13 @@ def showsummary():
 @app.route('/book/<competition>/<club>')
 def book(competition, club):
     foundclub = [c for c in clubs if c['name'] == club][0]
-    foundcompetition = [c for c in competitions if c['name'] == competition][0]
-    if foundclub and foundcompetition:
+    try:
+        foundcompetition = [c for c in competitions if c['name'] == competition][0]
+        if datetime.strptime(foundcompetition['date'], '%Y-%m-%d %H:%M:%S') < datetime.now():
+            flash("This competition is over.")
+            return render_template('welcome.html', club=foundclub, competitions=competitions), 403
         return render_template('booking.html', club=foundclub, competition=foundcompetition)
-    else:
+    except IndexError:
         flash("Something went wrong-please try again")
         return render_template('welcome.html', club=club, competitions=competitions)
 
@@ -103,3 +108,13 @@ def purchaseplaces():
 @app.route('/logout')
 def logout():
     return redirect(url_for('index'))
+
+
+@app.template_filter('to_date')
+def to_date_filter(iso_date):
+    return datetime.fromisoformat(iso_date)
+
+
+@app.template_filter('is_future')
+def is_future_filter(date):
+    return date > datetime.now()
