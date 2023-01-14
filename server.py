@@ -94,6 +94,7 @@ def purchaseplaces():
             try:
                 update_booked_places(competition, club, booked_places, placesrequired)
                 competition['numberOfPlaces'] = int(competition['numberOfPlaces']) - placesrequired
+                club['points'] = int(club['points']) - placesrequired
                 flash('Great-booking complete!')
                 return render_template('welcome.html', club=club, competitions=competitions), 200
             except ValueError as message:
