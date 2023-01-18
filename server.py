@@ -86,6 +86,9 @@ def purchaseplaces():
         if placesrequired > int(club['points']):
             flash('Sorry, you don\'t have enough points.', 'error')
             return render_template('booking.html', club=club, competition=competition), 403
+        elif placesrequired > int(competition['numberOfPlaces']):
+            flash('Not enough available places.', 'error')
+            return render_template('booking.html', club=club, competition=competition), 403
         elif placesrequired > 12:
             flash('Sorry, you can\'t book more than 12 places in a competition.', 'error')
             return render_template('booking.html', club=club, competition=competition), 403
@@ -101,8 +104,6 @@ def purchaseplaces():
     except ValueError:
         flash('You must enter an integer.', 'error')
     return render_template('booking.html', club=club, competition=competition), 403
-
-# TODO: Add route for points display
 
 
 @app.route('/showClubsSummary')
