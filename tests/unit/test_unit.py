@@ -59,3 +59,13 @@ class Test(TestCase):
             self.assertEqual(res.status_code, 200)
             self.assertIn("Sorry, that email wasn&#39;t found.",
                           res.data.decode(encoding='utf-8'))
+
+    def test_show_summary_good_email(self):
+        payload = {
+                'email': "kate@shelifts.co.uk",
+                }
+        with app.test_client() as client:
+            res = client.post('/showSummary', data=payload)
+
+            self.assertEqual(res.status_code, 200)
+            self.assertIn("She Lifts", res.data.decode(encoding='utf-8'))
