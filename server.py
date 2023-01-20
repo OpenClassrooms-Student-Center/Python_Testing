@@ -26,6 +26,17 @@ app.secret_key = 'something_special'
 
 competitions = loadCompetitions()
 clubs = loadClubs()
+history_of_reservation = []
+
+
+def get_number_of_place_reserved_for_competition(competition_name, club_name):
+    """Return the number of places reserved for a competition."""
+    number_of_place_reserved = 0
+    for reservation in history_of_reservation:
+        if (reservation['competition'] == competition_name and
+                reservation['club'] == club_name):
+            number_of_place_reserved += reservation['numberOfPlaces']
+    return number_of_place_reserved
 
 
 @app.route('/')
@@ -69,16 +80,28 @@ def purchasePlaces():
             club = c
 
     placesRequired = int(request.form['places'])
+    alreadyReserved = get_number_of_place_reserved_for_competition(
+            competition['name'], club['name'])
 
     if placesRequired > int(club['points']):
         flash(f"You don't have enough points to book {placesRequired} places")
         return render_template('welcome.html',
                                club=club,
                                competitions=competitions)
+    elif (placesRequired + alreadyReserved) > 12:
+        flash("You can only book 12 places per competition")
+        return render_template('welcome.html',
+                               club=club,
+                               competitions=competitions)
     else:
         competition['numberOfPlaces'] = int(
                 competition['numberOfPlaces'])-placesRequired
-        club['points'] = int(club['points'])-placesRequired
+        club['points'] = str(int(club['points'])-placesRequired)
+        history_of_reservation.append({
+            'competition': competition['name'],
+            'club': club['name'],
+            'numberOfPlaces': placesRequired,
+            })
         flash('Great-booking complete!')
         return render_template('welcome.html',
                                club=club,
