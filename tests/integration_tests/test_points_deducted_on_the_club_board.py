@@ -2,7 +2,7 @@ import server
 from server import app
 
 
-class TestPointsUpdated:
+class TestBoardPointsUpdated:
     client = app.test_client()
     competition = [
         {
@@ -26,12 +26,12 @@ class TestPointsUpdated:
 
     def test_points_updated(self):
         club_points_before = int(self.club[0]["points"])
-        places_booked = 3
+        booked_places = 3
 
         self.client.post(
             "/purchasePlaces",
             data={
-                "places": places_booked,
+                "places": booked_places,
                 "club": self.club[0]["name"],
                 "competition": self.competition[0]["name"]
             }
@@ -41,4 +41,4 @@ class TestPointsUpdated:
 
         assert result.status_code == 200
         assert f"<td>{self.club[0]['name']}</td>" in result.data.decode()
-        assert f"<td>{club_points_before - places_booked}</td>" in result.data.decode()
+        assert f"<td>{club_points_before - booked_places}</td>" in result.data.decode()

@@ -9,9 +9,7 @@
 <body>
     <h2>Welcome, {{club['email']}} </h2>
     <a href="{{url_for('logout')}}">Logout</a>
-    <br />
-    <br />
-    <a href="{{ url_for('showclubssummary') }}">Club points</a><br><br>
+
 
     {% include 'messages.html' %}
 
