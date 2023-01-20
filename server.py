@@ -5,7 +5,7 @@ from flask import (
         request,
         redirect,
         flash,
-        url_for
+        url_for,
         )
 
 
@@ -61,15 +61,28 @@ def book(competition, club):
 
 @app.route('/purchasePlaces', methods=['POST'])
 def purchasePlaces():
-    competition = [c for c in competitions if c['name'] == request.form['competition']][0]
-    club = [c for c in clubs if c['name'] == request.form['club']][0]
+    for c in competitions:
+        if c['name'] == request.form['competition']:
+            competition = c
+    for c in clubs:
+        if c['name'] == request.form['club']:
+            club = c
+
     placesRequired = int(request.form['places'])
-    competition['numberOfPlaces'] = int(
-            competition['numberOfPlaces'])-placesRequired
-    flash('Great-booking complete!')
-    return render_template('welcome.html',
-                           club=club,
-                           competitions=competitions)
+
+    if placesRequired > int(club['points']):
+        flash(f"You don't have enough points to book {placesRequired} places")
+        return render_template('welcome.html',
+                               club=club,
+                               competitions=competitions)
+    else:
+        competition['numberOfPlaces'] = int(
+                competition['numberOfPlaces'])-placesRequired
+        club['points'] = int(club['points'])-placesRequired
+        flash('Great-booking complete!')
+        return render_template('welcome.html',
+                               club=club,
+                               competitions=competitions)
 
 
 # TODO: Add route for points display

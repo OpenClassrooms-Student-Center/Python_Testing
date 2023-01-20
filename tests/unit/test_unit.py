@@ -1,5 +1,6 @@
 from unittest import TestCase
 from server import app
+import server
 import json
 
 
@@ -20,11 +21,8 @@ class Test(TestCase):
     def setUp(self):
         self.app = app.test_client()
         self.app.testing = True
-        self.club = loadClubs()
-        self.competition = loadCompetitions()
-
-    def test(self):
-        self.assertTrue(True)
+        server.clubs = loadClubs()
+        server.competitions = loadCompetitions()
 
     def test_load_clubs(self):
         club = loadClubs()
@@ -68,4 +66,47 @@ class Test(TestCase):
             res = client.post('/showSummary', data=payload)
 
             self.assertEqual(res.status_code, 200)
-            self.assertIn("She Lifts", res.data.decode(encoding='utf-8'))
+            self.assertIn("kate@shelifts.co.uk",
+                          res.data.decode(encoding='utf-8'))
+
+    def test_cannot_book_more_places_than_user_have(self):
+        """Test that the user cannot spend more points than they have."""
+        payload = {
+                'places': "13",
+                'competition': "Spring Festival",
+                'club': "She Lifts",
+                }
+        with app.test_client() as client:
+            res = client.post('/purchasePlaces', data=payload)
+
+            self.assertEqual(res.status_code, 200)
+            self.assertIn("You don&#39;t have enough points to book 13 places",
+                          res.data.decode(encoding='utf-8'))
+
+    def test_can_book_places(self):
+        """Test that the user can spend points."""
+        payload = {
+                'places': "4",
+                'competition': "Spring Festival",
+                'club': "She Lifts",
+                }
+        with app.test_client() as client:
+            res = client.post('/purchasePlaces', data=payload)
+
+            self.assertEqual(res.status_code, 200)
+            self.assertIn("Great-booking complete!",
+                          res.data.decode(encoding='utf-8'))
+
+    def test_point_are_correctly_deducted(self):
+        """Test that the user can spend points."""
+        payload = {
+                'places': "4",
+                'competition': "Spring Festival",
+                'club': "She Lifts",
+                }
+        with app.test_client() as client:
+            res = client.post('/purchasePlaces', data=payload)
+
+            self.assertEqual(res.status_code, 200)
+            self.assertIn("Points available: 8",
+                          res.data.decode(encoding='utf-8'))
