@@ -24,6 +24,13 @@ def return_club_from_server(club_name):
             return club
 
 
+def return_competition_from_server(competition_name):
+    """Return the competition from the competitions.json file."""
+    for competition in server.competitions:
+        if competition['name'] == competition_name:
+            return competition
+
+
 class Test(TestCase):
 
     def setUp(self):
@@ -148,3 +155,26 @@ class Test(TestCase):
                           html.unescape(res.data.decode(encoding='utf-8')))
             club = return_club_from_server('Simply Lift')
             self.assertEqual(club['points'], '13')
+
+    def test_competition_in_the_past_cant_be_reserved_anymore(self):
+        """Test that the user cannot book a competition that is in the past."""
+        with app.test_client() as client:
+            res = client.get('/book/Fall Classic/Simply Lift')
+
+            self.assertEqual(res.status_code, 200)
+            self.assertIn(("Sorry, you can't book for this competition as the"
+                           " date has passed."),
+                          html.unescape(res.data.decode(encoding='utf-8')))
+            club = return_club_from_server('Simply Lift')
+            self.assertEqual(club['points'], '13')
+
+    def test_competition_in_the_past_cant_be_reserved(self):
+        """Test gui doesn't show links anymore."""
+        payload = {
+                'email': "kate@shelifts.co.uk",
+                }
+        with app.test_client() as client:
+            res = client.post('/showSummary', data=payload)
+
+            self.assertEqual(res.status_code, 200)
+            self.assertEqual(res.data.decode(encoding='utf-8').count("<a"), 1)

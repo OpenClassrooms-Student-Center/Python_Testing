@@ -1,4 +1,5 @@
 import json
+import datetime
 from flask import (
         Flask,
         render_template,
@@ -46,8 +47,14 @@ def index():
 
 @app.route('/showSummary', methods=['POST'])
 def showSummary():
+    now = datetime.datetime.now()
     for club in clubs:
         if club['email'] == request.form['email']:
+            for comp in competitions:
+                date_as_datetime = datetime.datetime.strptime(
+                        comp['date'], '%Y-%m-%d %H:%M:%S')
+                if now > date_as_datetime:
+                    comp['passed'] = True
             return render_template('welcome.html',
                                    club=club,
                                    competitions=competitions)
@@ -57,16 +64,32 @@ def showSummary():
 
 @app.route('/book/<competition>/<club>')
 def book(competition, club):
-    foundClub = [c for c in clubs if c['name'] == club][0]
-    foundCompetition = [c for c in competitions if c['name'] == competition][0]
+    for c in clubs:
+        if c['name'] == club:
+            foundClub = c
+
+    for comp in competitions:
+        if comp['name'] == competition:
+            foundCompetition = comp
+
     if foundClub and foundCompetition:
-        return render_template('booking.html',
-                               club=foundClub,
-                               competition=foundCompetition)
+        now = datetime.datetime.now()
+        date_as_datetime = datetime.datetime.strptime(
+                foundCompetition['date'], '%Y-%m-%d %H:%M:%S')
+        if now < date_as_datetime:
+            return render_template('booking.html',
+                                   club=foundClub,
+                                   competition=foundCompetition)
+        else:
+            flash("Sorry, you can't book for this competition as " +
+                  "the date has passed.")
+            return render_template('welcome.html',
+                                   club=foundClub,
+                                   competitions=competitions)
     else:
         flash("Something went wrong-please try again")
         return render_template('welcome.html',
-                               club=club,
+                               club=foundClub,
                                competitions=competitions)
 
 
@@ -88,14 +111,23 @@ def purchasePlaces():
         return render_template('welcome.html',
                                club=club,
                                competitions=competitions)
+
     elif (placesRequired + alreadyReserved) > 12:
         flash("You can only book 12 places per competition")
         return render_template('welcome.html',
                                club=club,
                                competitions=competitions)
+
+    elif placesRequired > int(competition['numberOfPlaces']):
+        flash("Sorry, you can't book for this competition as"
+              " there are no places left.")
+        return render_template('welcome.html',
+                               club=club,
+                               competitions=competitions)
+
     else:
-        competition['numberOfPlaces'] = int(
-                competition['numberOfPlaces'])-placesRequired
+        competition['numberOfPlaces'] = str(int(
+                competition['numberOfPlaces'])-placesRequired)
         club['points'] = str(int(club['points'])-placesRequired)
         history_of_reservation.append({
             'competition': competition['name'],
