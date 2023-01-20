@@ -2,6 +2,7 @@ from unittest import TestCase
 from server import app
 import server
 import json
+import html
 
 
 def loadClubs():
@@ -16,15 +17,25 @@ def loadCompetitions():
         return listOfCompetitions
 
 
+def return_club_from_server(club_name):
+    """Return the club from the clubs.json file."""
+    for club in server.clubs:
+        if club['name'] == club_name:
+            return club
+
+
 class Test(TestCase):
 
     def setUp(self):
+        """Reset the 'database' before each test."""
         self.app = app.test_client()
         self.app.testing = True
         server.clubs = loadClubs()
         server.competitions = loadCompetitions()
+        server.history_of_reservation = []
 
     def test_load_clubs(self):
+        """Test that the clubs are loaded from the JSON file."""
         club = loadClubs()
         self.assertEqual(club,
                          [{'name': 'Simply Lift', 'email':
@@ -35,6 +46,7 @@ class Test(TestCase):
                            'points': '12'}])
 
     def test_load_competitions(self):
+        """Test that the competitions are loaded from the JSON file."""
         competition = loadCompetitions()
         self.assertEqual(competition,
                          [{'name': 'Spring Festival', 'date':
@@ -43,11 +55,14 @@ class Test(TestCase):
                            '2020-10-22 13:30:00', 'numberOfPlaces': '13'}])
 
     def test_server_is_running(self):
+        """Test that the server is running."""
         with app.test_client() as client:
             response = client.get('/')
             self.assertEqual(response.status_code, 200)
 
     def test_show_summary_bad_email(self):
+        """Test that the user is redirected to the index page if the email
+        is not found."""
         payload = {
                 'email': 'hello@example.com',
                 }
@@ -55,10 +70,12 @@ class Test(TestCase):
             res = client.post('/showSummary', data=payload)
 
             self.assertEqual(res.status_code, 200)
-            self.assertIn("Sorry, that email wasn&#39;t found.",
-                          res.data.decode(encoding='utf-8'))
+            self.assertIn("Sorry, that email wasn't found.",
+                          html.unescape(res.data.decode(encoding='utf-8')))
 
     def test_show_summary_good_email(self):
+        """Test that the user is redirected to the summary page if the email
+        is found."""
         payload = {
                 'email': "kate@shelifts.co.uk",
                 }
@@ -80,8 +97,8 @@ class Test(TestCase):
             res = client.post('/purchasePlaces', data=payload)
 
             self.assertEqual(res.status_code, 200)
-            self.assertIn("You don&#39;t have enough points to book 13 places",
-                          res.data.decode(encoding='utf-8'))
+            self.assertIn("You don't have enough points to book 13 places",
+                          html.unescape(res.data.decode(encoding='utf-8')))
 
     def test_can_book_places(self):
         """Test that the user can spend points."""
@@ -96,6 +113,8 @@ class Test(TestCase):
             self.assertEqual(res.status_code, 200)
             self.assertIn("Great-booking complete!",
                           res.data.decode(encoding='utf-8'))
+            club = return_club_from_server('She Lifts')
+            self.assertEqual(club['points'], '8')
 
     def test_point_are_correctly_deducted(self):
         """Test that the user can spend points."""
@@ -110,3 +129,22 @@ class Test(TestCase):
             self.assertEqual(res.status_code, 200)
             self.assertIn("Points available: 8",
                           res.data.decode(encoding='utf-8'))
+            club = return_club_from_server('She Lifts')
+            self.assertEqual(club['points'], '8')
+
+    def test_not_able_to_take_more_than_12_places_per_competition(self):
+        """Test that the user cannot book more
+        than 12 places per competition."""
+        payload = {
+                'places': "13",
+                'competition': "Spring Festival",
+                'club': "Simply Lift",
+                }
+        with app.test_client() as client:
+            res = client.post('/purchasePlaces', data=payload)
+
+            self.assertEqual(res.status_code, 200)
+            self.assertIn("You can only book 12 places per competition",
+                          html.unescape(res.data.decode(encoding='utf-8')))
+            club = return_club_from_server('Simply Lift')
+            self.assertEqual(club['points'], '13')
