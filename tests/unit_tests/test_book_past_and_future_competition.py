@@ -35,6 +35,7 @@ class TestBookPastAndFutureCompetition:
             f"/book/{self.competitions[0]['name']}/{self.club[0]['name']}"
         )
         assert result.status_code == 403
+        assert "This competition is over." in result.data.decode()
 
     def test_book_future_competition(self):
         result = self.client.get(
