@@ -128,6 +128,7 @@ def purchasePlaces():
     else:
         competition['numberOfPlaces'] = str(int(
                 competition['numberOfPlaces'])-placesRequired)
+        # Update the number of points the club has left after booking
         club['points'] = str(int(club['points'])-placesRequired)
         history_of_reservation.append({
             'competition': competition['name'],
