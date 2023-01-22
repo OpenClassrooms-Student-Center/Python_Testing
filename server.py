@@ -57,7 +57,8 @@ def showSummary():
                     comp['passed'] = True
             return render_template('welcome.html',
                                    club=club,
-                                   competitions=competitions)
+                                   competitions=competitions,
+                                   clubs=clubs)
     return render_template('index.html',
                            error="Sorry, that email wasn't found.")
 
@@ -110,20 +111,23 @@ def purchasePlaces():
         flash(f"You don't have enough points to book {placesRequired} places")
         return render_template('welcome.html',
                                club=club,
-                               competitions=competitions)
+                               competitions=competitions,
+                               clubs=clubs)
 
     elif (placesRequired + alreadyReserved) > 12:
         flash("You can only book 12 places per competition")
         return render_template('welcome.html',
                                club=club,
-                               competitions=competitions)
+                               competitions=competitions,
+                               clubs=clubs)
 
     elif placesRequired > int(competition['numberOfPlaces']):
         flash("Sorry, you can't book for this competition as"
               " there are no places left.")
         return render_template('welcome.html',
                                club=club,
-                               competitions=competitions)
+                               competitions=competitions,
+                               clubs=clubs)
 
     else:
         competition['numberOfPlaces'] = str(int(
@@ -138,7 +142,7 @@ def purchasePlaces():
         flash('Great-booking complete!')
         return render_template('welcome.html',
                                club=club,
-                               competitions=competitions)
+                               competitions=competitions, clubs=clubs)
 
 
 # TODO: Add route for points display
