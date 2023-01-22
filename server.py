@@ -77,7 +77,6 @@ def book(competition, club):
         return render_template('booking.html', club=foundclub, competition=foundcompetition), 200
 
 
-
 @app.route('/purchasePlaces', methods=['POST'])
 def purchaseplaces():
     competition = [c for c in competitions if c['name'] == request.form['competition']][0]
