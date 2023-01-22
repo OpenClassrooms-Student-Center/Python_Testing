@@ -6,13 +6,13 @@ import html
 
 
 def loadClubs():
-    with open('clubs.json') as c:
+    with open('test_clubs.json') as c:
         listOfClubs = json.load(c)['clubs']
         return listOfClubs
 
 
 def loadCompetitions():
-    with open('competitions.json') as comps:
+    with open('test_competitions.json') as comps:
         listOfCompetitions = json.load(comps)['competitions']
         return listOfCompetitions
 
@@ -188,5 +188,11 @@ class Test(TestCase):
             res = client.post('/showSummary', data=payload)
 
             self.assertEqual(res.status_code, 200)
-            self.assertIn("Points Board",
+            self.assertIn("Club points",
+                          html.unescape(res.data.decode(encoding='utf-8')))
+            self.assertIn("Simply Lift",
+                          html.unescape(res.data.decode(encoding='utf-8')))
+            self.assertIn("Iron Temple",
+                          html.unescape(res.data.decode(encoding='utf-8')))
+            self.assertIn("She Lifts",
                           html.unescape(res.data.decode(encoding='utf-8')))
