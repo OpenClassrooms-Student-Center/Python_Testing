@@ -42,7 +42,7 @@ def get_number_of_place_reserved_for_competition(competition_name, club_name):
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('index.html', clubs=clubs)
 
 
 @app.route('/showSummary', methods=['POST'])
