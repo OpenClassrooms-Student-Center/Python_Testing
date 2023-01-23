@@ -1,34 +1,13 @@
 from unittest import TestCase
 from server import app
+from tests.unit.test_unit import (
+        loadClubs,
+        loadCompetitions,
+        return_club_from_server,
+        return_competition_from_server
+        )
 import server
-import json
 import html
-
-
-def loadClubs():
-    with open('clubs.json') as c:
-        listOfClubs = json.load(c)['clubs']
-        return listOfClubs
-
-
-def loadCompetitions():
-    with open('competitions.json') as comps:
-        listOfCompetitions = json.load(comps)['competitions']
-        return listOfCompetitions
-
-
-def return_club_from_server(club_name):
-    """Return the club from the clubs.json file."""
-    for club in server.clubs:
-        if club['name'] == club_name:
-            return club
-
-
-def return_competition_from_server(competition_name):
-    """Return the competition from the competitions.json file."""
-    for competition in server.competitions:
-        if competition['name'] == competition_name:
-            return competition
 
 
 class Test(TestCase):

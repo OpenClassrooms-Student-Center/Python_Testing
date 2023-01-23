@@ -9,3 +9,4 @@ class HelloWorldUser(HttpUser):
                 'email': 'kate@shelifts.co.uk',
                 }
         self.client.post('/showSummary', data=payload)
+        self.client.get('/logout')
