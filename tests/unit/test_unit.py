@@ -51,6 +51,15 @@ class Test(TestCase):
                            'admin@irontemple.com', 'points': '4'},
                           {'name': 'She Lifts', 'email': 'kate@shelifts.co.uk',
                            'points': '12'}])
+        self.assertEqual(club[0]['name'], 'Simply Lift')
+        self.assertEqual(club[1]['name'], 'Iron Temple')
+        self.assertEqual(club[2]['name'], 'She Lifts')
+        self.assertEqual(club[0]['email'], 'john@simplylift.co')
+        self.assertEqual(club[1]['email'], 'admin@irontemple.com')
+        self.assertEqual(club[2]['email'], 'kate@shelifts.co.uk')
+        self.assertEqual(club[0]['points'], '13')
+        self.assertEqual(club[1]['points'], '4')
+        self.assertEqual(club[2]['points'], '12')
 
     def test_load_competitions(self):
         """Test that the competitions are loaded from the JSON file."""
@@ -60,6 +69,12 @@ class Test(TestCase):
                            '2020-03-27 10:00:00', 'numberOfPlaces': '25'},
                           {'name': 'Fall Classic', 'date':
                            '2020-10-22 13:30:00', 'numberOfPlaces': '13'}])
+        self.assertEqual(competition[0]['name'], 'Spring Festival')
+        self.assertEqual(competition[1]['name'], 'Fall Classic')
+        self.assertEqual(competition[0]['date'], '2020-03-27 10:00:00')
+        self.assertEqual(competition[1]['date'], '2020-10-22 13:30:00')
+        self.assertEqual(competition[0]['numberOfPlaces'], '25')
+        self.assertEqual(competition[1]['numberOfPlaces'], '13')
 
     def test_server_is_running(self):
         """Test that the server is running."""
@@ -72,6 +87,19 @@ class Test(TestCase):
         is not found."""
         payload = {
                 'email': 'hello@example.com',
+                }
+        with app.test_client() as client:
+            res = client.post('/showSummary', data=payload)
+
+            self.assertEqual(res.status_code, 200)
+            self.assertIn("Sorry, that email wasn't found.",
+                          html.unescape(res.data.decode(encoding='utf-8')))
+
+    def test_show_summary_empty_email(self):
+        """Test that the user is redirected to the index page if the email
+        is empty."""
+        payload = {
+                'email': '',
                 }
         with app.test_client() as client:
             res = client.post('/showSummary', data=payload)
