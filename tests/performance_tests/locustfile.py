@@ -17,7 +17,7 @@ class LocustTestServer(HttpUser):
         self.client.post(
             "/purchasePlaces",
             data={
-                "places": 1,
+                "places": 0,
                 "club": "Simply Lift",
                 "competition": "Spring Festival"
                  }

@@ -8,3 +8,4 @@ env/
 .idea/
 .pytest_cache
 .coverage
+assets/

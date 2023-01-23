@@ -94,16 +94,50 @@ Puis, accédez à l'adresse par défaut : [http://127.0.0.1:5000/](http://127.0.
 
 #### 2.1 Lancement des tests
 
-###### Tests unitaires, d'intégration et fonctionnel
-###### Couvertures de Test coverage
-###### Test de performances Locust
+###### Tests unitaires, d'intégration, fonctionnel et de couverture  
+Ces tests peuvent être effectués ensemble grâce à Pytest et Coverage. Pour que le test fonctionnel passe, il faut avoir lancé le serveur Flask au préalable.  
+Supprimez le dossier htmlcov et le fichier report.html présents en racine du projet.
+Exécutez ensuite la commande :
+
+    pytest --html=report.html --cov-report html:cov_html  
+- Un fichier report.html est alors regénéré. Il suffit de l'ouvrir avec votre navigateur et vous pouvez consulter le rapport des tests unitaires, d'intégration et fonctionnel.  
+- Un répertoire htmlcov est égélement présent. En l'ouvrant, vous pouvez consulter le rapport des tests de couverture à partir du fichier index.html
+
+###### Lancement des tests de performances Locust  
+Assurez-vous d'avoir lancé le serveur Flask, puis tapez :
+ 
+    locust -f .\tests\performance_tests\locustfile.py --web-host=localhost  
+
+Vous êtes alors invité à vous rendre sur l'adresse [http://localhost:8089](http://localhost:8089). Entrez les options souhaitées, comme 6 pour le nombre d'utilisateurs simultanés et pour 'host' l'adresse du site (http://127.0.0.1:5000/).  
+Cliquez sur le bouton Start Swarming pour démarrer le test.
+
 ###### Flake8
+Pour vérifier la cohérence du code avec la norme PEP8, vous pouvez lancer flake8-html et générer un rapport html.
+Supprimez le dossier flake8_report situé à la racine du projet.
+Depuis le terminal, placez-vous à la racine du projet et tapez :
+ 
+
+      flake8 --format=html --htmldir=flake8_report
+
+
+Le dossier flake8_report est de nouveau généré. Il contient le rapport global dans un fichier nommé index.html
 
 <div id="heading--2-2"/>
 
 #### 2.2 Présentation des rapports
 
+###### Tests  
 
+![tests_report](images/tests_report.png)  
 
+![coverage_report](images/coverage_report.png)  
 
+![server](images/server.png)  
 
+###### Performance  
+
+![locust_ok](images/locust_ok.png)  
+
+###### Flake8  
+
+![flake8](images/flake8.png) 
