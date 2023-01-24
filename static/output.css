@@ -691,6 +691,10 @@ video {
   height: 10rem;
 }
 
+.h-36 {
+  height: 9rem;
+}
+
 .max-h-full {
   max-height: 100%;
 }
@@ -992,6 +996,11 @@ video {
 .text-violet-600 {
   --tw-text-opacity: 1;
   color: rgb(124 58 237 / var(--tw-text-opacity));
+}
+
+.shadow-black {
+  --tw-shadow-color: #000;
+  --tw-shadow: var(--tw-shadow-colored);
 }
 
 .drop-shadow-2xl {
