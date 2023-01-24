@@ -2,51 +2,58 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link href="{{ url_for('static', filename='output.css') }}" rel="stylesheet">
         <title>Summary | GUDLFT Registration</title>
     </head>
     <body>
-        <h2>Welcome, {{club['email']}} </h2><a href="{{url_for('logout')}}">Logout</a>
+        <div class="bg-gradient-to-br from-blue-700 to-fuchsia-400 flex flex-col justify-center text-center h-screen">
+            <div class="h-1/6">
+                <h2 class="text-white text-3xl mt-5">Welcome, {{club['email']}} </h2>
 
-        {% with messages = get_flashed_messages()%}
-        {% if messages %}
-        <ul>
-            {% for message in messages %}
-            <li>{{message}}</li>
-            {% endfor %}
-        </ul>
-        {% endif%}
-        Points available: {{club['points']}}
-        <br>
-        <table>
-            <thead>
-                <tr>
-                    <th colspan="2">Club points</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for club in clubs %}
-                <tr>
-                    <td>{{club['name']}}</td>
-                    <td>{{club['points']}}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-            <br>
-        </table>
-        <h3>Competitions:</h3>
-        <ul>
-            {% for comp in competitions%}
-            <li>
-                {{comp['name']}}<br />
-                Date: {{comp['date']}}</br>
-                Number of Places: {{comp['numberOfPlaces']}}
-                {% if comp['numberOfPlaces']|int >0 and not comp['passed'] %}
-                <a href="{{ url_for('book',competition=comp['name'],club=club['name']) }}">Book Places</a>
-                {%endif%}
-            </li>
-            <hr />
-            {% endfor %}
-        </ul>
-        {%endwith%}
+                {% with messages = get_flashed_messages()%}
+                {% if messages %}
+                <ul>
+                    {% for message in messages %}
+                    <li class="text-white">{{message}}</li>
+                    {% endfor %}
+                </ul>
+                {% endif%}
+                <p class="text-white mb-3 text-xl">Points available: {{club['points']}}</p>
+                <a class="bg-gradient-to-br from-violet-400 to-rose-400 rounded-3xl p-2" href="{{url_for('logout')}}">Logout</a>
+            </div>
+            <table class="text-white w-2/3 h-1/6 content-center mx-auto text-center p-auto mb-16 mt-3">
+                <thead class="bg-gray-900">
+                    <tr>
+                        <th>Club</th>
+                        <th>Points available</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for club in clubs %}
+                    <tr>
+                        <td class="bg-gray-200 text-violet-600">{{club['name']}}</td>
+                        <td class="bg-gray-200 text-violet-600">{{club['points']}}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                <br>
+            </table>
+            <h2 class="text-6xl text-white">Competitions</h2>
+            <div class="h-4/6 p-4">
+                <div class="grid grid-cols-4 gap-4">
+                    {% for comp in competitions%}
+                    <div class="bg-white rounded h-35 text-center">
+                        <h4 class="text-xl">{{comp['name']}}</h4>
+                        <p>Date: {{comp['date']}}</p>
+                        <p>Number of Places: {{comp['numberOfPlaces']}}</p>
+                        {% if comp['numberOfPlaces']|int >0 and not comp['passed'] %}
+                        <a class="m-auto w-1/3 bg-gradient-to-br from-violet-400 to-rose-400 rounded-3xl" href="{{ url_for('book',competition=comp['name'],club=club['name']) }}">Book Places</a>
+                        {%endif%}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {%endwith%}
+        </div>
     </body>
 </html>
