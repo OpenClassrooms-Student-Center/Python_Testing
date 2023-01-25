@@ -1,0 +1,26 @@
+{
+  "name": "gudlft",
+  "version": "1.0.0",
+  "description": "flask software",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib",
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Meez25/Python_Testing.git"
+  },
+  "author": "Yann Bronner",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Meez25/Python_Testing/issues"
+  },
+  "homepage": "https://github.com/Meez25/Python_Testing#readme",
+  "dependencies": {
+    "tailwindcss": "^3.2.4"
+  }
+}
