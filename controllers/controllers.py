@@ -62,21 +62,19 @@ def remove_points_from_club(club, clubs_list, points_to_remove):
     return clubs_list
 
 
-def verify_user_input(request):
+def verify_user_input(request, clubs_list, competitions_list):
     """Sanitize user post."""
     competition = find_competition(
             request.form['competition'], competitions_list)
     club = find_club(request.form['club'], clubs_list)
     try:
         places_required = int(request.form['places'])
+        if places_required < 1:
+            raise CannotBookLessThanOnePlace
     except ValueError:
-        message = 'The number of places must be an integer'
-        page = 'index.html'
-
+        raise ValueError
     if not competition or not club or not places_required:
-        message = 'Une erreur est survenue, veuillez réessayer.'
-        page = 'index.html'
-        return message, page
+        raise ValueMissing
     else:
         return competition, club, places_required
 
@@ -89,9 +87,9 @@ def club_has_enough_points(club, places_required):
         return True
 
 
-def club_wants_more_than_twelve_places(places_required, alreadyReserved):
+def club_wants_more_than_twelve_places(places_required, already_reserved):
     """Verify the club wants to book more than 12 places."""
-    if (places_required + alreadyReserved) > 12:
+    if (places_required + already_reserved) > 12:
         return True
     else:
         return False
@@ -121,7 +119,17 @@ class NotEnoughPoints(Exception):
     pass
 
 
-def verify_club_can_book(competition, club, places_required, alreadyReserved):
+class ValueMissing(Exception):
+    """Exception raised when a value is missing."""
+    pass
+
+
+class CannotBookLessThanOnePlace(Exception):
+    """Exception raised when a club wants to book less than 1 place."""
+    pass
+
+
+def verify_club_can_book(competition, club, places_required, already_reserved):
     """Verify the club can book."""
     if not club_has_enough_points(club, places_required):
         raise NotEnoughPoints
@@ -129,7 +137,7 @@ def verify_club_can_book(competition, club, places_required, alreadyReserved):
                 'You don\'t have enough points to book {} places'.format(
                     places_required), 'welcome.html')
 
-    if club_wants_more_than_twelve_places(places_required, alreadyReserved):
+    if club_wants_more_than_twelve_places(places_required, already_reserved):
         raise BookMoreThanTwelvePlaces
         return (False,
                 "You can only book 12 places per competition", 'welcome.html')
@@ -156,7 +164,24 @@ def add_reservation_to_history(competition, club, places_required,
 def handle_purchase(request, history_of_reservation, competitions_list,
                     clubs_list):
     """Handle the purchase process."""
-    competition, club, places_required = verify_user_input(request)
+    try:
+        competition, club, places_required = verify_user_input(
+                request, clubs_list, competitions_list)
+    except CannotBookLessThanOnePlace:
+        message = "You can't book less than 1 place."
+        page = 'index.html'
+        club = ''
+        return message, page, club
+    except ValueMissing:
+        message = 'Please fill all the fields.'
+        page = 'index.html'
+        club = ''
+        return message, page, club
+    except ValueError:
+        message = 'Please enter a number for the number of places.'
+        page = 'index.html'
+        club = ''
+        return message, page, club
 
     alreadyReserved = get_number_of_place_reserved_for_competition(
             competition['name'], club['name'], history_of_reservation)
@@ -179,16 +204,19 @@ def handle_purchase(request, history_of_reservation, competitions_list,
 
     except NotEnoughPoints:
         message = ("You don't have enough points"
-                   f" to book {places_required} places")
+                   f" to book {places_required} places.")
         page = 'welcome.html'
+        return message, page, club
 
     except BookMoreThanTwelvePlaces:
-        message = ("You can only book 12 places per competition")
+        message = ("You can only book 12 places per competition.")
         page = 'welcome.html'
+        return message, page, club
 
     except BookMoreThanAvailablePlaces:
-        message = ("Sorry, you can't book for this competition as there"
+        message = ("Sorry, you can't book for this competition as there "
                    "are not enough places.")
         page = 'welcome.html'
+        return message, page, club
 
     return message, page, club

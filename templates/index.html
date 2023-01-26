@@ -10,6 +10,15 @@
             <div class="bg-white h-4/6 w-5/6 m-auto p-auto flex drop-shadow-md rounded">
                 <div class="bg-gradient-to-br from-violet-400 to-rose-400 w-4/6 grid content-center rounded">
                     <h1 class="text-3xl m-5 text-white font-sans font-bold">Welcome to the GUDLFT Registration Portal!</h1>
+                    {% with messages = get_flashed_messages()%}
+                    {% if messages %}
+                    <ul>
+                        {% for message in messages %}
+                        <li class="text-red-500 font-bold">{{message}}</li>
+                        {% endfor %}
+                    </ul>
+                    {% endif%}
+                    {%endwith%}
                     <p class="text-white mb-8 text-xl">See below the table that sums up the point that each clubs has.</p>
                     <table class="text-white w-2/3 content-center mx-auto text-center p-auto mb-16">
                         <thead class="bg-violet-700">
