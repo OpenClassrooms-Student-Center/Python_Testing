@@ -14,7 +14,7 @@
                 {% if messages %}
                 <ul>
                     {% for message in messages %}
-                    <li class="text-white">{{message}}</li>
+                    <li class="text-red-500 font-bold">{{message}}</li>
                     {% endfor %}
                 </ul>
                 {% endif%}
@@ -22,7 +22,7 @@
                 <a class="bg-gradient-to-br from-violet-400 to-rose-400 rounded-3xl p-2 text-white" href="{{url_for('logout')}}">Logout</a>
             </div>
             <table class="text-white w-2/3 h-1/6 content-center mx-auto text-center p-auto mb-16 mt-3">
-                <thead class="bg-gray-900">
+                <thead class="bg-violet-700">
                     <tr>
                         <th>Club</th>
                         <th>Points available</th>

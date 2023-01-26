@@ -1,6 +1,6 @@
+import server
 from unittest import TestCase
 from server import app
-import server
 import json
 import html
 
@@ -216,7 +216,7 @@ class Test(TestCase):
             res = client.post('/showSummary', data=payload)
 
             self.assertEqual(res.status_code, 200)
-            self.assertIn("Club points",
+            self.assertIn("Points available",
                           html.unescape(res.data.decode(encoding='utf-8')))
             self.assertIn("Simply Lift",
                           html.unescape(res.data.decode(encoding='utf-8')))

@@ -1,5 +1,3 @@
-import json
-import datetime
 from flask import (
         Flask,
         render_template,
@@ -8,144 +6,70 @@ from flask import (
         flash,
         url_for,
         )
-
-
-def loadClubs():
-    with open('clubs.json') as c:
-        listOfClubs = json.load(c)['clubs']
-        return listOfClubs
-
-
-def loadCompetitions():
-    with open('competitions.json') as comps:
-        listOfCompetitions = json.load(comps)['competitions']
-        return listOfCompetitions
-
+from controllers import controllers
 
 app = Flask(__name__)
 app.secret_key = 'something_special'
 
-competitions = loadCompetitions()
-clubs = loadClubs()
-history_of_reservation = []
-
-
-def get_number_of_place_reserved_for_competition(competition_name, club_name):
-    """Return the number of places reserved for a competition."""
-    number_of_place_reserved = 0
-    for reservation in history_of_reservation:
-        if (reservation['competition'] == competition_name and
-                reservation['club'] == club_name):
-            number_of_place_reserved += reservation['numberOfPlaces']
-    return number_of_place_reserved
-
 
 @app.route('/')
 def index():
-    return render_template('index.html', clubs=clubs)
+    return render_template('index.html', clubs=controllers.clubs_list)
 
 
 @app.route('/showSummary', methods=['POST'])
 def showSummary():
-    now = datetime.datetime.now()
-    for club in clubs:
-        if club['email'] == request.form['email']:
-            for comp in competitions:
-                date_as_datetime = datetime.datetime.strptime(
-                        comp['date'], '%Y-%m-%d %H:%M:%S')
-                if now > date_as_datetime:
-                    comp['passed'] = True
-            return render_template('welcome.html',
-                                   club=club,
-                                   competitions=competitions,
-                                   clubs=clubs)
-    return render_template('index.html',
-                           error="Sorry, that email wasn't found.")
+    email = controllers.email_found(request, controllers.clubs_list)
+    if not email:
+        return render_template('index.html',
+                               error="Sorry, that email wasn't found.")
+    club = controllers.email_found(request, controllers.clubs_list)
+    return render_template('welcome.html',
+                           club=club,
+                           competitions=controllers.competitions_list,
+                           clubs=controllers.clubs_list)
 
 
 @app.route('/book/<competition>/<club>')
 def book(competition, club):
-    for c in clubs:
-        if c['name'] == club:
-            foundClub = c
-
-    for comp in competitions:
-        if comp['name'] == competition:
-            foundCompetition = comp
-
-    if foundClub and foundCompetition:
-        now = datetime.datetime.now()
-        date_as_datetime = datetime.datetime.strptime(
-                foundCompetition['date'], '%Y-%m-%d %H:%M:%S')
-        if now < date_as_datetime:
+    club_found = controllers.find_club(club, controllers.clubs_list)
+    competition_found = controllers.find_competition(
+            competition, controllers.competitions_list)
+    if not club_found:
+        return render_template('index.html',
+                               error="Sorry, that club wasn't found.")
+    if not competition_found:
+        return render_template('index.html',
+                               error="Sorry, that competition wasn't found.")
+    if club_found and competition_found:
+        if not competition_found['passed']:
             return render_template('booking.html',
-                                   club=foundClub,
-                                   competition=foundCompetition)
+                                   club=club_found,
+                                   competition=competition_found)
         else:
             flash("Sorry, you can't book for this competition as " +
                   "the date has passed.")
             return render_template('welcome.html',
-                                   club=foundClub,
-                                   competitions=competitions)
+                                   club=club_found,
+                                   competitions=controllers.competitions_list)
     else:
         flash("Something went wrong-please try again")
         return render_template('welcome.html',
-                               club=foundClub,
-                               competitions=competitions)
+                               club=club_found,
+                               competitions=controllers.competitions_list)
 
 
 @app.route('/purchasePlaces', methods=['POST'])
 def purchasePlaces():
-    for c in competitions:
-        if c['name'] == request.form['competition']:
-            competition = c
-    for c in clubs:
-        if c['name'] == request.form['club']:
-            club = c
 
-    placesRequired = int(request.form['places'])
-    alreadyReserved = get_number_of_place_reserved_for_competition(
-            competition['name'], club['name'])
-
-    if placesRequired > int(club['points']):
-        flash(f"You don't have enough points to book {placesRequired} places")
-        return render_template('welcome.html',
-                               club=club,
-                               competitions=competitions,
-                               clubs=clubs)
-
-    elif (placesRequired + alreadyReserved) > 12:
-        flash("You can only book 12 places per competition")
-        return render_template('welcome.html',
-                               club=club,
-                               competitions=competitions,
-                               clubs=clubs)
-
-    elif placesRequired > int(competition['numberOfPlaces']):
-        flash("Sorry, you can't book for this competition as"
-              " there are no places left.")
-        return render_template('welcome.html',
-                               club=club,
-                               competitions=competitions,
-                               clubs=clubs)
-
-    else:
-        competition['numberOfPlaces'] = str(int(
-                competition['numberOfPlaces'])-placesRequired)
-        # Update the number of points the club has left after booking
-        club['points'] = str(int(club['points'])-placesRequired)
-        history_of_reservation.append({
-            'competition': competition['name'],
-            'club': club['name'],
-            'numberOfPlaces': placesRequired,
-            })
-        flash('Great-booking complete!')
-        return render_template('welcome.html',
-                               club=club,
-                               competitions=competitions, clubs=clubs)
-
-
-# TODO: Add route for points display
+    message, page, club = controllers.handle_purchase(
+            request, controllers.history_of_reservation,
+            controllers.competitions_list, controllers.clubs_list)
+    flash(message)
+    return render_template(page,
+                           club=club,
+                           competitions=controllers.competitions_list,
+                           clubs=controllers.clubs_list)
 
 
 @app.route('/logout')
