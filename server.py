@@ -6,6 +6,7 @@ from flask import (
         flash,
         url_for,
         )
+
 from controllers import controllers
 
 app = Flask(__name__)
@@ -22,7 +23,8 @@ def showSummary():
     email = controllers.email_found(request, controllers.clubs_list)
     if not email:
         return render_template('index.html',
-                               error="Sorry, that email wasn't found.")
+                               error="Sorry, that email wasn't found.",
+                               clubs=controllers.clubs_list)
     club = controllers.email_found(request, controllers.clubs_list)
     return render_template('welcome.html',
                            club=club,
@@ -37,26 +39,36 @@ def book(competition, club):
             competition, controllers.competitions_list)
     if not club_found:
         return render_template('index.html',
-                               error="Sorry, that club wasn't found.")
+                               error="Sorry, that club wasn't found.",
+                               clubs=controllers.clubs_list)
     if not competition_found:
         return render_template('index.html',
-                               error="Sorry, that competition wasn't found.")
+                               error="Sorry, that competition wasn't found.",
+                               clubs=controllers.clubs_list)
     if club_found and competition_found:
-        if not competition_found['passed']:
-            return render_template('booking.html',
+        if competition_found['numberOfPlaces'] == '0':
+            flash("Sorry, there are no places left for this competition.")
+            return render_template('welcome.html',
                                    club=club_found,
-                                   competition=competition_found)
-        else:
+                                   clubs=controllers.clubs_list,
+                                   competitions=controllers.competitions_list)
+        elif competition_found['passed']:
             flash("Sorry, you can't book for this competition as " +
                   "the date has passed.")
             return render_template('welcome.html',
                                    club=club_found,
+                                   clubs=controllers.clubs_list,
                                    competitions=controllers.competitions_list)
+        elif not competition_found['passed']:
+            return render_template('booking.html',
+                                   club=club_found,
+                                   competition=competition_found)
     else:
         flash("Something went wrong-please try again")
         return render_template('welcome.html',
                                club=club_found,
-                               competitions=controllers.competitions_list)
+                               competitions=controllers.competitions_list,
+                               clubs=controllers.clubs_list)
 
 
 @app.route('/purchasePlaces', methods=['POST'])

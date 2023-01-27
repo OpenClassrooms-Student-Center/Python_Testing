@@ -1,5 +1,6 @@
 from models import models
 
+
 clubs_list = models.load_clubs()
 competitions_list = models.load_competitions()
 history_of_reservation = []

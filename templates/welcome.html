@@ -46,9 +46,7 @@
                         <h4 class="text-xl">{{comp['name']}}</h4>
                         <p>Date: {{comp['date']}}</p>
                         <p>Number of Places: {{comp['numberOfPlaces']}}</p>
-                        {% if comp['numberOfPlaces']|int >0 and not comp['passed'] %}
                         <a class="m-auto p-1 w-1/3 bg-gradient-to-br from-violet-400 to-rose-400 rounded-3xl text-white" href="{{ url_for('book',competition=comp['name'],club=club['name']) }}">Book Places</a>
-                        {%endif%}
                     </div>
                     {% endfor %}
                 </div>

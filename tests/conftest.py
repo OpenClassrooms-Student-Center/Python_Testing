@@ -1,4 +1,53 @@
 import pytest
+from server import app
+
+
+@pytest.fixture
+def mock_clubs(mocker):
+    data = [{
+        "name": "Simply Lift",
+        "email": "john@simplylift.co",
+        "points": "13"
+        },
+            {
+                "name": "Iron Temple",
+                "email": "admin@irontemple.com",
+                "points": "4"
+                },
+            {
+                "name": "She Lifts",
+                "email": "kate@shelifts.co.uk",
+                "points": "12"
+                }
+            ]
+    mocker.patch.object('Python_Testing.controllers.clubs_list', data)
+
+
+@pytest.fixture
+def mock_competitions(mocker):
+    data = [
+        {
+            "name": "Spring Festival",
+            "date": "2020-03-27 10:00:00",
+            "numberOfPlaces": "25"
+            },
+        {
+            "name": "Fall Classic",
+            "date": "2020-10-22 13:30:00",
+            "numberOfPlaces": "13"
+            },
+        {
+            "name": "Winter Classic",
+            "date": "2023-12-31 10:00:00",
+            "numberOfPlaces": "10"
+            },
+        {
+            "name": "Summer Classic",
+            "date": "2023-06-30 10:00:00",
+            "numberOfPlaces": "10"
+            }
+        ]
+    mocker.patch('Python_Testing.controllers.competitions_list', data)
 
 
 @pytest.fixture
@@ -79,3 +128,39 @@ def clubs_list():
                 "points": "12"
                 }
             ]
+
+
+@pytest.fixture
+def club_15_points():
+    """Return a club with 15 points."""
+    return {
+            "name": "Simply Lift",
+            "email": "toto@mail.com",
+            "points": "15"
+            }
+
+
+@pytest.fixture
+def club_4_points():
+    """Return a club with 4 points."""
+    return {
+            "name": "Simply Lift",
+            "email": "not_relevant@email.com",
+            "points": "4"
+            }
+
+
+@pytest.fixture
+def competition_1_place():
+    """Competition with 1 place."""
+    return {
+            "name": "Spring Festival",
+            "date": "2020-03-27 10:00:00",
+            "numberOfPlaces": "1"
+            }
+
+
+@pytest.fixture
+def client():
+    """Test the function load_clubs."""
+    return app.test_client()
