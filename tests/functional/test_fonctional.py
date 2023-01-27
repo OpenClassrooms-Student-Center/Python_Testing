@@ -94,4 +94,4 @@ def test_club_cannot_book_more_than_club_points(client):
         }
     res = client.post("/purchasePlaces", data=payload)
     soup = BeautifulSoup(res.data, 'html.parser')
-    assert ("You don't have enough points to book 5 places.") in soup.prettify()
+    assert ("You don't have enough points to book 5 places") in soup.prettify()
