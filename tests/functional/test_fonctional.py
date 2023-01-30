@@ -1,79 +1,112 @@
-from unittest import TestCase
-from server import app
-from tests.unit.test_unit import (
-        loadClubs,
-        loadCompetitions,
-        return_club_from_server,
-        return_competition_from_server
-        )
-import server
-import html
+from bs4 import BeautifulSoup
 
 
-class Test(TestCase):
+def test_first_page(client):
+    """Test the login page."""
+    response = client.get('/')
+    assert b'Simply Lift' in response.data
+    assert response.status_code == 200
 
-    def setUp(self):
-        """Reset the 'database' before each test."""
-        self.app = app.test_client()
-        self.app.testing = True
-        server.clubs = loadClubs()
-        server.competitions = loadCompetitions()
-        server.history_of_reservation = []
 
-    def test_no_more_than_12_places_in_several_times(self):
-        """Test that the user cannot book more
-        than 12 places in several times."""
-        payload = {
-                'places': "7",
-                'competition': "Spring Festival",
-                'club': "Simply Lift",
-                }
-        with app.test_client() as client:
-            res = client.post('/purchasePlaces', data=payload)
+def test_user_can_login(client):
+    """Test the login page."""
+    payload = {
+        "email": "kate@shelifts.co.uk"
+        }
+    response = client.post("/showSummary", data=payload)
+    assert response.status_code == 200
+    assert b'Welcome, kate@shelifts.co.uk' in response.data
 
-            self.assertEqual(res.status_code, 200)
-            self.assertIn("Great-booking complete!",
-                          res.data.decode(encoding='utf-8'))
-            club = return_club_from_server('Simply Lift')
-            self.assertEqual(club['points'], '6')
 
-        payload = {
-                'places': "6",
-                'competition': "Spring Festival",
-                'club': "Simply Lift",
-                }
-        with app.test_client() as client:
-            res = client.post('/purchasePlaces', data=payload)
+def test_user_cannot_login(client):
+    """Test the login page."""
+    payload = {
+        "email": "unknown@mail.com",
+        }
+    response = client.post("/showSummary", data=payload)
+    assert b'Sorry, that email wasn' in response.data
+    assert b'Simply Lift' in response.data
 
-            self.assertEqual(res.status_code, 200)
-            self.assertIn("You can only book 12 places per competition",
-                          html.unescape(res.data.decode(encoding='utf-8')))
 
-    def test_competition_with_no_places_cant_be_reserved_anymore(self):
-        """Test that the user cannot book a competition that is full."""
-        with app.test_client() as client:
-            payload = {
-                    'places': "12",
-                    'competition': "Fall Classic",
-                    'club': "Simply Lift",
-                    }
+def test_user_enter_empty_email(client):
+    """Test the login page."""
+    payload = {
+        "email": "",
+        }
+    response = client.post("/showSummary", data=payload)
+    assert b'Please enter your secretary' in response.data
+    assert b'Simply Lift' in response.data
 
-            res = client.post('/purchasePlaces', data=payload)
 
-            self.assertEqual(res.status_code, 200)
-            club = return_club_from_server('Simply Lift')
-            competition = return_competition_from_server('Fall Classic')
-            self.assertEqual(club['points'], '1')
-            self.assertEqual(competition['numberOfPlaces'], '1')
-            payload = {
-                    'places': "2",
-                    'competition': "Fall Classic",
-                    'club': "Iron Temple",
-                    }
+def test_points_update_are_reflected(client):
+    """Test that the points are updated."""
+    payload = {
+            "club": "Iron Temple",
+            "competition": "Winter Classic",
+            "places": "2",
+        }
+    res = client.post("/purchasePlaces", data=payload)
+    soup = BeautifulSoup(res.data, 'html.parser')
+    assert 'Congratulation for booking 2 places !' in soup.prettify()
+    assert 'Points available: 2' in soup.prettify()
+    h4_winter_classic = soup.find('h4', string='Winter Classic')
+    date = h4_winter_classic.find_next_sibling('p')
+    place = date.find_next_sibling('p')
+    assert place.text == 'Number of Places: 11'
 
-            res = client.post('/purchasePlaces', data=payload)
 
-            self.assertEqual(res.status_code, 200)
-            self.assertIn(("Sorry, you can't book for this competition as"
-                           " there are no places left."), html.unescape(
-                            res.data.decode(encoding='utf-8')))
+def test_book_past_competition_gives_error_message(client):
+    """Test that booking a past competition gives an error message."""
+    res = client.get('/book/Fall Classic/Iron Temple')
+    soup = BeautifulSoup(res.data, 'html.parser')
+    assert ("Sorry, you can't book for this competition "
+            "as the date has passed.") in soup.prettify()
+
+
+def test_club_cannot_book_more_than_twelve_places(client):
+    """Test that a club cannot book more than 12 places."""
+    payload = {
+            "club": "Simply Lift",
+            "competition": "Winter Classic",
+            "places": "13",
+        }
+    res = client.post("/purchasePlaces", data=payload)
+    soup = BeautifulSoup(res.data, 'html.parser')
+    assert ("You can only book 12 places per competition.") in soup.prettify()
+
+
+def test_club_cannot_book_more_than_twelve_places_in_total(client):
+    """Test that a club cannot book more than 12 places in total."""
+    payload = {
+            "club": "Simply Lift",
+            "competition": "Winter Classic",
+            "places": "11",
+        }
+    client.post("/purchasePlaces", data=payload)
+    payload = {
+            "club": "Simply Lift",
+            "competition": "Winter Classic",
+            "places": "2",
+        }
+    res = client.post("/purchasePlaces", data=payload)
+    soup = BeautifulSoup(res.data, 'html.parser')
+    assert ("You can only book 12 places per competition.") in soup.prettify()
+
+
+def test_club_cannot_book_more_than_club_points(client):
+    """Test that a club cannot book more than your points."""
+    payload = {
+            "club": "Iron Temple",
+            "competition": "Winter Classic",
+            "places": "5",
+        }
+    res = client.post("/purchasePlaces", data=payload)
+    soup = BeautifulSoup(res.data, 'html.parser')
+    assert ("You don't have enough points to book 5 places") in soup.prettify()
+
+
+def test_logout(client):
+    """Test that the logout works."""
+    res = client.get('/logout')
+    assert res.status_code == 302
+    assert res.headers['Location'] == '/'
