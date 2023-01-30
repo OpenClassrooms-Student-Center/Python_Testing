@@ -391,7 +391,7 @@ def test_handle_purchase_happy_path(mocker, competitions, clubs_list):
             [],
             competitions,
             clubs_list)
-    assert message == 'Great-booking complete!'
+    assert message == 'Congratulation for booking 2 places !'
     assert page == "welcome.html"
 
 

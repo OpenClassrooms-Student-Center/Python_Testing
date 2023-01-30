@@ -1,16 +1,6 @@
 from bs4 import BeautifulSoup
 
 
-def get_club_test_data(clubs_list):
-    """Return the club test data."""
-    return clubs_list
-
-
-def get_competition_test_data(competitions_list):
-    """Return the competition test data."""
-    return competitions_list
-
-
 def test_first_page(client):
     """Test the login page."""
     response = client.get('/')
@@ -57,7 +47,7 @@ def test_points_update_are_reflected(client):
         }
     res = client.post("/purchasePlaces", data=payload)
     soup = BeautifulSoup(res.data, 'html.parser')
-    assert 'Great-booking complete!' in soup.prettify()
+    assert 'Congratulation for booking 2 places !' in soup.prettify()
     assert 'Points available: 2' in soup.prettify()
     h4_winter_classic = soup.find('h4', string='Winter Classic')
     date = h4_winter_classic.find_next_sibling('p')
@@ -85,6 +75,24 @@ def test_club_cannot_book_more_than_twelve_places(client):
     assert ("You can only book 12 places per competition.") in soup.prettify()
 
 
+def test_club_cannot_book_more_than_twelve_places_in_total(client):
+    """Test that a club cannot book more than 12 places in total."""
+    payload = {
+            "club": "Simply Lift",
+            "competition": "Winter Classic",
+            "places": "11",
+        }
+    client.post("/purchasePlaces", data=payload)
+    payload = {
+            "club": "Simply Lift",
+            "competition": "Winter Classic",
+            "places": "2",
+        }
+    res = client.post("/purchasePlaces", data=payload)
+    soup = BeautifulSoup(res.data, 'html.parser')
+    assert ("You can only book 12 places per competition.") in soup.prettify()
+
+
 def test_club_cannot_book_more_than_club_points(client):
     """Test that a club cannot book more than your points."""
     payload = {
@@ -95,3 +103,10 @@ def test_club_cannot_book_more_than_club_points(client):
     res = client.post("/purchasePlaces", data=payload)
     soup = BeautifulSoup(res.data, 'html.parser')
     assert ("You don't have enough points to book 5 places") in soup.prettify()
+
+
+def test_logout(client):
+    """Test that the logout works."""
+    res = client.get('/logout')
+    assert res.status_code == 302
+    assert res.headers['Location'] == '/'

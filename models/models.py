@@ -3,6 +3,7 @@ import datetime
 
 
 def load_clubs():
+    print("I'm here!")
     with open('clubs.json') as c:
         listOfClubs = json.load(c)['clubs']
         return listOfClubs

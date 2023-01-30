@@ -199,7 +199,7 @@ def handle_purchase(request, history_of_reservation, competitions_list,
         add_reservation_to_history(competition, club, places_required,
                                    history_of_reservation)
 
-        message = 'Great-booking complete!'
+        message = f'Congratulation for booking {places_required} places !'
         page = 'welcome.html'
 
     except NotEnoughPoints:
