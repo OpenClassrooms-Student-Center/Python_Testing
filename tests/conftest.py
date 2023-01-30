@@ -1,6 +1,6 @@
 import pytest
 from server import app
-from unittest.mock import patch
+from selenium import webdriver
 
 
 @pytest.fixture
@@ -218,3 +218,9 @@ def load_competitions(mocker):
                 ]
             }
     mocker.patch('models.models.load_competitions', competition_file)
+
+
+@pytest.fixture()
+def driver():
+    """Return a driver."""
+    return webdriver.Firefox()
