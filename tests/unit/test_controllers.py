@@ -63,8 +63,9 @@ def test_find_competition(competition_name, competitions):
     """Test the function find_competition."""
     assert controllers.find_competition(competition_name, competitions) == {
             "name": "Spring Festival",
-            "date": "2020-03-27 10:00:00",
-            "numberOfPlaces": "25"
+            "date": "2023-03-27 10:00:00",
+            "numberOfPlaces": "25",
+            "passed": False
             }
 
 
@@ -79,23 +80,27 @@ def test_remove_points_from_competition(competition, competitions):
             competition, competitions, 3) == [
         {
             "name": "Spring Festival",
-            "date": "2020-03-27 10:00:00",
-            "numberOfPlaces": "22"
+            "date": "2023-03-27 10:00:00",
+            "numberOfPlaces": "22",
+            "passed": False
             },
         {
             "name": "Fall Classic",
             "date": "2020-10-22 13:30:00",
-            "numberOfPlaces": "13"
+            "numberOfPlaces": "13",
+            "passed": True
             },
         {
             "name": "Winter Classic",
             "date": "2023-12-31 10:00:00",
-            "numberOfPlaces": "10"
+            "numberOfPlaces": "10",
+            "passed": False
             },
         {
             "name": "Summer Classic",
             "date": "2023-06-30 10:00:00",
-            "numberOfPlaces": "10"
+            "numberOfPlaces": "10",
+            "passed": False
             }
         ]
 
@@ -137,8 +142,9 @@ def test_verify_user_input_good_case(mocker, clubs_list, competitions):
 
     expected_competition = {
             "name": "Spring Festival",
-            "date": "2020-03-27 10:00:00",
-            "numberOfPlaces": "25"
+            "date": "2023-03-27 10:00:00",
+            "numberOfPlaces": "25",
+            "passed": False
             }
     expected_club = {
             "name": "Simply Lift",
@@ -275,16 +281,6 @@ def test_verify_club_can_book(
             already_required)
 
 
-@pytest.fixture
-def competition_1_place():
-    """Competition with 1 place."""
-    return {
-            "name": "Spring Festival",
-            "date": "2020-03-27 10:00:00",
-            "numberOfPlaces": "1"
-            }
-
-
 def test_verify_club_can_book_more_than_available_places(
         competition_1_place, club):
     """Test the raise of the BookMoreThanAvailablePlaces exception."""
@@ -299,16 +295,6 @@ def test_verify_club_can_book_more_than_available_places(
                 already_required)
 
 
-@pytest.fixture
-def club_4_points():
-    """Return a club with 4 points."""
-    return {
-            "name": "Simply Lift",
-            "email": "not_relevant@email.com",
-            "points": "4"
-            }
-
-
 def test_verify_club_can_book_raise_exception_not_enough_points(
         competition, club_4_points):
     """Test the raise of the NotEnoughPoints exception."""
@@ -320,16 +306,6 @@ def test_verify_club_can_book_raise_exception_not_enough_points(
                 club_4_points,
                 place_required,
                 already_required)
-
-
-@pytest.fixture
-def club_15_points():
-    """Return a club with 15 points."""
-    return {
-            "name": "Simply Lift",
-            "email": "toto@mail.com",
-            "points": "15"
-            }
 
 
 def test_verify_club_can_book_raise_exception_more_than_twelve_places(
@@ -382,7 +358,7 @@ def test_handle_purchase_happy_path(mocker, competitions, clubs_list):
     """Test the function handle_purchase."""
     request = mocker.Mock()
     request.form = {
-            'competition': 'Spring Festival',
+            'competition': 'Summer Classic',
             'club': 'Simply Lift',
             'places': '2'
             }

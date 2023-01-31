@@ -1,0 +1,4 @@
+[report]
+skip_empty = True
+omit = 
+    tests/conftest.py

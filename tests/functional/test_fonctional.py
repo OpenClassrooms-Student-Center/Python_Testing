@@ -55,12 +55,48 @@ def test_points_update_are_reflected(client):
     assert place.text == 'Number of Places: 11'
 
 
+def test_can_book_competition_that_has_a_correct_date_in_the_future(client):
+    """Test that the user can book a competition
+    that has a correct date in the future."""
+    res = client.get('/book/Winter Classic/Simply Lift')
+    soup = BeautifulSoup(res.data, 'html.parser')
+    assert ("How many places?") in soup.prettify()
+
+
 def test_book_past_competition_gives_error_message(client):
     """Test that booking a past competition gives an error message."""
     res = client.get('/book/Fall Classic/Iron Temple')
     soup = BeautifulSoup(res.data, 'html.parser')
     assert ("Sorry, you can't book for this competition "
             "as the date has passed.") in soup.prettify()
+
+
+def test_post_book_past_competition_gives_error_message(client, ):
+    """Test that booking a past competition gives an error message."""
+    payload = {
+            "club": "Iron Temple",
+            "competition": "Fall Classic",
+            "places": "2",
+            }
+    res = client.post("/purchasePlaces", data=payload)
+    soup = BeautifulSoup(res.data, 'html.parser')
+    print(soup.prettify())
+    assert ("Sorry, you can't book for this competition "
+            "as the date has passed.") in soup.prettify()
+
+
+def test_access_bad_competition_display_error(client):
+    """Test that a bad url gives an error message."""
+    res = client.get('/book/Bad Competition/Iron Temple')
+    soup = BeautifulSoup(res.data, 'html.parser')
+    assert ("Sorry, that competition wasn't found.") in soup.prettify()
+
+
+def test_access_bad_club_display_error(client):
+    """Test that a bad url gives an error message."""
+    res = client.get('/book/Fall Classic/Bad Club')
+    soup = BeautifulSoup(res.data, 'html.parser')
+    assert ("Sorry, that club wasn't found.") in soup.prettify()
 
 
 def test_club_cannot_book_more_than_twelve_places(client):
@@ -91,6 +127,20 @@ def test_club_cannot_book_more_than_twelve_places_in_total(client):
     res = client.post("/purchasePlaces", data=payload)
     soup = BeautifulSoup(res.data, 'html.parser')
     assert ("You can only book 12 places per competition.") in soup.prettify()
+
+
+def test_error_for_competition_that_are_full(client):
+    """Test that the user receives an error when competition are full."""
+    payload = {
+            "club": "She Lifts",
+            "competition": "Summer Classic",
+            "places": "10"
+        }
+    res = client.post("/purchasePlaces", data=payload)
+    res = client.get("/book/Summer Classic/She Lifts")
+    soup = BeautifulSoup(res.data, 'html.parser')
+    assert ("Sorry, there are no places " +
+            "left for this competition.") in soup.prettify()
 
 
 def test_club_cannot_book_more_than_club_points(client):

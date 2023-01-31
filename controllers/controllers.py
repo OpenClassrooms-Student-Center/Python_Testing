@@ -129,24 +129,26 @@ class CannotBookLessThanOnePlace(Exception):
     pass
 
 
+class CompetitionPassed(Exception):
+    """Exception raised when a competition has passed."""
+    pass
+
+
 def verify_club_can_book(competition, club, places_required, already_reserved):
     """Verify the club can book."""
+    print(competition)
     if not club_has_enough_points(club, places_required):
         raise NotEnoughPoints
-        return (False,
-                'You don\'t have enough points to book {} places'.format(
-                    places_required), 'welcome.html')
 
-    if club_wants_more_than_twelve_places(places_required, already_reserved):
+    elif club_wants_more_than_twelve_places(places_required, already_reserved):
         raise BookMoreThanTwelvePlaces
-        return (False,
-                "You can only book 12 places per competition", 'welcome.html')
 
-    if club_wants_more_than_available_places(places_required, competition):
+    elif club_wants_more_than_available_places(places_required, competition):
         raise BookMoreThanAvailablePlaces
-        return (False,
-                "Sorry, you can't book for this competition as there "
-                "are not enough places.", 'welcome.html')
+
+    elif competition['passed']:
+        raise CompetitionPassed
+
     else:
         return (True, 'Great-booking complete!', 'welcome.html')
 
@@ -216,6 +218,12 @@ def handle_purchase(request, history_of_reservation, competitions_list,
     except BookMoreThanAvailablePlaces:
         message = ("Sorry, you can't book for this competition as there "
                    "are not enough places.")
+        page = 'welcome.html'
+        return message, page, club
+
+    except CompetitionPassed:
+        message = ("Sorry, you can't book for this competition "
+                   "as the date has passed.")
         page = 'welcome.html'
         return message, page, club
 

@@ -29,23 +29,27 @@ def mock_competitions(mocker):
     data = [
         {
             "name": "Spring Festival",
-            "date": "2020-03-27 10:00:00",
-            "numberOfPlaces": "25"
+            "date": "2023-03-27 10:00:00",
+            "numberOfPlaces": "25",
+            "passed": False,
             },
         {
             "name": "Fall Classic",
             "date": "2020-10-22 13:30:00",
-            "numberOfPlaces": "13"
+            "numberOfPlaces": "13",
+            "passed": False,
             },
         {
             "name": "Winter Classic",
             "date": "2023-12-31 10:00:00",
-            "numberOfPlaces": "10"
+            "numberOfPlaces": "10",
+            "passed": True,
             },
         {
             "name": "Summer Classic",
             "date": "2023-06-30 10:00:00",
-            "numberOfPlaces": "10"
+            "numberOfPlaces": "10",
+            "passed": True,
             }
         ]
     mocker.patch('Python_Testing.controllers.competitions_list', data)
@@ -62,8 +66,9 @@ def competition():
     """Return a competition."""
     return {
             "name": "Spring Festival",
-            "date": "2020-03-27 10:00:00",
-            "numberOfPlaces": "25"
+            "date": "2023-03-27 10:00:00",
+            "numberOfPlaces": "25",
+            "passed": False,
             }
 
 
@@ -89,55 +94,39 @@ def competitions():
     return [
         {
             "name": "Spring Festival",
-            "date": "2020-03-27 10:00:00",
-            "numberOfPlaces": "25"
+            "date": "2023-03-27 10:00:00",
+            "numberOfPlaces": "25",
+            "passed": False,
             },
         {
             "name": "Fall Classic",
             "date": "2020-10-22 13:30:00",
-            "numberOfPlaces": "13"
+            "numberOfPlaces": "13",
+            "passed": True,
             },
         {
             "name": "Winter Classic",
             "date": "2023-12-31 10:00:00",
-            "numberOfPlaces": "10"
+            "numberOfPlaces": "10",
+            "passed": False,
             },
         {
             "name": "Summer Classic",
             "date": "2023-06-30 10:00:00",
-            "numberOfPlaces": "10"
+            "numberOfPlaces": "10",
+            "passed": False,
             }
         ]
 
 
 @pytest.fixture
-def clubs_list():
-    """Test the function load_clubs."""
-    return [{
-        "name": "Simply Lift",
-        "email": "john@simplylift.co",
-        "points": "13"
-        },
-            {
-                "name": "Iron Temple",
-                "email": "admin@irontemple.com",
-                "points": "4"
-                },
-            {
-                "name": "She Lifts",
-                "email": "kate@shelifts.co.uk",
-                "points": "12"
-                }
-            ]
-
-
-@pytest.fixture
-def club_15_points():
-    """Return a club with 15 points."""
+def competition_1_place():
+    """Competition with 1 place."""
     return {
-            "name": "Simply Lift",
-            "email": "toto@mail.com",
-            "points": "15"
+            "name": "Spring Festival",
+            "date": "2020-03-27 10:00:00",
+            "numberOfPlaces": "1",
+            "passed": True,
             }
 
 
@@ -152,13 +141,35 @@ def club_4_points():
 
 
 @pytest.fixture
-def competition_1_place():
-    """Competition with 1 place."""
+def club_15_points():
+    """Return a club with 15 points."""
     return {
-            "name": "Spring Festival",
-            "date": "2020-03-27 10:00:00",
-            "numberOfPlaces": "1"
+            "name": "Simply Lift",
+            "email": "toto@mail.com",
+            "points": "15"
             }
+
+
+@pytest.fixture
+def clubs_list():
+    """Fixture of clubs_list."""
+    return [
+            {
+                "name": "Simply Lift",
+                "email": "john@simplylift.co",
+                "points": "13"
+                },
+            {
+                "name": "Iron Temple",
+                "email": "admin@irontemple.com",
+                "points": "4"
+                },
+            {
+                "name": "She Lifts",
+                "email": "kate@shelifts.co.uk",
+                "points": "12"
+                }
+            ]
 
 
 @pytest.fixture
@@ -193,31 +204,33 @@ def load_clubs(mocker):
 @pytest.fixture(autouse=True)
 def load_competitions(mocker):
     """Mock of the load_competitors fonction."""
-    competition_file = {
-            "competitions": [
-                {
-                    "name": "Spring Festival",
-                    "date": "2020-03-27 10:00:00",
-                    "numberOfPlaces": "25"
-                    },
-                {
-                    "name": "Fall Classic",
-                    "date": "2020-10-22 13:30:00",
-                    "numberOfPlaces": "13"
-                    },
-                {
-                    "name": "Winter Classic",
-                    "date": "2023-12-31 10:00:00",
-                    "numberOfPlaces": "13"
-                    },
-                {
-                    "name": "Summer Classic",
-                    "date": "2023-06-30 10:00:00",
-                    "numberOfPlaces": "10"
-                    }
-                ]
+    competition_file = [
+            {
+                "name": "Spring Festival",
+                "date": "2023-03-27 10:00:00",
+                "numberOfPlaces": "25",
+                "passed": False,
+            },
+            {
+                "name": "Fall Classic",
+                "date": "2020-10-22 13:30:00",
+                "numberOfPlaces": "13",
+                "passed": True,
+            },
+            {
+                "name": "Winter Classic",
+                "date": "2023-12-31 10:00:00",
+                "numberOfPlaces": "13",
+                "passed": False,
+            },
+            {
+                "name": "Summer Classic",
+                "date": "2023-06-30 10:00:00",
+                "numberOfPlaces": "10",
+                "passed": False,
             }
-    mocker.patch('models.models.load_competitions', competition_file)
+        ]
+    mocker.patch('controllers.controllers.competitions_list', competition_file)
 
 
 @pytest.fixture()
