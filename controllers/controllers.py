@@ -136,7 +136,6 @@ class CompetitionPassed(Exception):
 
 def verify_club_can_book(competition, club, places_required, already_reserved):
     """Verify the club can book."""
-    print(competition)
     if not club_has_enough_points(club, places_required):
         raise NotEnoughPoints
 

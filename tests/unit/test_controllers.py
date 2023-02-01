@@ -322,6 +322,19 @@ def test_verify_club_can_book_raise_exception_more_than_twelve_places(
                 already_required)
 
 
+def test_verify_club_can_book_raise_exception_for_passed_competition(
+        competition_passed, club):
+    """Test the raise of the CompetitionPassed exception."""
+    place_required = 1
+    already_required = 0
+    with pytest.raises(controllers.CompetitionPassed):
+        controllers.verify_club_can_book(
+                competition_passed,
+                club,
+                place_required,
+                already_required)
+
+
 def test_add_reservation_to_history(competition, club):
     """Test the function add_reservation_to_history."""
     history_of_reservation = []

@@ -131,6 +131,17 @@ def competition_1_place():
 
 
 @pytest.fixture
+def competition_passed():
+    """Competition that has passed."""
+    return {
+            "name": "Spring Festival",
+            "date": "2020-03-27 10:00:00",
+            "numberOfPlaces": "25",
+            "passed": True,
+            }
+
+
+@pytest.fixture
 def club_4_points():
     """Return a club with 4 points."""
     return {
