@@ -1,0 +1,19 @@
+{% with messages = get_flashed_messages(with_categories=True) %}
+  {% if messages %}
+    <ul style="list-style-type: none">
+      {% for category, message in messages %}
+      {% if category == 'error' %}
+        <li class="{{ category }}" style="color:red" >
+          {{message}}
+        </li>
+      {% endif %}
+      {% if category == 'succes' %}
+      <li class="{{ category }}" style="color:green" >
+          {{message}}
+      </li>
+      {% endif%}
+      {% endfor %}
+    </ul>
+  {% endif%}
+
+{% endwith %}

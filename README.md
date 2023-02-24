@@ -1,51 +1,143 @@
-# gudlift-registration
+![Logo](images/logo.png)
 
-1. Why
+# Projet 11 DA-Python OC
+***Livrable forké et cloné à partir du repository [Python_Testing](https://github.com/OpenClassrooms-Student-Center/Python_Testing) d'OpenClassrooms-Student-Center.***  
+Il s'agit d'une plateforme de réservation de places à des compétitions de force pour l'entreprise Güdlft.  
+L'objectif du projet est de corriger les bugs et d'implémenter une nouvelle fonctionnalité décrits dans l'Issue repository du projet originel.  
+Chaque correctif de bug ou fonctionnalité correspond à une branche. Il y a égélement une branche d'affinement des tests et une branche QA stable.
+Les tests peuvent être éxécutés via Pytest et Locust.  
+## Sommaire
+
+**[1. Installation et lancement](#heading--1)**
+  * [1.1. Windows](#heading--1-1)
+  * [1.2. MacOS et Linux](#heading--1-2)
+
+**[2. Tests](#heading--2)**
+  * [2.1 Lancement des tests](#heading--2-1)
+  * [2.2 Présentation des rapports](#heading--2-2)
+
+       
+
+<div id="heading--1"/>
+
+### 1. Installation et lancement
+
+<div id="heading--1-1"/>
+
+#### 1.1 Windows :
+   Depuis votre terminal, naviguez vers le dossier racine souhaité.
+
+###### Récupération du projet
+   Tapez :    
+
+       git clone https://github.com/Cyl94700/P11_Op_Cl.git
+
+###### Accès au dossier du projet, création et activation l'environnement virtuel
+   Tapez :
+
+       cd P11_Op_Cl
+       python -m venv env 
+       env\scripts\activate
+    
+###### Installation des paquets requis
+   Tapez :
+
+       pip install -r requirements.txt
 
 
-    This is a proof of concept (POC) project to show a light-weight version of our competition booking platform. The aim is the keep things as light as possible, and use feedback from the users to iterate.
+###### Lancement du serveur Flask
+   Tapez :
 
-2. Getting Started
+      $env:FLASK_APP = "server.py"
+      flask run
 
-    This project uses the following technologies:
+Puis, accédez à l'adresse par défaut : [http://127.0.0.1:5000/](http://127.0.0.1:5000/)
 
-    * Python v3.x+
+<div id="heading--1-2"/>
 
-    * [Flask](https://flask.palletsprojects.com/en/1.1.x/)
+---------
 
-        Whereas Django does a lot of things for us out of the box, Flask allows us to add only what we need. 
-     
+####  1.2 MacOS et Linux :
+   Depuis votre terminal, naviguez vers le dossier souhaité.
 
-    * [Virtual environment](https://virtualenv.pypa.io/en/stable/installation.html)
+###### Récupération du projet
+   Tapez :
 
-        This ensures you'll be able to install the correct packages without interfering with Python on your machine.
+       git clone https://github.com/Cyl94700/P11_Op_Cl.git
 
-        Before you begin, please ensure you have this installed globally. 
+###### Accéder au dossier du projet, créer et activer l'environnement virtuel
+   Tapez :
+
+       cd P11_Op_Cl
+       python3 -m venv env 
+       source env/bin/activate
+    
+###### Installation des paquets requis
+   Tapez :
+
+       pip install -r requirements.txt
 
 
-3. Installation
+###### Lancement du serveur Flask
+   Tapez :
 
-    - After cloning, change into the directory and type <code>virtualenv .</code>. This will then set up a a virtual python environment within that directory.
+       export FLASK_APP=server
+       flask run
 
-    - Next, type <code>source bin/activate</code>. You should see that your command prompt has changed to the name of the folder. This means that you can install packages in here without affecting affecting files outside. To deactivate, type <code>deactivate</code>
+Puis, accédez à l'adresse par défaut : [http://127.0.0.1:5000/](http://127.0.0.1:5000/)
 
-    - Rather than hunting around for the packages you need, you can install in one step. Type <code>pip install -r requirements.txt</code>. This will install all the packages listed in the respective file. If you install a package, make sure others know by updating the requirements.txt file. An easy way to do this is <code>pip freeze > requirements.txt</code>
+<div id="heading--2"/>
 
-    - Flask requires that you set an environmental variable to the python file. However you do that, you'll want to set the file to be <code>server.py</code>. Check [here](https://flask.palletsprojects.com/en/1.1.x/quickstart/#a-minimal-application) for more details
+### 2. Tests
 
-    - You should now be ready to test the application. In the directory, type either <code>flask run</code> or <code>python -m flask run</code>. The app should respond with an address you should be able to go to using your browser.
+<div id="heading--2-1"/>
 
-4. Current Setup
+#### 2.1 Lancement des tests
 
-    The app is powered by [JSON files](https://www.tutorialspoint.com/json/json_quick_guide.htm). This is to get around having a DB until we actually need one. The main ones are:
-     
-    * competitions.json - list of competitions
-    * clubs.json - list of clubs with relevant information. You can look here to see what email addresses the app will accept for login.
+###### Tests unitaires, d'intégration, fonctionnel et de couverture  
+Ces tests peuvent être effectués ensemble grâce à Pytest et Coverage. Pour que le test fonctionnel passe, il faut avoir lancé le serveur Flask au préalable.  
+Supprimez le dossier htmlcov et le fichier report.html présents en racine du projet.
+Exécutez ensuite la commande :
 
-5. Testing
+    pytest --html=report.html --cov-report html:cov_html  
+- Un fichier report.html est alors regénéré. Il suffit de l'ouvrir avec votre navigateur et vous pouvez consulter le rapport des tests unitaires, d'intégration et fonctionnel.  
+- Un répertoire htmlcov est égélement présent. En l'ouvrant, vous pouvez consulter le rapport des tests de couverture à partir du fichier index.html
 
-    You are free to use whatever testing framework you like-the main thing is that you can show what tests you are using.
+###### Lancement des tests de performances Locust  
+Assurez-vous d'avoir lancé le serveur Flask, puis tapez :
+ 
+    locust -f .\tests\performance_tests\locustfile.py --web-host=localhost  
 
-    We also like to show how well we're testing, so there's a module called 
-    [coverage](https://coverage.readthedocs.io/en/coverage-5.1/) you should add to your project.
+Vous êtes alors invité à vous rendre sur l'adresse [http://localhost:8089](http://localhost:8089). Entrez les options souhaitées, comme 6 pour le nombre d'utilisateurs simultanés et pour 'host' l'adresse du site (http://127.0.0.1:5000/).  
+Cliquez sur le bouton Start Swarming pour démarrer le test.
 
+###### Flake8
+Pour vérifier la cohérence du code avec la norme PEP8, vous pouvez lancer flake8-html et générer un rapport html.
+Supprimez le dossier flake8_report situé à la racine du projet.
+Depuis le terminal, placez-vous à la racine du projet et tapez :
+ 
+
+      flake8 --format=html --htmldir=flake8_report
+
+
+Le dossier flake8_report est de nouveau généré. Il contient le rapport global dans un fichier nommé index.html
+
+<div id="heading--2-2"/>
+
+#### 2.2 Présentation des rapports
+
+###### Tests  
+
+![tests_report](images/tests_report.png)  
+
+![coverage_report](images/coverage_report.png)  
+
+![server](images/server.png)  
+
+###### Performance  
+
+![locust_ok](images/locust_ok.png)  
+
+###### Flake8  
+
+![flake8](images/flake8.png) 
