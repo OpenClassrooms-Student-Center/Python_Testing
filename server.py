@@ -1,28 +1,8 @@
 import json
 from flask import Flask,render_template,request,redirect,flash,url_for
-
-def search_club(club_email):
-    club = [club for club in clubs if club['email'] == club_email]
-    if len(club) == 1:
-        return club[0]
-    else:
-        return None
+from .tests.utilities import loadClubs, loadCompetitions, loadClubs_test_data, loadCompetitions_test_data, search_club
 
 
-def loadClubs():
-    with open('clubs.json') as c:
-         listOfClubs = json.load(c)['clubs']
-         return listOfClubs
-
-
-def loadCompetitions():
-    with open('competitions.json') as comps:
-         listOfCompetitions = json.load(comps)['competitions']
-         return listOfCompetitions
-
-
-competitions = loadCompetitions()
-clubs = loadClubs()
 MAX_INSCRIPTION = 12
 
 
@@ -30,6 +10,14 @@ def create_app(config):
 
     app = Flask(__name__)
     app.secret_key = 'something_special'
+    app.config.update(config)
+
+    competitions = loadCompetitions()
+    clubs = loadClubs()
+
+    if app.config['TESTING'] is True:
+        competitions = loadCompetitions_test_data()
+        clubs = loadClubs_test_data()
 
     @app.route('/')
     def index():
@@ -44,7 +32,7 @@ def create_app(config):
     
     @app.route('/showSummary',methods=['POST'])
     def showSummary():
-        club = search_club(request.form['email'])
+        club = search_club(request.form['email'], clubs)
         if club:
             return render_template('welcome.html', club=club, competitions=competitions)
         else:
@@ -65,15 +53,14 @@ def create_app(config):
 
     @app.route('/purchasePlaces',methods=['POST'])
     def purchasePlaces():
-        print('REQUEST server: ', request.form)
+
         competition = [c for c in competitions if c['name'] == request.form['competition']][0]
         club = [c for c in clubs if c['name'] == request.form['club']][0]
-
         placesRequired = request.form['places']
+
 
         if placesRequired != '':
             placesRequired = int(request.form['places'])
-
 
         if placesRequired == '':
             flash("You haven't specified a number of places!")
@@ -100,9 +87,7 @@ def create_app(config):
             flash('Great-booking complete!')
             return render_template('welcome.html', club=club, competitions=competitions)
 
-
     # TODO: Add route for points display
-
 
     @app.route('/logout')
     def logout():

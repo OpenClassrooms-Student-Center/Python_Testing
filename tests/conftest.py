@@ -3,38 +3,14 @@ import logging
 import json
 import os
 
-from unittest.mock import patch
-from ..server import create_app, loadClubs
-
-
-def pytest_configure(config):
-    logging.basicConfig(level=logging.INFO)
-
-def clubs_dataset():
-    with open('data/clubs_test.json') as c:
-         listOfClubs = json.load(c)['clubs']
-    return listOfClubs
-
-def competitions_dataset():
-    with open('data/competitions_test.json') as c:
-         listOfCompetitions = json.load(c)['competitions']
-    return listOfCompetitions
+from ..server import create_app
 
 @pytest.fixture
 def client():
     app = create_app({"TESTING": True})
-
-    clubs = clubs_dataset()
-    competitions = competitions_dataset()
-
-    os.environ['server.clubs'] = json.dumps(clubs)
-    os.environ['server.competitions'] = json.dumps(competitions)
-
+    
     with app.test_client() as client:
         yield client
-    
-    del os.environ['server.clubs']
-    del os.environ['server.competitions']
 
 @pytest.fixture
 def purchaseBase():
@@ -43,7 +19,7 @@ def purchaseBase():
 		'competition': 'Competition Test base',
 		'places': '4'
 		}
-    
+    print( "REQUETE AVANT ENVOI : ", purchase)
     yield purchase
 
 @pytest.fixture
