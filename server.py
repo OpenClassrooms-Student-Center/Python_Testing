@@ -74,8 +74,13 @@ def create_app(config):
         if placesRequired != '':
             placesRequired = int(request.form['places'])
 
+
         if placesRequired == '':
             flash("You haven't specified a number of places!")
+            return render_template('welcome.html', club=club, competitions=competitions)
+        
+        elif placesRequired > 12:
+            flash("Book less than 12 places!")
             return render_template('welcome.html', club=club, competitions=competitions)
         
         elif int(club['points']) - placesRequired < 0:
