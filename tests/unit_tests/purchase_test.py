@@ -1,7 +1,11 @@
+from datetime import datetime
+from ..utilities import retrieveDateCompetition
 import html
 
 CODE_200 = 200
 CODE_302 = 302
+
+NOW = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
 def test_validation_booking(client, purchaseBase):
 	"""
@@ -53,6 +57,22 @@ def test_competition_not_enough_points(client, purchaseNotEnoughPointsCompetitio
 
 	assert response.status_code == CODE_200
 	assert "Not enough places in the competition!" in message
+
+def test_competition_not_over(client, purchaseBase):
+	response = client.post('/purchasePlaces', data=purchaseBase)
+	message = html.unescape(response.data.decode())
+
+	assert response.status_code == 200
+	assert 'Great-booking complete!' in message
+	assert NOW < retrieveDateCompetition(purchaseBase['competition'])
+
+def test_competition_is_over(client, dateIsOver):
+	response = client.post('/purchasePlaces', data=dateIsOver)
+	message = html.unescape(response.data.decode())
+
+	assert response.status_code == 200
+	assert "That competition is over!" in message
+	assert NOW > retrieveDateCompetition(dateIsOver['competition'])
 
 
 def test_fixtures(client):

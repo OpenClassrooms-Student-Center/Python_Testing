@@ -61,3 +61,13 @@ def purchaseNotEnoughPointsClub():
 		}
     
     yield purchase
+
+@pytest.fixture
+def dateIsOver():
+    purchase = {
+		'club': 'club test base',
+		'competition': 'out dated',
+		'places': '4'
+		}
+    
+    yield purchase
