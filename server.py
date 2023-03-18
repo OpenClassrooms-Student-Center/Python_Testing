@@ -65,7 +65,6 @@ def create_app(config):
 
     @app.route('/purchasePlaces',methods=['POST'])
     def purchasePlaces():
-        print('REQUEST server: ', request.form)
         competition = [c for c in competitions if c['name'] == request.form['competition']][0]
         club = [c for c in clubs if c['name'] == request.form['club']][0]
 
@@ -87,11 +86,6 @@ def create_app(config):
             return render_template('welcome.html', club=club, competitions=competitions)
         
         else:
-            # update competition points
-            competition['numberOfPlaces'] = int(competition['numberOfPlaces'])-placesRequired
-            # update club points
-            club['points'] = str(int(club['points']) - placesRequired)
-
             flash('Great-booking complete!')
             return render_template('welcome.html', club=club, competitions=competitions)
 
