@@ -84,11 +84,6 @@ def create_app(config):
             return render_template('welcome.html', club=club, competitions=competitions, date=NOW_GABARIT)
         
         else:
-            # update competition points
-            competition['numberOfPlaces'] = int(competition['numberOfPlaces'])-placesRequired
-            # update club points
-            club['points'] = str(int(club['points']) - placesRequired)
-
             flash('Great-booking complete!')
             return render_template('welcome.html', club=club, competitions=competitions, date=NOW_GABARIT)
 
