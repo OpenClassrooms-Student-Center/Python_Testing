@@ -98,7 +98,13 @@ def create_app(config):
             flash('Great-booking complete!')
             return render_template('welcome.html', club=club, competitions=competitions, date=NOW_GABARIT)
 
-    # TODO: Add route for points display
+    @app.route('/publicBoard')
+    def board():
+
+        clubs_name = [c['name'] for c in clubs]
+        clubs_points = [p['points'] for p in clubs]
+
+        return render_template('publicBoard.html', clubs_name=clubs_name, clubs_points=clubs_points)
 
     @app.route('/logout')
     def logout():
