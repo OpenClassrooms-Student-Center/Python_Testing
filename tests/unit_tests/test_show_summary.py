@@ -19,5 +19,3 @@ class TestShowSummary:
         response = client.post('/showSummary', data={"email": invalid_email})
         assert response.data.decode()
         assert 'message' in response.data.decode()
-
-
