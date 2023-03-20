@@ -1,12 +1,11 @@
 from datetime import datetime
 from flask import Flask,render_template,request,redirect,flash,url_for
-from .tests.utilities import loadClubs, loadCompetitions, loadClubs_test_data, loadCompetitions_test_data, search_club
+from .tests.utilities import loadClubs, loadCompetitions, loadClubs_test_data, loadCompetitions_test_data, search_club, writerJson, init_db_clubs, init_db_competitions
 
 
 MAX_INSCRIPTION = 12
 NOW = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 NOW_GABARIT = datetime.now().strftime("%Y-%m-%d")
-
 
 def create_app(config):
 
@@ -16,10 +15,15 @@ def create_app(config):
 
     competitions = loadCompetitions()
     clubs = loadClubs()
+    test = ''
 
     if app.config['TESTING'] is True:
+        init_db_competitions()
+        init_db_clubs()
         competitions = loadCompetitions_test_data()
         clubs = loadClubs_test_data()
+        test = 'data/'
+        
 
     @app.route('/')
     def index():
@@ -85,9 +89,11 @@ def create_app(config):
         
         else:
             # update competition points
-            competition['numberOfPlaces'] = int(competition['numberOfPlaces'])-placesRequired
+            competition['numberOfPlaces'] = str(int(competition['numberOfPlaces'])-placesRequired)
+            writerJson(competitions, competition, f'{test}competitions_test.json')
             # update club points
             club['points'] = str(int(club['points']) - placesRequired)
+            writerJson(clubs, club, f'{test}clubs_test.json')
 
             flash('Great-booking complete!')
             return render_template('welcome.html', club=club, competitions=competitions, date=NOW_GABARIT)

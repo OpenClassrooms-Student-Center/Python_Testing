@@ -19,7 +19,7 @@ def purchaseBase():
 		'competition': 'Competition Test base',
 		'places': '4'
 		}
-    print( "REQUETE AVANT ENVOI : ", purchase)
+    
     yield purchase
 
 @pytest.fixture
@@ -71,3 +71,11 @@ def dateIsOver():
 		}
     
     yield purchase
+    
+"""def dataPointBeforeOperations():
+    {"clubs":[
+    {
+        "name":"club test base",
+        "email":"mail1@test.co",
+        "points":"10"
+    }"""
