@@ -1,5 +1,5 @@
 from utilis import change
-from flask import Flask, render_template, request, redirect, flash,url_for
+from flask import Flask, render_template, request, redirect, flash, url_for
 
 
 def create_app(config):
@@ -14,10 +14,14 @@ def create_app(config):
     def index():
         return render_template('index.html')
 
-    @app.route('/showSummary',methods=['POST'])
-    def showSummary():
-        club = [club for club in clubs if club['email'] == request.form['email']][0]
-        return render_template('welcome.html', club=club, competitions=competitions)
+    @app.route('/showSummary', methods=['POST'])
+    def show_summary():
+        try:
+            club = [club for club in clubs if club['email'] == request.form['email']][0]
+            return render_template('welcome.html', club=club, competitions=competitions)
+        except IndexError:
+            message = "No club found with this email"
+            return render_template('index.html', message=message)
 
 
     @app.route('/book/<competition>/<club>')
@@ -48,3 +52,4 @@ def create_app(config):
     def logout():
         return redirect(url_for('index'))
 
+    return app
