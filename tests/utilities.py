@@ -30,7 +30,13 @@ def search_club(club_email, clubs):
     else:
         return None
     
-    
+def retrieveDateCompetition(request):
+    all_comp = loadCompetitions_test_data()
+    for comp in all_comp:
+        if comp['name'] == request:
+            return comp['date']
+
+
 def init_db_competitions():
     with open('data/competitions_test.json') as c:
          listOfCompetitions = json.load(c)['competitions']
