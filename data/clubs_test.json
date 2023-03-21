@@ -1,0 +1,16 @@
+{"clubs":[
+    {
+        "name":"club test base",
+        "email":"mail1@test.co",
+        "points":"10"
+    },
+    {
+        "name":"club test not enough points",
+        "email": "mail2@test.co",
+        "points":"3"
+    },
+    {   "name":"club test more than 12 points",
+        "email": "mail3@test.co",
+        "points":"13"
+    }
+]}
