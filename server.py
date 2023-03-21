@@ -23,7 +23,6 @@ def create_app(config):
             message = "No club found with this email"
             return render_template('index.html', message=message)
 
-
     @app.route('/book/<competition>/<club>')
     def book(competition,club):
         foundClub = [c for c in clubs if c['name'] == club][0]
