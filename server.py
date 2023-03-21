@@ -13,16 +13,16 @@ def create_app(config):
     app.secret_key = 'something_special'
     app.config.update(config)
 
-    competitions = loadCompetitions()
-    clubs = loadClubs()
-    test = ''
-
     if app.config['TESTING'] is True:
         init_db_competitions()
         init_db_clubs()
         competitions = loadCompetitions_test_data()
         clubs = loadClubs_test_data()
         test = 'data/'
+    else:
+        competitions = loadCompetitions()
+        clubs = loadClubs()
+        test = ''
         
 
     @app.route('/')

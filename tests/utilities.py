@@ -107,10 +107,10 @@ def writerJson(alljsonValues: dict, actual: dict, jsonName: str):
                     json.dump(alljsonValues, ajv)
                 ajv.close()
                 break
+            
+            alljsonValues = {f'{jsonName[:-10]}' : alljsonValues}
 
-            alljsonValues = {f'{jsonName[:-5]}' : alljsonValues}
-
-            with open(f'{jsonName}', 'w') as ajv:
+            with open(f'{jsonName[:-10]}.json', 'w') as ajv:
                 json.dump(alljsonValues, ajv)
             ajv.close()
 
