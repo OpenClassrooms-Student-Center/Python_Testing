@@ -1,22 +1,41 @@
-import pytest
 import logging
+import pytest
+import shutil
 import json
 import os
 
 from ..server import create_app
 
+CLUBS_TEST_PATH = 'data_tests/clubs.json'
+COMPETITIONS_TEST_PATH = 'data_tests/competitions.json'
+
 @pytest.fixture
 def client():
-    app = create_app({"TESTING": True})
-    
-    with app.test_client() as client:
-        yield client
+	app = create_app({"TESTING": True})
+        
+	# Initialisation de la base de données
+	with app.app_context():
+		with open(CLUBS_TEST_PATH, 'r') as cl:
+			clubs_temp = json.load(cl)
+		with open(COMPETITIONS_TEST_PATH, 'r') as co:
+			comps_temp = json.load(co)
+
+	yield app.test_client()
+
+	# Nettoyage de la base de données
+	with app.app_context():
+                
+		with open(CLUBS_TEST_PATH, 'w') as clw:
+			json.dump(clubs_temp, clw)
+			
+		with open(COMPETITIONS_TEST_PATH, 'w') as cow:
+			json.dump(comps_temp, cow)
 
 @pytest.fixture
 def purchaseBase():
     purchase = {
-		'club': 'club test base',
-		'competition': 'Competition Test base',
+		'club': 'Simply Lift',
+		'competition': 'Spring Festival',
 		'places': '4'
 		}
     
@@ -25,8 +44,8 @@ def purchaseBase():
 @pytest.fixture
 def purchase12points():
     purchase = {
-		'club': 'club test more than 12 points',
-		'competition': 'Competition Test 12 points',
+		'club': 'Simply Lift',
+		'competition': 'Spring Festival',
 		'places': '13'
 		}
     
@@ -35,8 +54,8 @@ def purchase12points():
 @pytest.fixture
 def purchaseEmpty():
     purchase = {
-		'club': 'club test base',
-		'competition': 'Competition Test base',
+		'club': 'Simply Lift',
+		'competition': 'Spring Festival',
 		'places': ''
 		}
     
@@ -45,8 +64,8 @@ def purchaseEmpty():
 @pytest.fixture
 def purchaseNotEnoughPointsCompetition():
     purchase = {
-		'club': 'club test base',
-		'competition': 'Competition Test not enough points',
+		'club': 'Simply Lift',
+		'competition': 'Fall Classic',
 		'places': '4'
 		}
     
@@ -55,8 +74,8 @@ def purchaseNotEnoughPointsCompetition():
 @pytest.fixture
 def purchaseNotEnoughPointsClub():
     purchase = {
-		'club': 'club test not enough points',
-		'competition': 'Competition Test base',
+		'club': 'Iron Temple',
+		'competition': 'Spring Festival',
 		'places': '4'
 		}
     
@@ -65,17 +84,9 @@ def purchaseNotEnoughPointsClub():
 @pytest.fixture
 def dateIsOver():
     purchase = {
-		'club': 'club test base',
-		'competition': 'out dated',
+		'club': 'Simply Lift',
+		'competition': 'Out Dated',
 		'places': '4'
 		}
     
     yield purchase
-    
-"""def dataPointBeforeOperations():
-    {"clubs":[
-    {
-        "name":"club test base",
-        "email":"mail1@test.co",
-        "points":"10"
-    }"""

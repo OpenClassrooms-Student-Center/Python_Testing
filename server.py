@@ -1,41 +1,32 @@
 from datetime import datetime
 from flask import Flask,render_template,request,redirect,flash,url_for
-from .tests.utilities import loadClubs, loadCompetitions, loadClubs_test_data, loadCompetitions_test_data, search_club, writerJson, init_db_clubs, init_db_competitions
+import os
+import shutil
+from .tests.utilities import loadClubs, loadCompetitions, search_club, writerJson
+from .config import get_config
 
 
 MAX_INSCRIPTION = 12
 NOW = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 NOW_GABARIT = datetime.now().strftime("%Y-%m-%d")
 
+
 def create_app(config):
 
     app = Flask(__name__)
     app.secret_key = 'something_special'
-    app.config.update(config)
 
-    if app.config['TESTING'] is True:
-        init_db_competitions()
-        init_db_clubs()
-        competitions = loadCompetitions_test_data()
-        clubs = loadClubs_test_data()
-        test = 'data/'
-    else:
-        competitions = loadCompetitions()
-        clubs = loadClubs()
-        test = ''
-        
+    add_param = get_config(config)
+    app.config.update(add_param)
 
+    competitions = app.config['COMPETITIONS']
+    clubs = app.config['CLUBS']
+    
     @app.route('/')
     def index():
         return render_template('index.html')
-    
-    @app.route('/index')
-    def hello():
-        '''
-        route test
-        '''
-        return 'Hello, World!'
-    
+
+
     @app.route('/showSummary',methods=['POST'])
     def showSummary():
         club = search_club(request.form['email'], clubs)
@@ -59,8 +50,9 @@ def create_app(config):
 
     @app.route('/purchasePlaces',methods=['POST'])
     def purchasePlaces():
-
+        
         competition = [c for c in competitions if c['name'] == request.form['competition']][0]
+
         club = [c for c in clubs if c['name'] == request.form['club']][0]
         placesRequired = request.form['places']
 
@@ -90,10 +82,10 @@ def create_app(config):
         else:
             # update competition points
             competition['numberOfPlaces'] = str(int(competition['numberOfPlaces'])-placesRequired)
-            writerJson(competitions, competition, f'{test}competitions_test.json')
+            writerJson(competitions, competition, 'competitions.json', app.config['COMPS_PATH'])
             # update club points
             club['points'] = str(int(club['points']) - placesRequired)
-            writerJson(clubs, club, f'{test}clubs_test.json')
+            writerJson(clubs, club, 'clubs.json', app.config['CLUBS_PATH'])
 
             flash('Great-booking complete!')
             return render_template('welcome.html', club=club, competitions=competitions, date=NOW_GABARIT)
