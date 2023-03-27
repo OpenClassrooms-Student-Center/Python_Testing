@@ -1,5 +1,4 @@
 import json
-import shutil
 
 def loadClubs(clubs_path):
     with open(clubs_path) as c:
@@ -10,8 +9,11 @@ def loadCompetitions(competitions_path):
     with open(competitions_path) as comps:
          listOfCompetitions = json.load(comps)['competitions']
          return listOfCompetitions
-    
+
 def search_club(club_email, clubs):
+    '''
+    #1 verify if club exist
+    '''
     club = [club for club in clubs if club['email'] == club_email]
     if len(club) == 1:
         return club[0]
@@ -19,6 +21,9 @@ def search_club(club_email, clubs):
         return None
     
 def retrieveDateCompetition(request, comps_path):
+    '''
+    #5 return date of request competition
+    '''
     all_comp = loadCompetitions(comps_path)
     for comp in all_comp:
         if comp['name'] == request:
@@ -26,7 +31,7 @@ def retrieveDateCompetition(request, comps_path):
 
 def writerJson(alljsonValues: list[dict], actual: dict, jsonName: str, path: str)-> dict:
     '''
-    update json file
+    #6 update json file
     '''
 
     for jsonValue in alljsonValues:
