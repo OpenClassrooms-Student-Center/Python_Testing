@@ -1,0 +1,29 @@
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Summary | GUDLFT Registration</title>
+    </head>
+    <body>
+        <h3>Public board</h3>
+        <br>
+        <div class="public-board">
+            <table>
+                <tr>
+                    <td><strong>Clubs name</strong></td>
+                    {% for club in clubs_name %}
+                        <td>{{ club }}</td>
+                    {% endfor %}
+                </tr>
+                <tr>
+                    <td><strong>Points remaining</strong></td>
+                    {% for points in clubs_points %}
+                        <td>{{ points }}</td>
+                    {% endfor %}
+                </tr>
+            </table>
+        </div>
+    </body>
+</html>
+
+

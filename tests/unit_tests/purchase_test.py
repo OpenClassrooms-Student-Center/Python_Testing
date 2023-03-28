@@ -1,8 +1,7 @@
 from datetime import datetime
-from ..utilities import retrieveDateCompetition, loadCompetitions_test_data, loadClubs_test_data, init_db_clubs, init_db_competitions
-import html
-import json
+from ..utilities import retrieveDateCompetition, loadCompetitions_test_data, loadClubs_test_data
 import jsondiff
+import html
 
 CODE_200 = 200
 CODE_302 = 302
