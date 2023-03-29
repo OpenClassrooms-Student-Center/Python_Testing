@@ -3,6 +3,7 @@ import html
 
 CODE_200 = 200
 
+
 def test_booking_right(client, purchaseBase):
 
     comp_conv = urllib.parse.quote(purchaseBase['competition'])
@@ -12,7 +13,8 @@ def test_booking_right(client, purchaseBase):
     message = html.unescape(response.data.decode())
 
     assert response.status_code == CODE_200
-    assert f'<input type="hidden" name="club" value="{purchaseBase["club"]}">' in message
+    assert f'<input type="hidden" name="club" value="{purchaseBase["club"]}">'\
+        in message
 
 
 def test_booking_past_competition(client):
@@ -24,6 +26,7 @@ def test_booking_past_competition(client):
 
     assert response.status_code == CODE_200
     assert "Something went wrong-please try again" in message
+
 
 def test_booking_wrong_url(client):
     comp_conv = urllib.parse.quote("wrong url")

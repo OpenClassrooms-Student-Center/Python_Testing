@@ -8,9 +8,10 @@ from ..utilities import loadClubs, loadCompetitions
 CODE_200 = 200
 CODE_302 = 302
 
+
 def test_bookPlaces(client, purchaseBase):
     # login
-    data = {'email':'john@simplylift.co'}
+    data = {'email': 'john@simplylift.co'}
     response = client.post('/showSummary', data=data)
 
     assert response.status_code == 200
@@ -21,9 +22,10 @@ def test_bookPlaces(client, purchaseBase):
     # go booking
     response = client.get(f"/book/{comp_conv}/{club_conv}")
     message = html.unescape(response.data.decode())
-    
+
     assert response.status_code == CODE_200
-    assert f'<input type="hidden" name="club" value="{purchaseBase["club"]}">' in message
+    assert f'<input type="hidden" name="club" value="{purchaseBase["club"]}">'\
+        in message
 
     # book places
     data_comp_before_request = loadClubs(CLUBS_TEST_PATH)

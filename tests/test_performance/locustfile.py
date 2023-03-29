@@ -1,19 +1,20 @@
 from locust import HttpUser, task
 
 purchase = {
-		'club': 'Simply Lift',
-		'competition': 'Spring Festival',
-		'places': '4'
-		}
+    'club': 'Simply Lift',
+    'competition': 'Spring Festival',
+    'places': '4'
+}
+
 
 class ProjectPerfTest(HttpUser):
-    @task 
+    @task
     def home(self):
         self.client.get("/")
 
     @task
     def login(self):
-        self.client.post("/showSummary",{'email':'john@simplylift.co'})
+        self.client.post("/showSummary", {'email': 'john@simplylift.co'})
 
     @task
     def book(self):

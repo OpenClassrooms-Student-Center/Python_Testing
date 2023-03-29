@@ -5,9 +5,10 @@ COMPETITIONS_PATH = 'competitions.json'
 CLUBS_TEST_PATH = 'data_tests/clubs.json'
 COMPETITIONS_TEST_PATH = 'data_tests/competitions.json'
 
+
 def get_config(app):
 
-    if app["TESTING"] == True:
+    if app["TESTING"] is True:
         app.update({
             'DEBUG': True,
             'CLUBS': loadClubs(CLUBS_TEST_PATH),
@@ -16,7 +17,7 @@ def get_config(app):
             'COMPS_PATH': 'data_tests/competitions.json'
         })
         return app
-    
+
     app.update({
         'DEBUG': False,
         'CLUBS': loadClubs(CLUBS_PATH),
@@ -24,5 +25,5 @@ def get_config(app):
         'CLUBS_PATH': 'clubs.json',
         'COMPS_PATH': 'competitions.json'
     })
-    
+
     return app

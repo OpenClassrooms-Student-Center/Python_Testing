@@ -2,6 +2,7 @@ import html
 
 CODE_200 = 200
 
+
 def test_index_return_200(client):
     response = client.get('/')
     message = html.unescape(response.data.decode())

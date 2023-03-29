@@ -1,14 +1,17 @@
 import json
 
+
 def loadClubs(clubs_path):
     with open(clubs_path) as c:
-         listOfClubs = json.load(c)['clubs']
-         return listOfClubs
+        listOfClubs = json.load(c)['clubs']
+        return listOfClubs
+
 
 def loadCompetitions(competitions_path):
     with open(competitions_path) as comps:
-         listOfCompetitions = json.load(comps)['competitions']
-         return listOfCompetitions
+        listOfCompetitions = json.load(comps)['competitions']
+        return listOfCompetitions
+
 
 def search_club(club_email, clubs):
     '''
@@ -19,7 +22,8 @@ def search_club(club_email, clubs):
         return club[0]
     else:
         return None
-    
+
+
 def retrieveDateCompetition(request, comps_path):
     '''
     #5 return date of request competition
@@ -29,7 +33,11 @@ def retrieveDateCompetition(request, comps_path):
         if comp['name'] == request:
             return comp['date']
 
-def writerJson(alljsonValues: list[dict], actual: dict, jsonName: str, path: str)-> dict:
+
+def writerJson(alljsonValues: list[dict],
+               actual: dict,
+               jsonName: str,
+               path: str) -> dict:
     '''
     #6 update json file
     '''
@@ -42,8 +50,8 @@ def writerJson(alljsonValues: list[dict], actual: dict, jsonName: str, path: str
             except KeyError:
                 # competition
                 jsonValue['numberOfPlaces'] = actual['numberOfPlaces']
-            
-            alljsonValues = {f'{jsonName[:-5]}' : alljsonValues}
+
+            alljsonValues = {f'{jsonName[:-5]}': alljsonValues}
 
             with open(path, 'w') as ajv:
                 json.dump(alljsonValues, ajv)
