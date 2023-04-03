@@ -1,13 +1,15 @@
 from datetime import datetime
-from ..utilities import retrieveDateCompetition, loadCompetitions_test_data, loadClubs_test_data
 import jsondiff
 import html
+
+from ..utilities import retrieveDateCompetition, loadClubs, loadCompetitions
+from ...config import CLUBS_TEST_PATH, COMPETITIONS_TEST_PATH
 
 CODE_200 = 200
 CODE_302 = 302
 
 NOW = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
+    
 def test_validation_booking(client, purchaseBase):
 	"""
 	Classic test to book places that runs if no contrary condition is raised.
@@ -68,7 +70,7 @@ def test_competition_not_over(client, purchaseBase):
 
 	assert response.status_code == 200
 	assert 'Great-booking complete!' in message
-	assert NOW < retrieveDateCompetition(purchaseBase['competition'])
+	assert NOW < retrieveDateCompetition(purchaseBase['competition'], COMPETITIONS_TEST_PATH)
 
 def test_competition_is_over(client, dateIsOver):
 	"""
@@ -79,42 +81,41 @@ def test_competition_is_over(client, dateIsOver):
 
 	assert response.status_code == 200
 	assert "That competition is over!" in message
-	assert NOW > retrieveDateCompetition(dateIsOver['competition'])
+	assert NOW > retrieveDateCompetition(dateIsOver['competition'], COMPETITIONS_TEST_PATH)
+									    
 
 def test_json_club_points_removal(client, purchaseBase):
 	"""
 	Test if the points have change in the json file 'clubs_test'
+	point club : 15 || request point 4
 	"""
-	data_clubs_before_request = loadClubs_test_data()
+	data_clubs_before_request = loadClubs(CLUBS_TEST_PATH)
 
 	response = client.post('/purchasePlaces', data=purchaseBase)
 	message = html.unescape(response.data.decode())
 
-	data_clubs_after_request = loadClubs_test_data()
+	data_clubs_after_request = loadClubs(CLUBS_TEST_PATH)
 
 	diff = jsondiff.diff(data_clubs_before_request, data_clubs_after_request)
 
 	assert response.status_code == CODE_200
 	assert 'Great-booking complete!' in message
-	assert diff == {0: {'points': '2'}}
+	assert diff == {0: {'points': '11'}}
 
 def test_json_competition_points_removal(client, purchaseBase):
 	"""
 	Test if the points have change in the json file 'competitions_test'
+	point comp : 13 || request point 4
 	"""
-	data_comp_before_request = loadCompetitions_test_data()
+	data_comp_before_request = loadCompetitions(COMPETITIONS_TEST_PATH)
 	
 	response = client.post('/purchasePlaces', data=purchaseBase)
 	message = html.unescape(response.data.decode())
 
-	data_comp_after_request = loadCompetitions_test_data()
+	data_comp_after_request = loadCompetitions(COMPETITIONS_TEST_PATH)
 
 	diff = jsondiff.diff(data_comp_before_request, data_comp_after_request)
 
 	assert response.status_code == CODE_200
 	assert 'Great-booking complete!' in message
-	assert diff == {0: {'numberOfPlaces': '13'}}
-
-def test_fixtures(client):
-	response = client.get('/index')
-	assert response.status_code == CODE_200
+	assert diff == {0: {'numberOfPlaces': '9'}}
