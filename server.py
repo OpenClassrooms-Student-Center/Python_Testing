@@ -50,7 +50,7 @@ def create_app(config):
 
     @app.route('/purchasePlaces',methods=['POST'])
     def purchasePlaces():
-        
+
         competition = [c for c in competitions if c['name'] == request.form['competition']][0]
 
         club = [c for c in clubs if c['name'] == request.form['club']][0]
@@ -80,6 +80,7 @@ def create_app(config):
             return render_template('welcome.html', club=club, competitions=competitions, date=NOW_GABARIT)
         
         else:
+
             # update competition points
             competition['numberOfPlaces'] = str(int(competition['numberOfPlaces'])-placesRequired)
             writerJson(competitions, competition, 'competitions.json', app.config['COMPS_PATH'])
