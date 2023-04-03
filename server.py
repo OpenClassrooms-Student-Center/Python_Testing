@@ -122,6 +122,7 @@ def create_app(config):
                                    date=NOW_GABARIT)
 
         else:
+
             # update competition points
             competition['numberOfPlaces'] = str(
                 int(competition['numberOfPlaces'])-placesRequired)
