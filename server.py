@@ -39,13 +39,30 @@ def create_app(config):
 
     @app.route('/book/<competition>/<club>')
     def book(competition,club):
-        foundClub = [c for c in clubs if c['name'] == club][0]
-        foundCompetition = [c for c in competitions if c['name'] == competition][0]
-        if foundClub and foundCompetition:
+        verifications = []
+
+        try:
+            foundClub = [c for c in clubs if c['name'] == club][0]
+            foundCompetition = [c for c in competitions if c['name'] == competition][0]
+        except IndexError:
+            flash("False request, you have been disconnected")
+            return render_template('index.html')
+        
+        date_comp = datetime.strptime(foundCompetition['date'], "%Y-%m-%d %H:%M:%S")
+        date_now = datetime.strptime(NOW, "%Y-%m-%d %H:%M:%S")
+
+        if int(foundClub['points']) > 0 :
+            verifications.append(True)
+        if int(foundCompetition['numberOfPlaces']) > 0:
+            verifications.append(True)
+        if date_comp > date_now :
+            verifications.append(True)
+
+        if foundClub and foundCompetition and any(verifications) and len(verifications) == 3:
             return render_template('booking.html',club=foundClub,competition=foundCompetition, date=NOW_GABARIT)
         else:
             flash("Something went wrong-please try again")
-            return render_template('welcome.html', club=club, competitions=competitions, date=NOW_GABARIT)
+            return render_template('welcome.html', club=foundClub, competitions=competitions, date=NOW_GABARIT)
 
 
     @app.route('/purchasePlaces',methods=['POST'])

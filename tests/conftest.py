@@ -12,7 +12,7 @@ COMPETITIONS_TEST_PATH = 'data_tests/competitions.json'
 @pytest.fixture
 def client():
 	app = create_app({"TESTING": True})
-        
+  
 	# Initialisation de la base de données
 	with app.app_context():
 		with open(CLUBS_TEST_PATH, 'r') as cl:

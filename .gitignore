@@ -4,5 +4,6 @@ lib
 .Python
 .envrc
 __pycache__
-p11env/
-/p11env
+env/
+env
+.env
