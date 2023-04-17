@@ -1,0 +1,4 @@
+[
+  "test_fixtures.py::test_check_if_a_user_exists",
+  "test_fixtures.py::test_secretary_email"
+]
