@@ -1,51 +1,101 @@
-# gudlift-registration
+# OC-PROJET 11: Améliorez une application Web Python par des tests et du débogage
+#
+### Présentation:
+Nous sommes chargés par la société Güdlft d'améliorer leur application de gestion des reservation
+pour que des clubs de liftings puissent réserver des places en compétitions.
 
-1. Why
+Cette application est écrite avec **Python** accompagné du framework **Flask** et plusieurs libraries de tests
+telles que **coverage**, **pytest**, **flake8** et **locust**
 
+Nous devons donc débugger et tester l'application.
 
-    This is a proof of concept (POC) project to show a light-weight version of our competition booking platform. The aim is the keep things as light as possible, and use feedback from the users to iterate.
+Le projet originel se trouve ici : https://github.com/OpenClassrooms-Student-Center/Python_Testing
+#
+### Installation:
+Vous devez tout d'abord vous doter de la dernière version de python, vous pouvez la télécharger ici:
+https://www.python.org/downloads/
 
-2. Getting Started
+Du fait que ce projet est un **fork** (nouveau logiciel créé à partir d'un logiciel existant), 
+vous devrez cloner mon **fork**, pour ce faire : 
+1. Ouvrez un terminal de commande
+2. Entrez : ``git clone https://github.com/thomas-barbato/projet-11``
+3. Créer un environnement virtuel:
+`python3 -m venv /path/to/new/virtual/environment`
+ Ou `python -m virtualenv venv`
+4. Activer l'environnement virtuel:
+```
+cd Venv\Scripts\ ; .\activate.bat ;
+cd .. 
+cd ..
+```
+5. Installez les prérequis au bon fonctionnement du projet avec la commande suivante:
+   - Version "normale": ``pip install -r requirements.txt``
+   - Version "testing": ``pip install -r requirements-testing.txt``
+#
+### Démarrage de l'application:
+Pour faire fonctionner l'application, vous aurez besoin de démarrer Flask, pour cela:
+1. Ouvrez un terminal **externe** à votre IDE *( integrated development environment)*
+dans le dossier du projet.
+2. Définissez une variable d'environnement :
+    - Sous windows: ``set FLASK_APP=server.py``
+    - sous linux: ``export FLASK_APP=server``
+3. Démarrez avec la commande suivante :
+    - ``flask run``
+4. Vous pouvez maintenant accéder à l'application, via l'url suivante :
+    - http://127.0.0.1:5000/
+#
+### La phase de tests:
+Pour ce projet, nous effectuons trois phases de tests, pour cela nous utiliserons quatre
+outils différents, leur utilisation est expliquée ci-dessous:
 
-    This project uses the following technologies:
+##### *Pytest*
+Les tests qui ont étés rédigés pour ce projet se trouvent dans le répertoire **tests**
+Pour lancer pytest veuillez entrer la commande suivante dans votre terminal:
 
-    * Python v3.x+
+- `pytest .\tests\`
 
-    * [Flask](https://flask.palletsprojects.com/en/1.1.x/)
+Cette commande exécutera tous les tests qui se trouvent dans le répertoire tests, vous pouvez
+choisir vos tests en ajoutant directement le nom du fichier test ciblé, exemple:
+- ``pytest .\tests\test_clubs.py``
 
-        Whereas Django does a lot of things for us out of the box, Flask allows us to add only what we need. 
-     
+##### *Locust*
 
-    * [Virtual environment](https://virtualenv.pypa.io/en/stable/installation.html)
+Concernant Locust, vous pouvez consulter le rapport généré dans le dossier **locust_report**, 
+il s'ouvre dans un navigateur.
 
-        This ensures you'll be able to install the correct packages without interfering with Python on your machine.
+Cependant, si vous voulez lancer vous-même le test locust, entrez la commande suivante dans votre terminal:
 
-        Before you begin, please ensure you have this installed globally. 
+- ``locust -f .\tests\locustfile.py``
 
+Vous aurez alors l'url suivante générée : 
+ - http://0.0.0.0:8089
 
-3. Installation
+**CEPENDANT** si cette url ne fonctionne pas, alors vous devez utiliser l'url suivante : 
+ - http://localhost:8089/
 
-    - After cloning, change into the directory and type <code>virtualenv .</code>. This will then set up a a virtual python environment within that directory.
+##### *Coverage*
 
-    - Next, type <code>source bin/activate</code>. You should see that your command prompt has changed to the name of the folder. This means that you can install packages in here without affecting affecting files outside. To deactivate, type <code>deactivate</code>
+Vous pouvez consulter le rapport coverage situé dans:
+- ``htmlcov/index.html``
 
-    - Rather than hunting around for the packages you need, you can install in one step. Type <code>pip install -r requirements.txt</code>. This will install all the packages listed in the respective file. If you install a package, make sure others know by updating the requirements.txt file. An easy way to do this is <code>pip freeze > requirements.txt</code>
+Il s'ouvre avec votre navigateur web, **les spécifications fonctionnelles exigent d'avoir un taux
+de couverture de 60% , ici nous sommes à 88%.**
 
-    - Flask requires that you set an environmental variable to the python file. However you do that, you'll want to set the file to be <code>server.py</code>. Check [here](https://flask.palletsprojects.com/en/1.1.x/quickstart/#a-minimal-application) for more details
+!["Résultats de coverage en image"](coverage_results.PNG)
 
-    - You should now be ready to test the application. In the directory, type either <code>flask run</code> or <code>python -m flask run</code>. The app should respond with an address you should be able to go to using your browser.
+Pour exécuter coverage, vous devrez entrer la commande suivante dans votre terminal:
+- ``coverage run -m pytest .\tests\``
 
-4. Current Setup
+Pour sauvegarder ensuite le rapport en html:
+- ``coverage html``
 
-    The app is powered by [JSON files](https://www.tutorialspoint.com/json/json_quick_guide.htm). This is to get around having a DB until we actually need one. The main ones are:
-     
-    * competitions.json - list of competitions
-    * clubs.json - list of clubs with relevant information. You can look here to see what email addresses the app will accept for login.
+##### *Flake8*
 
-5. Testing
+Vous pouvez consulter le rapport flake8 dans le répertoire suivant:
+- ``flake-report/index.html``
 
-    You are free to use whatever testing framework you like-the main thing is that you can show what tests you are using.
+Pour générer vous-même un test, entrez la commande suivante dans votre terminal:
+- ``flake8``
 
-    We also like to show how well we're testing, so there's a module called 
-    [coverage](https://coverage.readthedocs.io/en/coverage-5.1/) you should add to your project.
-
+Aucun argument n'est nécessaire, car nous avons déjà un fichier de configuration ici:
+- ``setup.cfg``
