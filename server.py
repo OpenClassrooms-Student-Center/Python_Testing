@@ -1,3 +1,4 @@
+import datetime
 import json
 from flask import Flask,render_template,request,redirect,flash,url_for
 
@@ -31,7 +32,7 @@ def showSummary():
         message = "Email not found. Please try again."
         return render_template('index.html', message=message)
     else:
-        return render_template('welcome.html', club=club[0], competitions=competitions)
+        return render_template('welcome.html', club=club[0], competitions=competitions, today=str(datetime.date.today()))
 
 
 
