@@ -45,5 +45,33 @@ def test_purchase_places_exceeding_points(client):
     # response should indicate that the purchase was not possible
     assert b'Cannot redeem more points than available' in response.data
 
+    
+def test_purchase_places_max_points(client):
+    # load the clubs and competitions data
+    clubs = loadClubs()
+    competitions = loadCompetitions()
+
+    # find a club and a competition for testing
+    club = next(c for c in clubs if c['name'] == 'Simply Lift')
+    competition = next(c for c in competitions if c['name'] == 'Spring Festival')
+
+    # count the initial number of points
+    initial_points = int(club['points'])
+
+    # try to purchase more places than 12
+    places_required = 13
+    response = client.post(
+        '/purchasePlaces', 
+        data=dict(
+            competition=competition['name'],
+            club=club['name'],
+            places=places_required
+        ), 
+        follow_redirects=True
+    )
+
+    # response should indicate that the purchase was not possible
+    assert b'Cannot redeem more than 12 places!' in response.data
+
     # club's points should not have changed
     assert int(club['points']) == initial_points
