@@ -101,3 +101,9 @@ def saveCompetitions():
 @app.route("/logout")
 def logout():
     return redirect(url_for("index"))
+
+
+@app.route("/clubPoints", methods=["POST"])
+def clubPoints():
+    mail = request.form["email"]
+    return render_template("club_points.html", clubs=clubs, mail=mail)

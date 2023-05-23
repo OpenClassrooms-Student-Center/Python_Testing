@@ -126,3 +126,20 @@ def test_purchase_places_deducts_points(client):
             int(updated_competition["numberOfPlaces"])
             == initial_places - places_required
         )
+
+
+def test_display_points(client):
+    # Load the clubs and competitions data
+    clubs = loadClubs()
+    club = next(c for c in clubs if c["name"] == "Simply Lift")
+    club_points = int(club["points"])
+    print(club_points)
+
+    response = client.post(
+        "/clubPoints",
+        data=dict(email=clubs[1]["email"]),
+        follow_redirects=True,
+    )
+    print(response.data)
+
+    assert f"Simply Lift</td>\n\t\t\t\t<td>{club_points}".encode() in response.data
