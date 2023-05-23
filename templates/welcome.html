@@ -26,7 +26,7 @@
             Date: {{ comp['date'] }}</ br>
             Number of Places: {{ comp['numberOfPlaces'] }}
             {% if comp['numberOfPlaces']|int > 0 %}
-            {% if comp['date'] > today %}
+            {% if not today or comp['date'] > today %}
             <a href="{{ url_for('book',competition=comp['name'],club=club['name']) }}">Book Places</a>
             {% else %}
             <p>Competition has already taken place</p>
