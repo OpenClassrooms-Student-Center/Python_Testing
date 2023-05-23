@@ -44,25 +44,37 @@ def showSummary():
 
 @app.route("/book/<competition>/<club>")
 def book(competition, club):
-    foundClub = [c for c in clubs if c["name"] == club][0]
-    foundCompetition = [c for c in competitions if c["name"] == competition][0]
-    if foundClub and foundCompetition:
-        return render_template(
-            "booking.html", club=foundClub, competition=foundCompetition
-        )
-    else:
+    foundClub = [c for c in clubs if c["name"] == club]
+    if len(foundClub) == 0:
         flash("Something went wrong-please try again")
         return render_template("welcome.html", club=club, competitions=competitions)
+    foundClub = foundClub[0]
+    foundCompetition = [c for c in competitions if c["name"] == competition]
+    if len(foundCompetition) == 0:
+        flash("Something went wrong-please try again")
+        return render_template("welcome.html", club=club, competitions=competitions)
+    foundCompetition = foundCompetition[0]
+
+    return render_template(
+            "booking.html", club=foundClub, competition=foundCompetition
+        )
 
 
 @app.route("/purchasePlaces", methods=["POST"])
 def purchasePlaces():
     competition_name = request.form["competition"]
     club_name = request.form["club"]
-    places_required = int(request.form["places"])
+    places_required = convert_to_int_or_float(request.form["places"])
+    
+
 
     competition = next(c for c in competitions if c["name"] == competition_name)
     club = next(c for c in clubs if c["name"] == club_name)
+    
+    
+    if type(places_required) == float or places_required == None:
+        flash("Please enter a whole number!")
+        return render_template("welcome.html", club=club, competitions=competitions)
 
     # Check if club has enough points
     if int(club["points"]) < places_required:
@@ -102,8 +114,22 @@ def saveCompetitions():
 def logout():
     return redirect(url_for("index"))
 
-
-@app.route("/clubPoints", methods=["POST"])
+@app.route("/clubPoints", methods=["POST", "GET"])
 def clubPoints():
-    mail = request.form["email"]
-    return render_template("club_points.html", clubs=clubs, mail=mail)
+    if request.method == "POST":
+        mail = request.form["email"]
+        return render_template("club_points.html", clubs=clubs, mail=mail)
+    else:
+        return render_template("club_points.html", clubs=clubs)
+
+
+def convert_to_int_or_float(value):
+    try:
+        converted_value = int(value)
+        return converted_value
+    except ValueError:
+        try:
+            converted_value = float(value)
+            return converted_value
+        except ValueError:
+            return None
