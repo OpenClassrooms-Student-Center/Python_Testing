@@ -1,36 +1,50 @@
-<html lang="en">
+<!DOCTYPE html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Summary | GUDLFT Registration</title>
 </head>
 <body>
-        <h2>Welcome, {{club['email']}} </h2><a href="{{url_for('logout')}}">Logout</a>
+        <h2>Welcome, {{ club['email'] }} </h2>
+        <a href="{{ url_for('logout') }}">Logout</a>
+        		<form
+			action="{{ url_for('clubPoints') }}"
+			method="post">
+			<input
+				type="hidden"
+				name="email"
+				value="{{ club['email'] }}" />
+			<button type="submit">Clubs</button>
+		</form>
 
     {% with messages = get_flashed_messages()%}
     {% if messages %}
         <ul>
        {% for message in messages %}
-            <li>{{message}}</li>
+            <li>{{ message }}</li>
         {% endfor %}
        </ul>
-    {% endif%}
-    Points available: {{club['points']}}
+    {% endif %}
+    Points available: {{ club['points'] }}
     <h3>Competitions:</h3>
     <ul>
-        {% for comp in competitions%}
+        {% for comp in competitions %}
         <li>
-            {{comp['name']}}<br />
-            Date: {{comp['date']}}</br>
-            Number of Places: {{comp['numberOfPlaces']}}
-            {%if comp['numberOfPlaces']|int >0%}
+            {{ comp['name'] }}<br />
+            Date: {{ comp['date'] }}</ br>
+            Number of Places: {{ comp['numberOfPlaces'] }}
+            {% if comp['numberOfPlaces']|int > 0 %}
+            {% if not today or comp['date'] > today %}
             <a href="{{ url_for('book',competition=comp['name'],club=club['name']) }}">Book Places</a>
-            {%endif%}
+            {% else %}
+            <p>Competition has already taken place</p>
+            {% endif %}
+            {% endif %}
         </li>
         <hr />
         {% endfor %}
     </ul>
-    {%endwith%}
+    {% endwith %}
 
 </body>
-</html>
