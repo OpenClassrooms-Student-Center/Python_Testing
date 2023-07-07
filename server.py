@@ -30,9 +30,13 @@ def create_app(config, json_competitions, json_clubs):
 
     @app.route('/showSummary',methods=['POST'])
     def showSummary():
-        club = [club for club in clubs if club['email'] == request.form['email']][0]
-        return render_template('welcome.html',club=club,competitions=competitions)
-
+        try:
+            club = [club for club in clubs if club['email'] == request.form['email']][0]
+            flash(f"You are connected as {request.form['email']}", "success")
+            return render_template('welcome.html',club=club,competitions=competitions)
+        except IndexError:
+            flash("Please enter a recognized email", "error")
+            return render_template('index.html'), 401
 
     @app.route('/book/<competition>/<club>')
     def book(competition,club):
@@ -44,7 +48,6 @@ def create_app(config, json_competitions, json_clubs):
             flash("Something went wrong-please try again")
             return render_template('welcome.html', club=club, competitions=competitions)
 
-
     @app.route('/purchasePlaces',methods=['POST'])
     def purchasePlaces():
         competition = [c for c in competitions if c['name'] == request.form['competition']][0]
@@ -54,9 +57,7 @@ def create_app(config, json_competitions, json_clubs):
         flash('Great-booking complete!')
         return render_template('welcome.html', club=club, competitions=competitions)
 
-
     # TODO: Add route for points display
-
 
     @app.route('/logout')
     def logout():
