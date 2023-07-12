@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta
+			name="viewport"
+			content="width=device-width, initial-scale=1.0" />
+		<title>Club Points | GUDLFT Registration</title>
+	</head>
+
+	<body>
+		<h2>Club Points</h2>
+		<a href="{{ url_for('logout') }}">Logout</a>
+		<form
+			action="{{ url_for('showSummary') }}"
+			method="post">
+			<input
+				type="hidden"
+				name="email"
+				value="{{ mail }}" />
+			<button type="submit">Back</button>
+		</form>
+		{% with messages = get_flashed_messages() %} {% if messages %}
+		<ul>
+			{% for message in messages %}
+			<li>{{ message }}</li>
+			{% endfor %}
+		</ul>
+		{% endif %} {% endwith %}
+
+		<table>
+			<tr>
+				<th>Club Name</th>
+				<th>Points</th>
+			</tr>
+			{% for club in clubs %}
+			<tr>
+				<td>{{ club['name'] }}</td>
+				<td>{{ club['points'] }}</td>
+			</tr>
+			{% endfor %}
+		</table>
+	</body>
+</html>
