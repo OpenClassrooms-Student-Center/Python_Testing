@@ -60,6 +60,9 @@ def create_app(config, json_competitions, json_clubs):
         elif placesRequired > int(competition["numberOfPlaces"]):
             flash("Not enough places available for this purchase", "error")
             return render_template('booking.html', club=club, competition=competition), 400
+        elif placesRequired > 12:
+            flash("You cannot buy more than 12 tickets from the same competition", "error")
+            return render_template('booking.html', club=club, competition=competition), 400
         else:
             competition['numberOfPlaces'] = int(competition['numberOfPlaces'])-placesRequired
             flash('Great-booking complete!', "success")
