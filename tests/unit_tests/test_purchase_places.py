@@ -58,3 +58,15 @@ def test_purchase_places_post_more_than_12_places_400(client, existent_club, exi
     assert rv.status_code == 400
     data = rv.data.decode()
     assert "You cannot buy more than 12 tickets from the same competition" in data
+
+
+def test_purchase_places_outdated_book_400(client, existent_club, existent_competition):
+    rv = client.post("/purchasePlaces",
+                     data={"club": existent_club[0]["name"],
+                           "competition": existent_competition[2]["name"],
+                           "places": 1
+                           })
+    assert rv.status_code == 400
+    data = rv.data.decode()
+    print("yoyo : ", data)
+    assert 'Cannot buy places, this book is obsolete, please select one that has not already passed' in data
