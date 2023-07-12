@@ -53,9 +53,17 @@ def create_app(config, json_competitions, json_clubs):
         competition = [c for c in competitions if c['name'] == request.form['competition']][0]
         club = [c for c in clubs if c['name'] == request.form['club']][0]
         placesRequired = int(request.form['places'])
-        competition['numberOfPlaces'] = int(competition['numberOfPlaces'])-placesRequired
-        flash('Great-booking complete!')
-        return render_template('welcome.html', club=club, competitions=competitions)
+
+        if placesRequired > int(club["points"]):
+            flash("Not enough points available for this purchase", "error")
+            return render_template('booking.html', club=club, competition=competition), 400
+        elif placesRequired > int(competition["numberOfPlaces"]):
+            flash("Not enough places available for this purchase", "error")
+            return render_template('booking.html', club=club, competition=competition), 400
+        else:
+            competition['numberOfPlaces'] = int(competition['numberOfPlaces'])-placesRequired
+            flash('Great-booking complete!', "success")
+            return render_template('welcome.html', club=club, competitions=competitions)
 
     # TODO: Add route for points display
 
