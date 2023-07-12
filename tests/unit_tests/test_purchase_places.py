@@ -12,6 +12,18 @@ def test_purchase_places_post_200(client, existent_club, existent_competition):
     assert "Great-booking complete!" in data
 
 
+def test_purchase_places_post_under_zero_input_400(client, existent_club, existent_competition):
+    # If the club does not have enough points
+    rv = client.post("/purchasePlaces",
+                     data={"club": existent_club[0]["name"],
+                           "competition": existent_competition[0]["name"],
+                           "places": -5,
+                           })
+    assert rv.status_code == 400
+    data = rv.data.decode()
+    assert "Please, enter an integer greater than 0 as value" in data
+
+
 def test_purchase_places_post_not_enough_point_400(client, existent_club, existent_competition):
     # If the club does not have enough points
     rv = client.post("/purchasePlaces",

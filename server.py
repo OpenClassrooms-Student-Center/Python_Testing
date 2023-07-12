@@ -54,7 +54,10 @@ def create_app(config, json_competitions, json_clubs):
         club = [c for c in clubs if c['name'] == request.form['club']][0]
         placesRequired = int(request.form['places'])
 
-        if placesRequired > int(club["points"]):
+        if placesRequired < 0:
+            flash("Please, enter an integer greater than 0 as value", "error")
+            return render_template('booking.html', club=club, competition=competition), 400
+        elif placesRequired > int(club["points"]):
             flash("Not enough points available for this purchase", "error")
             return render_template('booking.html', club=club, competition=competition), 400
         elif placesRequired > int(competition["numberOfPlaces"]):
