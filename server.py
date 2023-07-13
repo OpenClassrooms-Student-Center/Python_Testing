@@ -75,7 +75,8 @@ def create_app(config, json_competitions, json_clubs):
             flash("Cannot buy places, this book is obsolete, please select one that has not already passed", "error")
             return render_template('welcome.html', club=club, competition=competition), 400
         else:
-            competition['numberOfPlaces'] = int(competition['numberOfPlaces'])-placesRequired
+            competition['numberOfPlaces'] = int(competition['numberOfPlaces']) - placesRequired
+            club['points'] = int(club['points']) - placesRequired
             flash('Great-booking complete!', "success")
             return render_template('welcome.html', club=club, competitions=competitions)
 

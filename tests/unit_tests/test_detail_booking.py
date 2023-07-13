@@ -4,7 +4,7 @@ from datetime import datetime
 
 
 def test_get_detail_book_200(client, existent_competition, existent_club):
-
+    # Success access to book detail (retrieve)
     rv = client.get(
         f"/book/{existent_competition[0]['name']}"
         f"/{existent_club[0]['name']}")
