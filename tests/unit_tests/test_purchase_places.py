@@ -75,7 +75,7 @@ def test_purchase_places_outdated_book_400(client, existent_club, existent_compe
 
 
 def test_purchase_place_deduct_points_club_200(client, existent_club, existent_competition):
-    # Test if points deduction is taken into club balance account
+    # Test and success if points deduction is taken into club balance account
     compared_var = int(existent_club[0]["points"])
     places_purchased = int(3)
     compared_var_deduct = compared_var - places_purchased
@@ -91,7 +91,7 @@ def test_purchase_place_deduct_points_club_200(client, existent_club, existent_c
 
 
 def test_purchase_place_deduct_places_competition_200(client, existent_club, existent_competition):
-    # Test if places deduction is taken into competition balance account
+    # Test and success if places deduction is taken into competition balance account
     compared_var = int(existent_competition[0]["numberOfPlaces"])
     places_purchased = int(3)
     compared_var_deduct = compared_var - places_purchased
