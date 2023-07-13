@@ -1,18 +1,18 @@
-import json
 from datetime import datetime
 from flask import Flask,render_template,request,redirect,flash,url_for
+import json
 
 
 def loadClubs():
     with open('clubs.json') as c:
-         listOfClubs = json.load(c)['clubs']
-         return listOfClubs
+        listOfClubs = json.load(c)['clubs']
+        return listOfClubs
 
 
 def loadCompetitions():
     with open('competitions.json') as comps:
-         listOfCompetitions = json.load(comps)['competitions']
-         return listOfCompetitions
+        listOfCompetitions = json.load(comps)['competitions']
+        return listOfCompetitions
 
 
 def create_app(config, json_competitions, json_clubs):
@@ -80,7 +80,9 @@ def create_app(config, json_competitions, json_clubs):
             flash('Great-booking complete!', "success")
             return render_template('welcome.html', club=club, competitions=competitions)
 
-    # TODO: Add route for points display
+    @app.route('/clubsPointsBoard')
+    def clubs_points_board():
+        return render_template('clubs_points_board.html', clubs=clubs)
 
     @app.route('/logout')
     def logout():
