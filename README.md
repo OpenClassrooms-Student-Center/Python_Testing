@@ -1,9 +1,12 @@
 # gudlift-registration
 
 1. Why
+   
+   The given source material state : 
 
+""This is a proof of concept (POC) project to show a light-weight version of our competition booking platform. The aim is the keep things as light as possible, and use feedback from the users to iterate.""
 
-    This is a proof of concept (POC) project to show a light-weight version of our competition booking platform. The aim is the keep things as light as possible, and use feedback from the users to iterate.
+The goal is to pursue the early development and handle any existing or arising issues during the development of the next phase of the project 
 
 2. Getting Started
 
@@ -12,9 +15,7 @@
     * Python v3.x+
 
     * [Flask](https://flask.palletsprojects.com/en/1.1.x/)
-
-        Whereas Django does a lot of things for us out of the box, Flask allows us to add only what we need. 
-     
+ 
 
     * [Virtual environment](https://virtualenv.pypa.io/en/stable/installation.html)
 
@@ -43,9 +44,9 @@
     * clubs.json - list of clubs with relevant information. You can look here to see what email addresses the app will accept for login.
 
 5. Testing
-
-    You are free to use whatever testing framework you like-the main thing is that you can show what tests you are using.
-
+   
+   Testing is done using Pytest. All tests are located in the directory tests/<test_type>.
+    
     We also like to show how well we're testing, so there's a module called 
-    [coverage](https://coverage.readthedocs.io/en/coverage-5.1/) you should add to your project.
+    [coverage](https://coverage.readthedocs.io/en/coverage-5.1/) that will be added to the project in the near future.
 
