@@ -62,6 +62,7 @@ def purchasePlaces():
         flash(INSUFFICIENT_POINTS)
         return render_template('welcome.html', club=club, competitions=competitions)
     else:
+        club["points"] = club_points - placesRequired  # point's actualisation
         competition['numberOfPlaces'] = competition_numberOfPlaces - placesRequired
         flash(SUCCESS_MESSAGE)
         return render_template('welcome.html', club=club, competitions=competitions)
