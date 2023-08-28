@@ -59,7 +59,9 @@ def purchase_places():
     club_remaining_point = int(club["points"]) - placesRequired
 
     if club_remaining_point <= 0:
-        flash(f"Sorry you can't book more than {club_remaining_point + placesRequired} places.")
+        flash(
+            f"Sorry you can't book more than {club_remaining_point + placesRequired} places."
+        )
         return render_template("welcome.html", club=club, competitions=competitions)
 
     competition_name = request.form["competition"]
