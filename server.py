@@ -1,3 +1,4 @@
+from datetime import datetime
 import json
 from flask import Flask, render_template, request, redirect, flash, url_for
 
@@ -42,8 +43,9 @@ def book(competition, club):
     foundClub = [c for c in clubs if c["name"] == club][0]
     foundCompetition = [c for c in competitions if c["name"] == competition][0]
     if foundClub and foundCompetition:
+        over = datetime.strptime(foundCompetition['date'], '%Y-%m-%d %H:%M:%S') < datetime.now()
         return render_template(
-            "booking.html", club=foundClub, competition=foundCompetition
+            "booking.html", club=foundClub, competition=foundCompetition, over=over
         )
     else:
         flash("Something went wrong-please try again")
