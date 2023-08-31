@@ -37,7 +37,8 @@ def test_book_non_existing_competition(app):
 
     decoded_response = decode_response(response.data)
 
-    assert "Something went wrong-please try again"  in decoded_response
+    assert "Something went wrong-please try again" in decoded_response
+
 
 def test_book_non_existing_club(app):
     client = app.test_client()
@@ -48,4 +49,4 @@ def test_book_non_existing_club(app):
 
     decoded_response = decode_response(response.data)
 
-    assert "Something went wrong-please try again"  in decoded_response
+    assert "Something went wrong-please try again" in decoded_response

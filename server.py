@@ -16,11 +16,16 @@ def load_competitions(file_name):
         return listOfCompetitions
 
 
+def is_competition_over(competition):
+    return datetime.strptime(competition["date"], "%Y-%m-%d %H:%M:%S") < datetime.now()
+
+
 app = Flask(__name__)
 app.secret_key = "something_special"
 
 clubs = load_clubs("clubs.json")
 competitions = load_competitions("competitions.json")
+
 
 @app.route("/")
 def index():
@@ -40,16 +45,32 @@ def show_summary():
 
 @app.route("/book/<competition>/<club>")
 def book(competition, club):
-    foundClub = [c for c in clubs if c["name"] == club][0]
-    foundCompetition = [c for c in competitions if c["name"] == competition][0]
-    if foundClub and foundCompetition:
-        over = datetime.strptime(foundCompetition['date'], '%Y-%m-%d %H:%M:%S') < datetime.now()
+    found_club = next(
+        (found_club for found_club in clubs if found_club["name"] == club), False
+    )
+
+    found_competition = next(
+        (
+            found_competition
+            for found_competition in competitions
+            if found_competition["name"] == competition
+        ),
+        False,
+    )
+
+    if found_competition and is_competition_over(found_competition):
+        flash("Sorry, this competition is over, places are not available anymore.")
+        return render_template("welcome.html", club=found_club, competitions=competitions)
+
+    if found_club and found_competition:
         return render_template(
-            "booking.html", club=foundClub, competition=foundCompetition, over=over
+            "booking.html",
+            club=found_club,
+            competition=found_competition,
         )
     else:
         flash("Something went wrong-please try again")
-        return render_template("welcome.html", club=club, competitions=competitions)
+        return render_template("welcome.html", club=found_club, competitions=competitions)
 
 
 @app.route("/purchasePlaces", methods=["POST"])
