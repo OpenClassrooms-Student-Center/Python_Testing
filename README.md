@@ -46,7 +46,6 @@ The goal is to pursue the early development and handle any existing or arising i
 5. Testing
    
    Testing is done using Pytest. All tests are located in the directory tests/<test_type>.
-    
-    We also like to show how well we're testing, so there's a module called 
-    [coverage](https://coverage.readthedocs.io/en/coverage-5.1/) that will be added to the project in the near future.
+
+   [coverage](https://coverage.readthedocs.io/en/coverage-5.1/) is used to check code coverage while running pytest. This is set automatically via setup.cfg.
 
