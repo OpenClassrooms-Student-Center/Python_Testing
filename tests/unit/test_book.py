@@ -1,13 +1,4 @@
-import html
-import os
-import sys
-
-import pytest
-
-PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
-sys.path.insert(0, PROJECT_ROOT)
-
-import server
+from tests.tests_utils import decode_response
 
 TEST_CLUB = {"name": "Test club", "email": "admin@admin.com", "points": "5"}
 
@@ -22,21 +13,6 @@ TEST_COMPETITION_GOING = {
     "date": "2026-03-27 10:00:00",
     "numberOfPlaces": "10",
 }
-
-
-def decode_response(response_bytes):
-    decoded_text = response_bytes.decode("utf-8")
-    decoded_text = html.unescape(decoded_text)
-    return decoded_text
-
-
-@pytest.fixture
-def app():
-    app = server.app
-    app.config["TESTING"] = True
-    app.secret_key = "testing_secret_key"
-
-    return app
 
 
 def test_book_competition_over(app):
