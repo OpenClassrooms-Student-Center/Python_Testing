@@ -1,16 +1,17 @@
-from datetime import datetime
 import json
+from datetime import datetime
+
 from flask import Flask, render_template, request, redirect, flash, url_for
 
 
-def loadClubs():
-    with open("clubs.json") as c:
+def load_clubs(file_name):
+    with open(file_name) as c:
         listOfClubs = json.load(c)["clubs"]
         return listOfClubs
 
 
-def loadCompetitions():
-    with open("competitions.json") as comps:
+def load_competitions(file_name):
+    with open(file_name) as comps:
         listOfCompetitions = json.load(comps)["competitions"]
         return listOfCompetitions
 
@@ -18,9 +19,8 @@ def loadCompetitions():
 app = Flask(__name__)
 app.secret_key = "something_special"
 
-competitions = loadCompetitions()
-clubs = loadClubs()
-
+clubs = load_clubs("clubs.json")
+competitions = load_competitions("competitions.json")
 
 @app.route("/")
 def index():
