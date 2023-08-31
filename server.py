@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import json
 from datetime import datetime
 
@@ -25,6 +27,9 @@ app.secret_key = "something_special"
 
 clubs = load_clubs("clubs.json")
 competitions = load_competitions("competitions.json")
+
+# clubs = load_clubs("tests/clubs.json")
+# competitions = load_competitions("tests/competitions.json")
 
 
 @app.route("/")
@@ -75,19 +80,24 @@ def book(competition, club):
 
 @app.route("/purchasePlaces", methods=["POST"])
 def purchase_places():
-    club_name = request.form["club"]
+    club_name = request.form.get("club", False)
     club = next((club for club in clubs if club["name"] == club_name), False)
 
-    placesRequired = int(request.form["places"])
-    club_remaining_point = int(club["points"]) - placesRequired
-
-    if club_remaining_point <= 0:
-        flash(
-            f"Sorry you can't book more than {club_remaining_point + placesRequired} places."
-        )
+    if not club:
+        flash("Something went wrong-please try again")
         return render_template("welcome.html", club=club, competitions=competitions)
 
-    competition_name = request.form["competition"]
+    placesRequired = request.form.get("places", "%")
+    if not placesRequired.isdigit():
+        flash("Please provide a valid rounded number")
+        return render_template("welcome.html", club=club, competitions=competitions)
+
+    placesRequired = int(placesRequired)
+    if placesRequired > 12:
+        flash("Sorry you can't book more than 12 places")
+        return render_template("welcome.html", club=club, competitions=competitions)
+
+    competition_name = request.form.get("competition", False)
 
     competition = next(
         (
@@ -98,8 +108,25 @@ def purchase_places():
         False,
     )
 
+    if not competition or is_competition_over(competition):
+        flash("Something went wrong-please try again")
+        return render_template("welcome.html", club=club, competitions=competitions)
+
+    competition_remaining_places = int(competition.get("numberOfPlaces", 0))
+
+    if not competition_remaining_places > 0:
+        flash("Sorry this competition is already full.")
+        return render_template("welcome.html", club=club, competitions=competitions)
+
+    club_remaining_point = int(club["points"]) - placesRequired
+    if club_remaining_point < 0:
+        flash(
+            f"Sorry you can't book more than {club_remaining_point + placesRequired} places."
+        )
+        return render_template("welcome.html", club=club, competitions=competitions)
+
     club["points"] = club_remaining_point
-    competition["numberOfPlaces"] = int(competition["numberOfPlaces"]) - placesRequired
+    competition["numberOfPlaces"] = competition_remaining_places - placesRequired
     flash("Great-booking complete!")
     return render_template("welcome.html", club=club, competitions=competitions)
 
