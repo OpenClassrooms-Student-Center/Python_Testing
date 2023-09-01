@@ -18,7 +18,6 @@ def test_book_competition_over(client):
     assert response.status_code == HTTPStatus.BAD_REQUEST
 
 
-
 def test_book_competition_going(client):
     response = client.get(
         f"/book/going/book",
@@ -26,10 +25,8 @@ def test_book_competition_going(client):
     )
 
     decoded_response = decode_response(response.data)
-
     assert f"This competition is open until" in decoded_response
     assert response.status_code == HTTPStatus.OK
-
 
 
 def test_book_non_existing_competition(client):
@@ -44,7 +41,6 @@ def test_book_non_existing_competition(client):
     assert response.status_code == HTTPStatus.BAD_REQUEST
 
 
-
 def test_book_non_existing_club(client):
     response = client.get(
         f"/book/empty/DoesntExist",
@@ -55,4 +51,3 @@ def test_book_non_existing_club(client):
 
     assert "Something went wrong-please try again" in decoded_response
     assert response.status_code == HTTPStatus.BAD_REQUEST
-
