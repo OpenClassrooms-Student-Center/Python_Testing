@@ -1,5 +1,7 @@
-from tests.tests_utils import decode_response
 from http import HTTPStatus
+
+from tests.tests_utils import decode_response
+
 
 def test_invalid_email(client):
     response = client.post(
