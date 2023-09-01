@@ -51,7 +51,9 @@ def book(competition, club):
 
     if not found_competition or not found_club:
         flash("Something went wrong-please try again")
-        return logout()
+        return redirect_user_to(
+            "welcome", HTTPStatus.BAD_REQUEST, club=club, competitions=competitions
+        )
 
     if server_utils.is_competition_over(found_competition):
         flash("Sorry, this competition is over, places are not available anymore.")
@@ -75,7 +77,9 @@ def purchase_places():
 
     if not club or not competition or server_utils.is_competition_over(competition):
         flash("Something went wrong-please try again")
-        return logout()
+        return redirect_user_to(
+            "welcome", HTTPStatus.BAD_REQUEST, club=club, competitions=competitions
+        )
 
     places_required = server_utils.parse_places_required(places_required_str)
     if places_required is None:
