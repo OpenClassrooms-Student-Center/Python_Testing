@@ -15,7 +15,6 @@ def test_purchase_no_club(client):
     assert response.status_code == HTTPStatus.BAD_REQUEST
 
 
-
 def test_purchase_non_existing_club(client):
     response = client.post(
         "/purchasePlaces",
@@ -59,7 +58,6 @@ def test_purchase_competition_over(client):
         follow_redirects=True,
     )
     decoded_response = decode_response(response.data)
-
     assert "Something went wrong-please try again" in decoded_response
     assert response.status_code == HTTPStatus.BAD_REQUEST
 
@@ -100,7 +98,7 @@ def test_purchase_non_int_number_of_places(client):
     assert response.status_code == HTTPStatus.BAD_REQUEST
 
 
-def test_not_enough_places_for_purchase(client):
+def test_competition_is_full(client):
     response = client.post(
         "/purchasePlaces",
         data={"competition": "full", "club": "purchase_places", "places": "1"},
@@ -113,10 +111,23 @@ def test_not_enough_places_for_purchase(client):
     assert response.status_code == HTTPStatus.BAD_REQUEST
 
 
+def test_not_enough_places_for_purchase(client):
+    response = client.post(
+        "/purchasePlaces",
+        data={"competition": "going", "club": "purchase_places", "places": "6"},
+        follow_redirects=True,
+    )
+
+    decoded_response = decode_response(response.data)
+
+    assert "Sorry you can't book more than 5 places." in decoded_response
+    assert response.status_code == HTTPStatus.BAD_REQUEST
+
+
 def test_purchase_more_than_allowed_places(client):
     response = client.post(
         "/purchasePlaces",
-        data={"competition": "full", "club": "purchase_places", "places": "15"},
+        data={"competition": "going", "club": "purchase_places", "places": "13"},
         follow_redirects=True,
     )
     decoded_response = decode_response(response.data)
@@ -132,7 +143,6 @@ def test_not_enough_points_for_purchase(client):
         follow_redirects=True,
     )
     decoded_response = decode_response(response.data)
-
     assert "Sorry you can't book more than 10 places" in decoded_response
     assert response.status_code == HTTPStatus.BAD_REQUEST
 
@@ -144,6 +154,5 @@ def test_points_are_deducted_after_booking(client):
         follow_redirects=True,
     )
     decoded_response = decode_response(response.data)
-
     assert "Points available: 9" in decoded_response
     assert response.status_code == HTTPStatus.OK
