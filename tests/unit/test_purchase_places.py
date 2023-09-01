@@ -127,7 +127,7 @@ def test_not_enough_places_for_purchase(client):
 def test_purchase_more_than_allowed_places(client):
     response = client.post(
         "/purchasePlaces",
-        data={"competition": "going", "club": "purchase_places", "places": "13"},
+        data={"competition": "going", "club": "purchase_places", "places": "15"},
         follow_redirects=True,
     )
     decoded_response = decode_response(response.data)
