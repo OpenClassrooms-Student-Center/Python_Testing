@@ -45,7 +45,14 @@ The goal is to pursue the early development and handle any existing or arising i
 
 5. Testing
    
-   Testing is done using Pytest. All tests are located in the directory tests/<test_type>.
+   Testing is done using Pytest. All tests are located in the directory tests/<test_type>. To run the tests :
+   - Run the command line : <code>pytest</code>
+
 
    [coverage](https://coverage.readthedocs.io/en/coverage-5.1/) is used to check code coverage while running pytest. This is set automatically via setup.cfg.
+
+   Locust is set as a load testing, all params are in locust.conf. To run Locust:
+   - Make sure that your Flask server is up and running
+   - Make sure that your server adresse is in pair with the host set in locust.conf (default : host = http://127.0.0.1:5000/)
+   - Run the command line : <code>locust</code>
 
