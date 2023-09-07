@@ -38,6 +38,7 @@ def parse_places_required(places_required):
 
 
 def is_valid_booking(club, competition, places_required):
+    # match / case ne sont pas utilisables ici car pas d'expressions authorise dans les tokens, à creuser.
     if int(competition["numberOfPlaces"]) <= 0:
         return False, "Sorry this competition is already full."
     elif places_required > 12:
@@ -50,6 +51,21 @@ def is_valid_booking(club, competition, places_required):
             f"Sorry you can't book more than {competition['numberOfPlaces']} places.",
         )
     return True, None
+
+# def is_valid_booking(club, competition, places_required):
+#     # Use match/case to simplify the code
+#     match places_required:
+#         case int(competition["numberOfPlaces"]) <= 0:
+#             return False, "Sorry this competition is already full."
+#         case places_required > 12:
+#             return False, "Sorry you can't book more than 12 places."
+#         case places_required > int(club["points"]):
+#             return False, f"Sorry you can't book more than {int(club['points'])} places."
+#         case int(competition["numberOfPlaces"]) < places_required:
+#             return False, f"Sorry you can't book more than {competition['numberOfPlaces']} places."
+#         case _:
+#             return True, None
+
 
 
 def update_booking_data(club, competition, places_required):
