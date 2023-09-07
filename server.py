@@ -86,17 +86,19 @@ def purchase_places():
     valid_booking, error_msg = server_utils.is_valid_booking(
         club, competition, places_required
     )
-    if not valid_booking:
-        flash(error_msg)
+    if valid_booking:
+        server_utils.update_booking_data(club, competition, places_required)
+        flash("Great-booking complete!")
         return redirect_user_to(
-            "welcome", HTTPStatus.BAD_REQUEST, club=club, competitions=competitions
+            "welcome", HTTPStatus.OK, club=club, competitions=competitions
         )
 
-    server_utils.update_booking_data(club, competition, places_required)
-    flash("Great-booking complete!")
+    flash(error_msg)
     return redirect_user_to(
-        "welcome", HTTPStatus.OK, club=club, competitions=competitions
+        "welcome", HTTPStatus.BAD_REQUEST, club=club, competitions=competitions
     )
+
+
 
 
 def redirect_user_to(template, status, **kwargs):
