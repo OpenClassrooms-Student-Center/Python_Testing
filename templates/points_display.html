@@ -1,0 +1,16 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clubs Points Display</title>
+</head>
+
+<body>
+    <div>
+        {% for club in clubs_points_dict %}
+        Club : {{ club[0] }} <br>
+        Points : {{ club[1] }} <br><br>
+        {% endfor %}
+    </div>
+</body>
