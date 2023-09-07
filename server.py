@@ -20,6 +20,9 @@ app.secret_key = "something_special"
 competitions = loadCompetitions()
 clubs = loadClubs()
 
+if __name__ == "__main__":
+    app.run(port=8000)
+
 
 @app.route("/")
 def index():
