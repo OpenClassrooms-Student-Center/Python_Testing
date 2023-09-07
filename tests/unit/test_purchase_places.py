@@ -1,6 +1,6 @@
 from http import HTTPStatus
 
-from tests.tests_utils import decode_response
+from tests.tests_utils import decode_response, is_redirection_page
 
 
 def test_purchase_no_club(client):
@@ -10,8 +10,7 @@ def test_purchase_no_club(client):
         follow_redirects=True,
     )
     decoded_response = decode_response(response.data)
-
-    assert "Something went wrong-please try again" in decoded_response
+    assert is_redirection_page(decoded_response)
     assert response.status_code == HTTPStatus.BAD_REQUEST
 
 
@@ -22,8 +21,7 @@ def test_purchase_non_existing_club(client):
         follow_redirects=True,
     )
     decoded_response = decode_response(response.data)
-
-    assert "Something went wrong-please try again" in decoded_response
+    assert is_redirection_page(decoded_response)
     assert response.status_code == HTTPStatus.BAD_REQUEST
 
 
@@ -34,8 +32,7 @@ def test_purchase_no_competition(client):
         follow_redirects=True,
     )
     decoded_response = decode_response(response.data)
-
-    assert "Something went wrong-please try again" in decoded_response
+    assert is_redirection_page(decoded_response)
     assert response.status_code == HTTPStatus.BAD_REQUEST
 
 
@@ -46,8 +43,7 @@ def test_purchase_non_existing_competition(client):
         follow_redirects=True,
     )
     decoded_response = decode_response(response.data)
-
-    assert "Something went wrong-please try again" in decoded_response
+    assert is_redirection_page(decoded_response)
     assert response.status_code == HTTPStatus.BAD_REQUEST
 
 
@@ -58,7 +54,7 @@ def test_purchase_competition_over(client):
         follow_redirects=True,
     )
     decoded_response = decode_response(response.data)
-    assert "Something went wrong-please try again" in decoded_response
+    assert is_redirection_page(decoded_response)
     assert response.status_code == HTTPStatus.BAD_REQUEST
 
 

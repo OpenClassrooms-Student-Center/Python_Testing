@@ -1,6 +1,6 @@
 from http import HTTPStatus
 
-from tests.tests_utils import decode_response
+from tests.tests_utils import decode_response, is_redirection_page
 
 
 def test_book_competition_over(client):
@@ -36,8 +36,7 @@ def test_book_non_existing_competition(client):
     )
 
     decoded_response = decode_response(response.data)
-
-    assert "Something went wrong-please try again" in decoded_response
+    assert is_redirection_page(decoded_response)
     assert response.status_code == HTTPStatus.BAD_REQUEST
 
 
@@ -48,6 +47,5 @@ def test_book_non_existing_club(client):
     )
 
     decoded_response = decode_response(response.data)
-
-    assert "Something went wrong-please try again" in decoded_response
+    assert is_redirection_page(decoded_response)
     assert response.status_code == HTTPStatus.BAD_REQUEST
