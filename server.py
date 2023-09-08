@@ -20,9 +20,6 @@ app.secret_key = "something_special"
 competitions = loadCompetitions()
 clubs = loadClubs()
 
-if __name__ == "__main__":
-    app.run(port=8000)
-
 
 @app.route("/")
 def index():
@@ -63,10 +60,14 @@ def purchasePlaces():
 # TODO: Add route for points display
 @app.route("/points_display")
 def points_display():
-    clubs_points_dict = [[club["name"], club["points"]] for club in clubs]
-    return render_template("points_display.html", clubs_points_dict=clubs_points_dict)
+    clubs_points_list = [[club["name"], int(club["points"])] for club in clubs]
+    return render_template("points_display.html", clubs_points_list=clubs_points_list)
 
 
 @app.route("/logout")
 def logout():
     return redirect(url_for("index"))
+
+
+if __name__ == "__main__":
+    app.run(debug=True)
