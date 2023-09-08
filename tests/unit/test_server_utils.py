@@ -111,6 +111,14 @@ def test_is_valid_booking_purchase_more_than_valid():
     assert message == "Sorry you can't book more than 12 places."
 
 
+def test_is_valid_booking_purchase_with_no_points():
+    TEST_CLUB["points"] = "0"
+    status, message = server_utils.is_valid_booking(TEST_CLUB, TEST_COMPETITION, 1)
+    assert status is False
+    assert message == "Sorry you dont have anymore points."
+    TEST_CLUB["points"] = "10"
+
+
 def test_is_valid_booking_purchase_more_than_available_points():
     status, message = server_utils.is_valid_booking(
         TEST_CLUB, TEST_COMPETITION, int(TEST_CLUB["points"]) + 1
