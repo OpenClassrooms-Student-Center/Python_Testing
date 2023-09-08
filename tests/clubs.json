@@ -17,5 +17,10 @@
         "name":"purchase_places",
         "email": "purchase_places@test.srv",
         "points":"10"
+    },
+    {
+        "name":"broke",
+        "email": "broke@test.srv",
+        "points":"0"
     }
 ]}
