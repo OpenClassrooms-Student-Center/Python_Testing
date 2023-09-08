@@ -1,3 +1,4 @@
+import datetime
 import json
 from http import HTTPStatus
 
@@ -101,7 +102,7 @@ def purchase_places():
 
 def display_html_template(template, status, **kwargs):
     return (
-        render_template(template_name_or_list=f"{template}.html", **kwargs),
+        render_template(template_name_or_list=f"{template}.html", now=datetime.datetime.now(), **kwargs),
         status,
     )
 

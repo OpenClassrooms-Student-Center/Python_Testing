@@ -25,12 +25,12 @@ def test_no_email(client):
 
 def test_email_valid(client):
     response = client.post(
-        "/showSummary", data={"email": "book@test.srv"}, follow_redirects=True
+        "/showSummary", data={"email": "show_summary@test.srv"}, follow_redirects=True
     )
 
     decoded_response = decode_response(response.data)
     assert response.status_code == HTTPStatus.OK
-    assert "Welcome, book@test.srv" in decoded_response
+    assert "Welcome, show_summary@test.srv" in decoded_response
 
 
 def test_logout(client):

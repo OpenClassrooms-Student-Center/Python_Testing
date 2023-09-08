@@ -45,7 +45,6 @@ def is_valid_booking(club, competition, places_required):
         return False, "Sorry you can't book more than 12 places."
     elif int(club["points"]) < 1:
         return False, "Sorry you dont have anymore points."
-
     elif places_required > int(club["points"]):
         return False, f"Sorry you can't book more than {int(club['points'])} places."
     elif int(competition["numberOfPlaces"]) < places_required:
