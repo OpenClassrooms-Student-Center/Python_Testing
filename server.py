@@ -24,7 +24,7 @@ competitions = load_data("competitions.json")["competitions"]
 
 @app.route("/")
 def index():
-    return redirect_user_to("index", HTTPStatus.OK)
+    return display_html_template("index", HTTPStatus.OK)
 
 
 @app.route("/showSummary", methods=["POST"])
@@ -34,9 +34,9 @@ def show_summary():
 
     if not club:
         flash("Sorry, that email wasn't found.")
-        return redirect_user_to("index", HTTPStatus.BAD_REQUEST)
+        return display_html_template("index", HTTPStatus.BAD_REQUEST)
 
-    return redirect_user_to(
+    return display_html_template(
         "welcome",
         HTTPStatus.OK,
         club=club,
@@ -54,11 +54,11 @@ def book(competition, club):
         return redirect(url_for("index"), HTTPStatus.BAD_REQUEST)
     if server_utils.is_competition_over(found_competition):
         flash("Sorry, this competition is over, places are not available anymore.")
-        return redirect_user_to(
+        return display_html_template(
             "welcome", HTTPStatus.BAD_REQUEST, club=club, competitions=competitions
         )
 
-    return redirect_user_to(
+    return display_html_template(
         "booking", HTTPStatus.OK, club=found_club, competition=found_competition
     )
 
@@ -79,7 +79,7 @@ def purchase_places():
     places_required = server_utils.parse_places_required(places_required_str)
     if places_required is None:
         flash("Please provide a valid rounded number")
-        return redirect_user_to(
+        return display_html_template(
             "welcome", HTTPStatus.BAD_REQUEST, club=club, competitions=competitions
         )
 
@@ -89,26 +89,26 @@ def purchase_places():
     if valid_booking:
         server_utils.update_booking_data(club, competition, places_required)
         flash("Great-booking complete!")
-        return redirect_user_to(
+        return display_html_template(
             "welcome", HTTPStatus.OK, club=club, competitions=competitions
         )
 
     flash(error_msg)
-    return redirect_user_to(
+    return display_html_template(
         "welcome", HTTPStatus.BAD_REQUEST, club=club, competitions=competitions
     )
 
 
-
-
-def redirect_user_to(template, status, **kwargs):
+def display_html_template(template, status, **kwargs):
     return (
         render_template(template_name_or_list=f"{template}.html", **kwargs),
         status,
     )
 
 
-# TODO: Add route for points display
+@app.route("/displayBoard")
+def display_board():
+    return display_html_template("display_board", HTTPStatus.OK, clubs=clubs)
 
 
 @app.route("/logout")
