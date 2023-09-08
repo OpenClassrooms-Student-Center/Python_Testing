@@ -43,6 +43,9 @@ def is_valid_booking(club, competition, places_required):
         return False, "Sorry this competition is already full."
     elif places_required > 12:
         return False, "Sorry you can't book more than 12 places."
+    elif int(club["points"]) < 1:
+        return False, "Sorry you dont have anymore points."
+
     elif places_required > int(club["points"]):
         return False, f"Sorry you can't book more than {int(club['points'])} places."
     elif int(competition["numberOfPlaces"]) < places_required:
@@ -50,7 +53,9 @@ def is_valid_booking(club, competition, places_required):
             False,
             f"Sorry you can't book more than {competition['numberOfPlaces']} places.",
         )
+
     return True, None
+
 
 # def is_valid_booking(club, competition, places_required):
 #     # Use match/case to simplify the code
@@ -67,7 +72,6 @@ def is_valid_booking(club, competition, places_required):
 #             return True, None
 
 
-
 def update_booking_data(club, competition, places_required):
-    club["points"] = int(club["points"]) - places_required
-    competition["numberOfPlaces"] = int(competition["numberOfPlaces"]) - places_required
+    club["points"] = int(club["points"]) - int(places_required)
+    competition["numberOfPlaces"] = int(competition["numberOfPlaces"]) - int(places_required)
