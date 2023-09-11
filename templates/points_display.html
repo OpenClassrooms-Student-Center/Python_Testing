@@ -1,0 +1,40 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+    <title>Clubs Points
+        Display</title>
+</head>
+
+<body>
+    <h1> Tableau des Points par Club</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Clubs</th>
+                <th>Points</th>
+            </tr>
+        </thead>
+        <tbody>
+
+            {% for club in clubs_points_list %}
+            <tr>
+                <td>{{ club[0] }}</td>
+                <td class="points-bold" 
+                {% if club[1] == 0 %}
+                    style="background-color: #f55c51;"
+                {% elif 0 < club[1] < 6 %}
+                    style="background-color: #f5e15f;"
+                {% elif club[1] > 5 %}
+                    style="background-color: #7fff6b;"
+                {% endif %}>{{ club[1] }}</td>
+                    
+            </tr>
+            {% endfor %}
+
+        </tbody>
+    </table>
+</body>
