@@ -32,6 +32,7 @@ def test_from_welcome_to_booking(client):
     )
     decoded_response = decode_response(booking.data)
     assert html_checks.is_competition_name_displayed_in_booking_html(decoded_response)
+    assert html_checks.is_booking_form_displayed_in_booking_html(decoded_response)
 
 
 def test_from_welcome_to_display_board(client):

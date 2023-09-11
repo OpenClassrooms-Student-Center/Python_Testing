@@ -13,6 +13,7 @@ def test_from_index_to_welcome(client):
     )
 
     decoded_response = decode_response(logged_in.data)
+
     assert html_checks.is_club_name_displayed_in_welcome_html(decoded_response, "index")
 
 

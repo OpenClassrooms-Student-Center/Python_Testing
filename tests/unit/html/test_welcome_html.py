@@ -8,9 +8,10 @@ def test_display_welcome_html(client):
     )
 
     decoded_response = decode_response(response.data)
-    assert html_checks.is_logout_option_available_in_welcome_html(decoded_response)
-    assert html_checks.is_competition_list_displayed_in_welcome_html(decoded_response)
+    assert html_checks.is_club_name_displayed_in_welcome_html(decoded_response, "show_summary")
     assert html_checks.are_points_displayed_in_welcome_html(decoded_response)
+    assert html_checks.is_competition_list_displayed_in_welcome_html(decoded_response)
+    assert html_checks.are_competition_details_displayed_in_welcome_html(decoded_response)
 
 
 def test_urls_welcome_html(client):
