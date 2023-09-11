@@ -52,6 +52,10 @@ def is_log_in_form_in_html(parsed_html):
     return True
 
 
+def is_club_name_displayed_in_welcome_html(parsed_html, club_name):
+    return f"Welcome, {club_name}" in parsed_html
+
+
 def is_logout_option_available_in_welcome_html(parsed_html):
     return LOG_OUT_LINK in parsed_html
 
