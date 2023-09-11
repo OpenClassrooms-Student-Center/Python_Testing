@@ -8,29 +8,38 @@
         <h2>Welcome, {{club['email']}} </h2><a href="{{url_for('logout')}}">Logout</a>
 
     {% with messages = get_flashed_messages()%}
-    {% if messages %}
-        <ul>
-       {% for message in messages %}
-            <li>{{message}}</li>
-        {% endfor %}
-       </ul>
-    {% endif%}
-    Points available: {{club['points']}}
+        {% if messages %}
+            <ul>
+           {% for message in messages %}
+                <li>{{message}}</li>
+            {% endfor %}
+           </ul>
+        {% endif %}
+    {%endwith%}
+
+
+        <h3>Clubs:</h3>
+        <p>Points available: {{club['points']}}</p>
+        <p><a href="{{url_for('display_board')}}">See other clubs available points</a></p>
+
     <h3>Competitions:</h3>
     <ul>
         {% for comp in competitions%}
         <li>
+
             {{comp['name']}}<br />
             Date: {{comp['date']}}</br>
             Number of Places: {{comp['numberOfPlaces']}}
+            {% if now < now.strptime(comp['date'], "%Y-%m-%d %H:%M:%S")%}
             {%if comp['numberOfPlaces']|int >0%}
             <a href="{{ url_for('book',competition=comp['name'],club=club['name']) }}">Book Places</a>
             {%endif%}
+            {%endif%}
+
         </li>
         <hr />
         {% endfor %}
     </ul>
-    {%endwith%}
 
 </body>
 </html>

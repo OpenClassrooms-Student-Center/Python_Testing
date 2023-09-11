@@ -1,9 +1,12 @@
 # gudlift-registration
 
 1. Why
+   
+   The given source material state : 
 
+""This is a proof of concept (POC) project to show a light-weight version of our competition booking platform. The aim is the keep things as light as possible, and use feedback from the users to iterate.""
 
-    This is a proof of concept (POC) project to show a light-weight version of our competition booking platform. The aim is the keep things as light as possible, and use feedback from the users to iterate.
+The goal is to pursue the early development and handle any existing or arising issues during the development of the next phase of the project 
 
 2. Getting Started
 
@@ -12,9 +15,7 @@
     * Python v3.x+
 
     * [Flask](https://flask.palletsprojects.com/en/1.1.x/)
-
-        Whereas Django does a lot of things for us out of the box, Flask allows us to add only what we need. 
-     
+ 
 
     * [Virtual environment](https://virtualenv.pypa.io/en/stable/installation.html)
 
@@ -43,9 +44,15 @@
     * clubs.json - list of clubs with relevant information. You can look here to see what email addresses the app will accept for login.
 
 5. Testing
+   
+   Testing is done using Pytest. All tests are located in the directory tests/<test_type>. To run the tests :
+   - Run the command line : <code>pytest</code>
 
-    You are free to use whatever testing framework you like-the main thing is that you can show what tests you are using.
 
-    We also like to show how well we're testing, so there's a module called 
-    [coverage](https://coverage.readthedocs.io/en/coverage-5.1/) you should add to your project.
+   [coverage](https://coverage.readthedocs.io/en/coverage-5.1/) is used to check code coverage while running pytest. This is set automatically via setup.cfg.
+
+   Locust is set as a load testing, all params are in locust.conf. To run Locust:
+   - Make sure that your Flask server is up and running
+   - Make sure that your server adresse is in pair with the host set in locust.conf (default : host = http://127.0.0.1:5000/)
+   - Run the command line : <code>locust</code>
 

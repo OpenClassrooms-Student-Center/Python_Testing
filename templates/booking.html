@@ -6,12 +6,18 @@
 </head>
 <body>
     <h2>{{competition['name']}}</h2>
+    {% if over %}
+    <p> Sorry, this competition is over, places are not available anymore. </p>
+    {% else %}
+    <p> This competition is open until {{competition['date']}}. </p>
     Places available: {{competition['numberOfPlaces']}}
     <form action="/purchasePlaces" method="post">
         <input type="hidden" name="club" value="{{club['name']}}">
         <input type="hidden" name="competition" value="{{competition['name']}}">
-        <label for="places">How many places?</label><input type="number" name="places" id=""/>
+        <label for="places">How many places?</label>
+        <input type="number" name="places" max={{(competition["numberOfPlaces"]|int, club["points"]|int, 12) | min}} id=""/>
         <button type="submit">Book</button>
     </form>
+    {% endif %}
 </body>
 </html>
