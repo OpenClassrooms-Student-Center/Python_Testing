@@ -26,13 +26,8 @@ def index():
 
 @app.route('/showSummary',methods=['POST'])
 def showSummary():
-    # BUG: résolue
-    try:
-        club = [club for club in clubs if club['email'] == request.form['email']][0]
-        return render_template('welcome.html',club=club,competitions=competitions)
-    except IndexError:
-        flash("The email is not found")
-        return render_template("index.html", clubs=clubs)
+    club = [club for club in clubs if club['email'] == request.form['email']][0]
+    return render_template('welcome.html',club=club,competitions=competitions)
 
 
 @app.route('/book/<competition>/<club>')
@@ -57,7 +52,9 @@ def purchasePlaces():
 
 
 # TODO: Add route for points display
-
+@app.route("/display")
+def display():
+    return render_template("display.html", clubs=clubs)
 
 @app.route('/logout')
 def logout():
