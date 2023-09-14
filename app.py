@@ -4,7 +4,7 @@ from flask import Flask,render_template,request,redirect,flash,url_for
 
 def loadClubs():
     with open('clubs.json') as c:
-         listOfClubs = json.load(c)['clubs']
+         listOfClubs = json.load(c)['clubs']   
          return listOfClubs
 
 
@@ -22,12 +22,18 @@ clubs = loadClubs()
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    # FEATURE: 
+    return render_template('index.html', clubs=clubs)
 
 @app.route('/showSummary',methods=['POST'])
 def showSummary():
-    club = [club for club in clubs if club['email'] == request.form['email']][0]
-    return render_template('welcome.html',club=club,competitions=competitions)
+    # BUG: résolue
+    try:
+        club = [club for club in clubs if club['email'] == request.form['email']][0]
+        return render_template('welcome.html',club=club,competitions=competitions)
+    except IndexError:
+        flash("The email is not found")
+        return render_template("index.html", clubs=clubs)
 
 
 @app.route('/book/<competition>/<club>')
@@ -40,18 +46,36 @@ def book(competition,club):
         flash("Something went wrong-please try again")
         return render_template('welcome.html', club=club, competitions=competitions)
 
-
 @app.route('/purchasePlaces',methods=['POST'])
 def purchasePlaces():
     competition = [c for c in competitions if c['name'] == request.form['competition']][0]
+    
     club = [c for c in clubs if c['name'] == request.form['club']][0]
-    placesRequired = int(request.form['places'])git
-    competition['numberOfPlaces'] = int(competition['numberOfPlaces'])-placesRequired
-    flash('Great-booking complete!')
-    return render_template('welcome.html', club=club, competitions=competitions)
-
-
+    placesRequired = int(request.form['places'])
+    club["points"] = int(club["points"])
+    competition['numberOfPlaces'] = int(competition['numberOfPlaces'])
+    
+    # BUG: résolue
+    if placesRequired <= club["points"] and placesRequired > 0 and placesRequired <= competition["numberOfPlaces"]:
+        club["points"] -= placesRequired
+        competition["numberOfPlaces"]-=placesRequired
+        flash('Great-booking complete!') 
+        return render_template('welcome.html', club=club, competitions=competitions) 
+        
+    else:
+        if placesRequired > club["points"]:
+            flash("you don't have enough points")
+        elif placesRequired < 0:
+            flash("incorrect value")
+        elif placesRequired > competition["numberOfPlaces"]:
+            flash("there are not enough places")
+        return render_template("booking.html", club=club, competition=competition)
+        
+    
 # TODO: Add route for points display
+@app.route("/display")
+def display():
+    return render_template("display.html", clubs=clubs)
 
 
 @app.route('/logout')
