@@ -1,0 +1,32 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GUDLFT Registration</title>
+</head>
+<body>
+    {% with messages = get_flashed_messages() %}
+    <table>
+        <thead>
+          <tr>
+            <th style="color:#FFF; background-color: #333;" colspan="2">Clubs</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="border: 1px solid #333;">Name</td>
+            <td style="border: 1px solid #333;">Email</td>
+            <td style="border: 1px solid #333;">Points</td>
+          </tr>
+          {% for club in clubs %}
+          <tr>
+            <td style="border: 1px solid #333;">{{club["name"]}}</td>
+            <td style="border: 1px solid #333;">{{club["email"]}}</td>
+            <td style="border: 1px solid #333;">{{club["points"]}}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% endwith %}
+</body>
+</html>
