@@ -1,7 +1,9 @@
 bin
-include
-lib
+include/
+Lib/
+Scripts/
 .Python
-tests/
 .envrc
-__pycache__
+__pycache__/
+pyvenv.cfg
+.pytest_cache/
