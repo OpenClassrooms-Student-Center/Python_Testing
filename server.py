@@ -1,5 +1,6 @@
 import json
-from flask import Flask,render_template,request,redirect,flash,url_for
+from config import DEBUG
+from flask import Flask, render_template, request, redirect, flash, url_for
 
 
 def loadClubs():
@@ -17,6 +18,9 @@ def loadCompetitions():
 app = Flask(__name__)
 app.secret_key = 'something_special'
 
+if DEBUG:
+    app.debug = True
+
 competitions = loadCompetitions()
 clubs = loadClubs()
 
@@ -24,10 +28,29 @@ clubs = loadClubs()
 def index():
     return render_template('index.html')
 
-@app.route('/showSummary',methods=['POST'])
+
+@app.route('/showSummary', methods=['POST'])
 def showSummary():
-    club = [club for club in clubs if club['email'] == request.form['email']][0]
-    return render_template('welcome.html',club=club,competitions=competitions)
+    # Récupérer l'adresse e-mail depuis le formulaire, en supprimant les espaces inutiles
+    email = request.form.get('email', '').strip()
+    
+    # Vérification de l'adresse e-mail
+    if not email:
+        # Si l'adresse e-mail est vide, affichez un message flash et renvoyez un statut HTTP 400 (Mauvaise Requête)
+        flash('Veuillez fournir une adresse e-mail.')
+        return redirect(url_for('index'), code=400)
+
+    # Recherche du club correspondant à l'adresse e-mail
+    club = [club for club in clubs if club['email'] == email]
+
+    if not club:
+        # Si le club n'est pas trouvé, affichez un message flash et renvoyez un statut HTTP 400 (Mauvaise Requête)
+        flash('Adresse e-mail inconnue. Veuillez vous inscrire.')
+        return redirect(url_for('index'), code=400)
+
+    # Si tout est correct, affichez la page de résumé avec les détails du club et des compétitions
+    return render_template('welcome.html', club=club[0], competitions=competitions)
+
 
 
 @app.route('/book/<competition>/<club>')
