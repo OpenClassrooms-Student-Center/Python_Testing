@@ -1,33 +1,36 @@
 import json
-from flask import Flask,render_template,request,redirect,flash,url_for
+from flask import Flask, render_template, request, redirect, flash, url_for
+
+def load_clubs():
+    with open('clubs.json') as club:
+         return json.load(club)['clubs']
 
 
-def loadClubs():
-    with open('clubs.json') as c:
-         listOfClubs = json.load(c)['clubs']
-         return listOfClubs
-
-
-def loadCompetitions():
-    with open('competitions.json') as comps:
-         listOfCompetitions = json.load(comps)['competitions']
-         return listOfCompetitions
+def load_competitions():
+    with open('competitions.json') as competition:
+         return json.load(competition)['competitions']
 
 
 app = Flask(__name__)
 app.secret_key = 'something_special'
 
-competitions = loadCompetitions()
-clubs = loadClubs()
+competitions = load_competitions()
+clubs = load_clubs()
 
 @app.route('/')
 def index():
     return render_template('index.html')
 
-@app.route('/showSummary',methods=['POST'])
-def showSummary():
-    club = [club for club in clubs if club['email'] == request.form['email']][0]
-    return render_template('welcome.html',club=club,competitions=competitions)
+@app.route("/showSummary", methods=["POST"])
+def show_summary():
+    club = [club for club in clubs if club["email"] == request.form["email"]]
+    if not club:
+        flash("Sorry, that email wasn't found.")
+        return redirect(url_for("index"))
+    club = club[0]
+    return render_template(
+        "welcome.html", club=club, competitions=competitions
+    )
 
 
 @app.route('/book/<competition>/<club>')
