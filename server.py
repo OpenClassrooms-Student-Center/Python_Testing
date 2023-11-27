@@ -26,6 +26,7 @@ def load_competitions():
     with open("competitions.json") as competitions_file:
         return json.load(competitions_file)["competitions"]
 
+
 def check_if_the_date_has_passed(date):
     """
     Check if the given date has already passed.
@@ -39,6 +40,7 @@ def check_if_the_date_has_passed(date):
     format_str = "%Y-%m-%d %H:%M:%S"
     date = datetime.strptime(date, format_str)
     return date > datetime.now()
+
 
 def write_on_json_file(json_file, key, value):
     """
@@ -150,46 +152,171 @@ def check_booking_conditions(
         return True
     return False
 
+
 app = Flask(__name__)
 app.secret_key = "something_special"
 
 clubs = load_clubs()
 competitions = load_competitions()
 
-@app.route('/')
+
+@app.route("/")
 def index():
-    return render_template('index.html')
+    """
+    Render the index page.
 
-@app.route('/showSummary',methods=['POST'])
-def showSummary():
-    club = [club for club in clubs if club['email'] == request.form['email']][0]
-    return render_template('welcome.html',club=club,competitions=competitions)
+    Returns:
+    - str: Rendered HTML content for the index page.
+    """
+    return render_template("index.html", clubs=clubs)
 
 
-@app.route('/book/<competition>/<club>')
-def book(competition,club):
-    foundClub = [c for c in clubs if c['name'] == club][0]
-    foundCompetition = [c for c in competitions if c['name'] == competition][0]
-    if foundClub and foundCompetition:
-        return render_template('booking.html',club=foundClub,competition=foundCompetition)
+@app.route("/showSummary", methods=["POST"])
+def show_summary():
+    """
+    Show the summary for a club based on the provided email.
+
+    Returns:
+    - str: Rendered HTML content for the welcome page or a redirection to the
+    index page.
+    """
+    email = request.form.get("email")
+    club = find_items_by_key(items_list=clubs, key="email", value=email)
+    if not club:
+        flash("Sorry, that email wasn't found.")
+        return redirect(url_for("index"))
+    club = club[0]
+    return render_template(
+        "welcome.html", club=club, competitions=competitions
+    )
+
+
+@app.route("/book/<competition>/<club>")
+def book(competition, club):
+    """
+    Render the booking page for a specific competition and club.
+
+    Args:
+    - competition (str): The name of the competition.
+    - club (str): The name of the club.
+
+    Returns:
+    - str: Rendered HTML content for the booking page or a redirection to
+    the welcome page with a flash message.
+    """
+    found_club = find_first_item_by_key(
+        items_list=clubs, key="name", value=club
+    )
+    found_competition = find_first_item_by_key(
+        items_list=competitions, key="name", value=competition
+    )
+    if found_club and found_competition:
+        return render_template(
+            "booking.html", club=found_club, competition=found_competition
+        )
     else:
-        flash("Something went wrong-please try again")
-        return render_template('welcome.html', club=club, competitions=competitions)
+        flash("Something went wrong - please try again")
+    return render_template(
+        "welcome.html", club=found_club, competition=found_competition
+    )
 
 
-@app.route('/purchasePlaces',methods=['POST'])
-def purchasePlaces():
-    competition = [c for c in competitions if c['name'] == request.form['competition']][0]
-    club = [c for c in clubs if c['name'] == request.form['club']][0]
-    placesRequired = int(request.form['places'])
-    competition['numberOfPlaces'] = int(competition['numberOfPlaces'])-placesRequired
-    flash('Great-booking complete!')
-    return render_template('welcome.html', club=club, competitions=competitions)
+@app.route("/purchasePlaces", methods=["POST"])
+def purchase_places():
+    """
+    Process the purchase of places for a competition and club.
+
+    This function handles the POST request to "/purchasePlaces", initializes
+    the cart, and updates club and competition data based on the purchase.
+
+    Returns:
+    - str: Rendered HTML content for the welcome page with flash messages
+    indicating the result of the purchase.
+    """
+    cart = cart_initialization()
+
+    competition_name = request.form["competition"]
+    club_name = request.form["club"]
+    places_required = int(request.form["places"])
+
+    competition = find_first_item_by_key(
+        items_list=competitions, key="name", value=competition_name
+    )
+    club = find_first_item_by_key(
+        items_list=clubs, key="name", value=club_name
+    )
+    current_cart = cart[competition["name"]][club["name"]]
+    current_places_available = int(competition["numberOfPlaces"])
+    points = int(club["points"])
+
+    if check_if_the_date_has_passed(competition["date"]) is False:
+        flash("Sorry, this competition is over!")
+        return render_template(
+            "booking.html", club=club, competition=competition
+        )
+
+    if check_booking_conditions(
+        places_required=places_required,
+        points=points,
+        MAX_PLACES=MAX_PLACES,
+        current_cart=current_cart,
+        current_places_available=current_places_available,
+        club=club,
+        competition=competition,
+    ):
+        # Deduct points from the club
+        for c in clubs:
+            if c["name"] == club_name:
+                c["points"] = str(int(c["points"]) - places_required)
+
+        # Update the number of places available for the competition
+        for c in competitions:
+            if c["name"] == competition_name:
+                c["numberOfPlaces"] = str(
+                    int(c["numberOfPlaces"]) - places_required
+                )
+
+        # Save the updated data to JSON files
+        write_on_json_file("clubs.json", "clubs", clubs)
+        write_on_json_file("competitions.json", "competitions", competitions)
+
+        cart[competition_name][club_name] += places_required
+
+        flash(
+            f"You have booked {places_required} places for {competition_name}!"
+        )
+
+    return render_template(
+        "welcome.html",
+        club=club,
+        competitions=competitions,
+        add_to_cart=cart[competition_name][club_name],
+    )
 
 
-# TODO: Add route for points display
+@app.route("/board", methods=["GET"])
+def show_board():
+    """
+    Render the board.html template displaying information about all clubs.
+
+    This function handles the GET request to "/board" and renders the
+    "board.html" template.
+
+    Returns:
+    - str: Rendered HTML content for the board page.
+    """
+    return render_template("board.html", all_clubs=clubs)
 
 
-@app.route('/logout')
+@app.route("/logout")
 def logout():
-    return redirect(url_for('index'))
+    """
+    Log out the user by redirecting to the index page.
+
+    This function handles the GET request to "/logout" and redirects the
+    user to the index page.
+
+    Returns:
+    - Redirect: Redirect to the index page.
+    """
+    return redirect(url_for("index"))

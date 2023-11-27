@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block content %}
+    <style>
+        table {
+            border-collapse: collapse;
+            font-weight:bold;
+        }
+        caption{
+            padding: 10px;
+        }
+        td, th{
+            border: 1px solid black;
+            padding: 15px;
+            text-align: center;
+        }
+    </style>
+    <main>
+        <center>
+            <h1>Welcome to the GUDLFT Board</h1>
+            <h2>Points display board</h2>
+            {% if all_clubs|length < 1 %}
+                <p>Sorry, this section has no clubs to display</p>
+            {% else %}
+                <table>
+                    <tr>
+                        <th>Club name</th>
+                        <th>points available</th>
+                    </tr>
+                    {% for club in all_clubs %}
+                        <tr>
+                            <td>{{ club['name'] }}</td>
+                            <td>{{ club['points'] }}</td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            {% endif %}
+            <button onclick="history.go(-1);">Return</button>
+        </center>
+    </main>
+{% endblock content %}
