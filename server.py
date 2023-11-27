@@ -16,17 +16,22 @@ def load_clubs():
         return json.load(clubs_file)["clubs"]
 
 
-def loadCompetitions():
-    with open('competitions.json') as comps:
-         listOfCompetitions = json.load(comps)['competitions']
-         return listOfCompetitions
+def load_competitions():
+    """
+    Load the list of competitions from the 'competitions.json' file.
+
+    Returns:
+    - list: A list of dictionaries representing the competitions.
+    """
+    with open("competitions.json") as competitions_file:
+        return json.load(competitions_file)["competitions"]
 
 
 app = Flask(__name__)
-app.secret_key = 'something_special'
+app.secret_key = "something_special"
 
-competitions = loadCompetitions()
-clubs = loadClubs()
+clubs = load_clubs()
+competitions = load_competitions()
 
 @app.route('/')
 def index():
