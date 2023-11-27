@@ -1,11 +1,19 @@
 import json
-from flask import Flask,render_template,request,redirect,flash,url_for
+from datetime import datetime
+from flask import Flask, render_template, request, redirect, flash, url_for
+
+MAX_PLACES = 12
 
 
-def loadClubs():
-    with open('clubs.json') as c:
-         listOfClubs = json.load(c)['clubs']
-         return listOfClubs
+def load_clubs():
+    """
+    Load the list of clubs from the 'clubs.json' file.
+
+    Returns:
+    - list: A list of dictionaries representing the clubs.
+    """
+    with open("clubs.json") as clubs_file:
+        return json.load(clubs_file)["clubs"]
 
 
 def loadCompetitions():
