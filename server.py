@@ -40,6 +40,19 @@ def check_if_the_date_has_passed(date):
     date = datetime.strptime(date, format_str)
     return date > datetime.now()
 
+def write_on_json_file(json_file, key, value):
+    """
+    Write a key-value pair to a JSON file.
+
+    Args:
+    - json_file (str): The path to the JSON file.
+    - key (str): The key to be written.
+    - value: The value associated with the key.
+    """
+    with open(json_file, "w") as f:
+        json.dump({key: value}, f, indent=4)
+
+
 app = Flask(__name__)
 app.secret_key = "something_special"
 
