@@ -26,6 +26,19 @@ def load_competitions():
     with open("competitions.json") as competitions_file:
         return json.load(competitions_file)["competitions"]
 
+def check_if_the_date_has_passed(date):
+    """
+    Check if the given date has already passed.
+
+    Args:
+    - date (str): The date to be checked in the format '%Y-%m-%d %H:%M:%S'.
+
+    Returns:
+    - bool: True if the date is in the future, False if it has passed.
+    """
+    format_str = "%Y-%m-%d %H:%M:%S"
+    date = datetime.strptime(date, format_str)
+    return date > datetime.now()
 
 app = Flask(__name__)
 app.secret_key = "something_special"
