@@ -53,6 +53,20 @@ def write_on_json_file(json_file, key, value):
         json.dump({key: value}, f, indent=4)
 
 
+def cart_initialization():
+    """
+    Initialize an empty cart based on available competitions and clubs.
+
+    Returns:
+    - dict: A nested dictionary representing the cart with competitions as
+    outer keys and clubs as inner keys, all initialized to zero.
+    """
+    cart = {
+        competition["name"]: {club["name"]: 0 for club in clubs}
+        for competition in competitions
+    }
+    return cart
+
 app = Flask(__name__)
 app.secret_key = "something_special"
 
