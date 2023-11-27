@@ -67,6 +67,89 @@ def cart_initialization():
     }
     return cart
 
+
+def find_first_item_by_key(items_list, key, value):
+    """
+    Find the first item in a list of dictionaries based on a specified
+    key-value pair.
+
+    Args:
+    - items_list (list): List of dictionaries.
+    - key (str): Key to search for.
+    - value (str): Value to match.
+
+    Returns:
+    - dict or None: The first dictionary in the list that contains the
+    specified key-value pair, or None if no match is found.
+    """
+    matching_items = [item for item in items_list if item.get(key) == value]
+    return matching_items[0] if matching_items else None
+
+
+def find_items_by_key(items_list, key, value):
+    """
+    Find all items in a list of dictionaries based on a specified key-value
+    pair.
+
+    Args:
+    - items_list (list): List of dictionaries.
+    - key (str): Key to search for.
+    - value (str): Value to match.
+
+    Returns:
+    - list or None: List of dictionaries that contain the specified
+    key-value pair, or None if no match is found.
+    """
+    matching_items = [item for item in items_list if item.get(key) == value]
+    return matching_items if matching_items else None
+
+
+def check_booking_conditions(
+    places_required,
+    points,
+    MAX_PLACES,
+    current_cart,
+    current_places_available,
+    club,
+    competition,
+    flash_function=None,
+):
+    """
+    Check the booking conditions before purchasing places for a competition.
+
+    Args:
+    - places_required (int): Number of places requested.
+    - points (int): Points available for the club.
+    - MAX_PLACES (int): Maximum allowed places for booking.
+    - current_cart (int): Current number of places booked in the cart.
+    - current_places_available (int): Current available places for the
+    competition.
+    - club (dict): Club information.
+    - competition (dict): Competition information.
+    - flash_function (function, optional): Flash message function.
+    Defaults to None.
+
+    Returns:
+    - bool: True if booking conditions are met, False otherwise.
+    """
+    if places_required > points:
+        if flash_function:
+            flash_function("Sorry, your club doesn't have enough points!")
+    elif places_required > MAX_PLACES:
+        if flash_function:
+            flash_function(
+                f"Sorry, you can't book more than {MAX_PLACES} places!"
+            )
+    elif places_required + current_cart > MAX_PLACES:
+        if flash_function:
+            flash_function("Sorry, you have exceeded the booking limit!")
+    elif places_required > current_places_available:
+        if flash_function:
+            flash_function("Sorry, you booked more places than available!")
+    else:
+        return True
+    return False
+
 app = Flask(__name__)
 app.secret_key = "something_special"
 
