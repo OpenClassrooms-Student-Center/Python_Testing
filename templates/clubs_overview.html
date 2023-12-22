@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <meta charset="UTF-8">
+    <title>Summary | GUDLFT listing</title>
+</head>
+<body>
+    <table class="center">
+        <thead>
+            <tr>
+                <th colspan="2">Listing des clubs inscrits</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td class="bold">Nom du club</td>
+                <td class="bold">Points</td>
+            </tr>
+        {% for club in clubs %}
+            <tr>
+                <td>{{ club['name'] }}</td>
+                <td>{{ club['points'] }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+        <a href="/" >Retour à l'index</a>
+    </table>
+</body>
+</html>
