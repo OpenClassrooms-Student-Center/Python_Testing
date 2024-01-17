@@ -1,4 +1,6 @@
 import json
+from datetime import datetime
+
 from flask import Flask,render_template,request,redirect,flash,url_for
 
 
@@ -27,7 +29,12 @@ def index():
 @app.route('/showSummary',methods=['POST'])
 def showSummary():
     club = [club for club in clubs if club['email'] == request.form['email']][0]
-    return render_template('welcome.html',club=club,competitions=competitions)
+    competitions_with_datetime = [
+        {'name': c['name'], 'date': datetime.strptime(c['date'], '%Y-%m-%d %H:%M:%S')}
+        for c in competitions if c['date']
+    ]
+    is_past = [c['name'] for c in competitions_with_datetime if c['date'] < datetime.now()]
+    return render_template('welcome.html',club=club,competitions=competitions,is_past_names=is_past)
 
 
 @app.route('/book/<competition>/<club>')
