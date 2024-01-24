@@ -26,7 +26,7 @@ def index():
 
 @app.route('/showSummary',methods=['POST'])
 def showSummary():
-    club = [club for club in clubs if club['email'] == request.form['email']]
+    club = [club for club in clubs if club['email'] == request.form['email']] # will raise an IndexError: list index out of range if we try to access the [0] index in an empty club list
     if club:
         return render_template("welcome.html", club=club[0], competitions=competitions)
     else:
