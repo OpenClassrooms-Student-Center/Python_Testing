@@ -2,6 +2,11 @@ bin
 include
 lib
 .Python
+.pytest_cache
+pytest.ini
 tests/
 .envrc
 __pycache__
+.DS_Store
+
+guide-project-test.md
