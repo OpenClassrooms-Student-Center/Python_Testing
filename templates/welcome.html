@@ -3,34 +3,59 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Summary | GUDLFT Registration</title>
+    <style>
+        /* CSS style for flashed messages */
+        #flash-messages {
+            color: red; /* Default color for flashed messages */
+        }
+        .green-text {
+            color: green; /* Green color for specific flashed message */
+        }
+    </style>
 </head>
 <body>
-        <h2>Welcome, {{club['email']}} </h2><a href="{{url_for('logout')}}">Logout</a>
+    <h2>Welcome, {{ club['email'] }} </h2>
+    <a href="{{ url_for('logout') }}">Logout</a>
 
-    {% with messages = get_flashed_messages()%}
+    {% with messages = get_flashed_messages() %}
     {% if messages %}
-        <ul>
-       {% for message in messages %}
-            <li>{{message}}</li>
+        <ul id="flash-messages">
+        {% for message in messages %}
+            {% if message == "Great-booking complete!" %}
+                <li class="green-text">{{ message }}</li>
+            {% else %}
+                <li>{{ message }}</li>
+            {% endif %}
         {% endfor %}
-       </ul>
-    {% endif%}
-    Points available: {{club['points']}}
+        </ul>
+    {% endif %}
+    {% endwith %}
+
+    Points available: {{ club['points'] }}
     <h3>Competitions:</h3>
     <ul>
-        {% for comp in competitions%}
+        {% for comp in competitions %}
         <li>
-            {{comp['name']}}<br />
-            Date: {{comp['date']}}</br>
-            Number of Places: {{comp['numberOfPlaces']}}
-            {%if comp['numberOfPlaces']|int >0%}
-            <a href="{{ url_for('book',competition=comp['name'],club=club['name']) }}">Book Places</a>
-            {%endif%}
+            {{ comp['name'] }}<br />
+            Date: {{ comp['date'] }}<br />
+            Number of Places: {{ comp['numberOfPlaces'] }}
+            {% if comp['numberOfPlaces'] | int > 0 %}
+            <a href="{{ url_for('book', competition=comp['name'], club=club['name']) }}">Book Places</a>
+            {% endif %}
         </li>
         <hr />
         {% endfor %}
     </ul>
-    {%endwith%}
+
+    <script>
+    // Function to remove flash messages after 5 seconds
+    setTimeout(function() {
+        var flashMessages = document.getElementById('flash-messages');
+        if (flashMessages) {
+            flashMessages.parentNode.removeChild(flashMessages);
+        }
+    }, 2000);
+    </script>
 
 </body>
 </html>
