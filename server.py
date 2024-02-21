@@ -44,19 +44,25 @@ def book(competition,club):
         return render_template('welcome.html', club=club, competitions=competitions)
 
 
+
 @app.route('/purchasePlaces',methods=['POST'])
 def purchasePlaces():
     try:
         competition = [c for c in competitions if c['name'] == request.form['competition']][0]
         club = [c for c in clubs if c['name'] == request.form['club']][0]
         placesRequired = int(request.form['places'])
-        if placesRequired <= int(club['points']):
-            competition['numberOfPlaces'] = int(competition['numberOfPlaces'])-placesRequired
-            club['points'] = int(club['points'])-placesRequired
-            flash('Great-booking complete!')
-            return render_template('welcome.html', club=club, competitions=competitions)
+        max_places = 12
+        if placesRequired <= max_places:
+            if placesRequired <= int(club['points']):
+                competition['numberOfPlaces'] = int(competition['numberOfPlaces'])-placesRequired
+                club['points'] = int(club['points'])-placesRequired
+                flash('Great-booking complete!')
+                return render_template('welcome.html', club=club, competitions=competitions)
+            else:
+                flash('You do not have enougth points')
+                return render_template('welcome.html', club=club, competitions=competitions)
         else:
-            flash("You don't have enougth points")
+            flash('You can not buy more than 12 places')
             return render_template('welcome.html', club=club, competitions=competitions)
     except Exception:
         flash("Something went wrong-please try again")
