@@ -23,15 +23,15 @@ clubs = loadClubs()
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('index.html', clubs=clubs)
 
 @app.route('/showSummary',methods=['POST'])
 def showSummary():
     try:
         club = [club for club in clubs if club['email'] == request.form['email']][0]
-        return render_template('welcome.html', club=club, clubs=clubs, competitions=competitions)
+        return render_template('welcome.html', club=club, competitions=competitions)
     except Exception:
-        return render_template('index.html')
+        return render_template('index.html', clubs=clubs)
 
 
 @app.route('/book/<competition>/<club>')
@@ -44,10 +44,10 @@ def book(competition,club):
             return render_template('booking.html',club=foundClub,competition=foundCompetition)
         else:
             flash("Something went wrong-please try again")
-            return render_template('welcome.html', club=club, competitions=competitions, clubs=clubs)
+            return render_template('welcome.html', club=club, competitions=competitions)
     else:
         flash('Competition is over. You can not buy places')
-        return render_template('welcome.html', club=club, competitions=competitions, clubs=clubs)
+        return render_template('welcome.html', club=club, competitions=competitions)
 
 
 @app.route('/purchasePlaces',methods=['POST'])
@@ -62,16 +62,16 @@ def purchasePlaces():
                 competition['numberOfPlaces'] = int(competition['numberOfPlaces'])-placesRequired
                 club['points'] = int(club['points'])-placesRequired
                 flash('Great-booking complete!')
-                return render_template('welcome.html', club=club, competitions=competitions, clubs=clubs)
+                return render_template('welcome.html', club=club, competitions=competitions)
             else:
                 flash('You do not have enougth points')
-                return render_template('welcome.html', club=club, competitions=competitions, clubs=clubs)
+                return render_template('welcome.html', club=club, competitions=competitions)
         else:
             flash('You can not buy more than 12 places')
-            return render_template('welcome.html', club=club, competitions=competitions, clubs=clubs)
+            return render_template('welcome.html', club=club, competitions=competitions)
     except Exception:
         flash("Something went wrong-please try again")
-        return render_template('welcome.html', club=club, competitions=competitions, clubs=clubs)
+        return render_template('welcome.html', club=club, competitions=competitions)
 
 
 # TODO: Add route for points display
