@@ -1,19 +1,16 @@
 import json
-from flask import Flask,render_template,request,redirect,flash,url_for
+from flask import Flask, render_template, request, redirect, flash, url_for
 from datetime import datetime
-
 
 def loadClubs():
     with open('clubs.json') as c:
          listOfClubs = json.load(c)['clubs']
          return listOfClubs
 
-
 def loadCompetitions():
     with open('competitions.json') as comps:
          listOfCompetitions = json.load(comps)['competitions']
          return listOfCompetitions
-
 
 app = Flask(__name__)
 app.secret_key = 'something_special'
@@ -33,7 +30,6 @@ def showSummary():
     except Exception:
         return render_template('index.html', clubs=clubs)
 
-
 @app.route('/book/<competition>/<club>')
 def book(competition,club):
     foundClub = [c for c in clubs if c['name'] == club][0]
@@ -48,7 +44,6 @@ def book(competition,club):
     else:
         flash('Competition is over. You can not buy places')
         return render_template('welcome.html', club=club, competitions=competitions)
-
 
 @app.route('/purchasePlaces',methods=['POST'])
 def purchasePlaces():
@@ -73,9 +68,12 @@ def purchasePlaces():
         flash("Something went wrong-please try again")
         return render_template('welcome.html', club=club, competitions=competitions)
 
-
 # TODO: Add route for points display
-
+@app.route('/displaypoints')
+def display_points():
+    # Créez une structure de données contenant les totaux de points pour chaque club
+    points_table = [{'name': club['name'], 'points': club['points']} for club in clubs]
+    return render_template('displaypoints.html', points_table=points_table)
 
 @app.route('/logout')
 def logout():
