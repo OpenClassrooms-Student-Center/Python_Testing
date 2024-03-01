@@ -12,6 +12,13 @@ def loadCompetitions():
          listOfCompetitions = json.load(comps)['competitions']
          return listOfCompetitions
 
+def total_reserved_places(club_name, competition_name):
+    club = next((c for c in clubs if c['name'] == club_name), None)
+    if club:
+        return sum(int(booking['places']) for booking in club['booking'] if booking['competition'] == competition_name)
+    else:
+        return 0
+
 app = Flask(__name__)
 app.secret_key = 'something_special'
 
@@ -40,22 +47,27 @@ def book(competition,club):
             return render_template('booking.html',club=foundClub,competition=foundCompetition)
         else:
             flash("Something went wrong-please try again")
-            return render_template('welcome.html', club=club, competitions=competitions)
+            return render_template('welcome.html', club=foundClub, competitions=competitions)
     else:
         flash('Competition is over. You can not buy places')
-        return render_template('welcome.html', club=club, competitions=competitions)
+        return render_template('welcome.html', club=foundClub, competitions=competitions)
 
 @app.route('/purchasePlaces',methods=['POST'])
 def purchasePlaces():
     try:
-        competition = [c for c in competitions if c['name'] == request.form['competition']][0]
-        club = [c for c in clubs if c['name'] == request.form['club']][0]
+        competition_name = request.form['competition']
+        club_name = request.form['club']
+        competition = [c for c in competitions if c['name'] == competition_name][0]
+        club = [c for c in clubs if c['name'] == club_name][0]
         placesRequired = int(request.form['places'])
+        total_places_reserved = total_reserved_places(club_name, competition_name)
         max_places = 12
-        if placesRequired <= max_places:
+        if total_places_reserved + placesRequired <= max_places:
             if placesRequired <= int(club['points']):
                 competition['numberOfPlaces'] = int(competition['numberOfPlaces'])-placesRequired
                 club['points'] = int(club['points'])-placesRequired
+                booking = {'competition': competition_name, 'places': placesRequired}
+                club['booking'].append(booking)
                 flash('Great-booking complete!')
                 return render_template('welcome.html', club=club, competitions=competitions)
             else:
@@ -68,10 +80,9 @@ def purchasePlaces():
         flash("Something went wrong-please try again")
         return render_template('welcome.html', club=club, competitions=competitions)
 
-# TODO: Add route for points display
+# Issue#7 route for points display
 @app.route('/displaypoints')
 def display_points():
-    # Créez une structure de données contenant les totaux de points pour chaque club
     points_table = [{'name': club['name'], 'points': club['points']} for club in clubs]
     return render_template('displaypoints.html', points_table=points_table)
 
