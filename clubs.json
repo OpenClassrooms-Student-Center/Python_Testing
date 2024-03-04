@@ -1,17 +1,17 @@
 {"clubs":[
     {
-        "name":"Simply Lift",
+        "name":"Simply-Lift",
         "email":"john@simplylift.co",
         "points":"13",
         "booking":[]
     },
     {
-        "name":"Iron Temple",
+        "name":"Iron-Temple",
         "email": "admin@irontemple.com",
         "points":"4",
         "booking":[]
     },
-    {   "name":"She Lifts",
+    {   "name":"She-Lifts",
         "email": "kate@shelifts.co.uk",
         "points":"12",
         "booking":[]
