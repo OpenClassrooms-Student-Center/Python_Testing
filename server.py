@@ -18,17 +18,14 @@ def loadCompetitions():
 clubs = loadClubs()
 competitions = loadCompetitions()
 
-
 @app.route('/')
 def index():
     return render_template('index.html')
-
 
 @app.route('/showSummary', methods=['POST'])
 def showSummary():
     club = [club for club in clubs if club['email'] == request.form['email']][0]
     return render_template('welcome.html', club=club, competitions=competitions)
-
 
 @app.route('/book/<competition>/<club>')
 def book(competition, club):
@@ -39,7 +36,6 @@ def book(competition, club):
     else:
         flash("Something went wrong-please try again")
         return render_template('welcome.html', club=club, competitions=competitions)
-
 
 @app.route('/purchasePlaces', methods=['POST'])
 def purchasePlaces():
@@ -53,34 +49,47 @@ def purchasePlaces():
     competition = next((c for c in competitions if c['name'] == competition_name), None)
 
     if club and competition:
-        # String points to int
-        club_points = int(club['points'])
-        if club_points >= places_required:
+        # Check if the user has already bought 12 places for this club
+        user_club_bookings = [b for b in club.get('bookings', []) if b.get('competition') == competition_name]
+        user_total_places = sum(b.get('places', 0) for b in user_club_bookings)
+        if user_total_places + places_required <= 12:
             if int(competition['numberOfPlaces']) >= places_required:
                 competition['numberOfPlaces'] = str(int(competition['numberOfPlaces']) - places_required)
-                club_points -= places_required
-                club['points'] = str(club_points)
+                club_points = int(club['points'])
+                if club_points >= places_required:
+                    club_points -= places_required
+                    club['points'] = str(club_points)
+                    # Save booking
+                    club.setdefault('bookings', []).append({
+                        'competition': competition_name,
+                        'places': places_required
+                    })
+                    # Save in JSON
+                    with open('clubs.json', 'w') as clubs_file:
+                        json.dump({'clubs': clubs}, clubs_file, indent=4)
+                    with open('competitions.json', 'w') as competitions_file:
+                        json.dump({'competitions': competitions}, competitions_file, indent=4)
 
-                # Save in JSON
-                with open('clubs.json', 'w') as clubs_file:
-                    json.dump({'clubs': clubs}, clubs_file, indent=4)
-                with open('competitions.json', 'w') as competitions_file:
-                    json.dump({'competitions': competitions}, competitions_file, indent=4)
-
-                flash('Great-booking complete!')
+                    flash('Great-booking complete!')
+                else:
+                    flash('Not enough points to make the booking.')
             else:
                 flash('Not enough places available in the competition.')
         else:
-            flash('Not enough points to make the booking.')
+            flash('You can only purchase up to 12 places for the same club in one competition.')
+    else:
+        flash('Club or competition not found.')
 
     return render_template('welcome.html', club=club, competitions=competitions)
 
+# Route to display points
 @app.route('/points', methods=['GET'])
 def points():
     club_points = [{'name': club['name'], 'points': int(club['points'])} for club in clubs]
     sorted_clubs = sorted(club_points, key=lambda x: x['points'], reverse=True)
     return render_template('points.html', clubs=sorted_clubs)
 
+# Logout route
 @app.route('/logout')
 def logout():
     return redirect(url_for('index'))
