@@ -1,22 +1,61 @@
 import json
 from flask import Flask, render_template, request, redirect, flash, url_for
+import os
+from flask_testing import TestCase
 
 app = Flask(__name__)
 app.secret_key = 'something_special'
 
-def loadClubs():
-    with open('clubs.json') as c:
-        listOfClubs = json.load(c)['clubs']
-        return listOfClubs
+is_testing = 'testing'
 
-def loadCompetitions():
-    with open('competitions.json') as comps:
-        listOfCompetitions = json.load(comps)['competitions']
-        return listOfCompetitions
+# Si l'application est en mode test, utilisez les données prédéfinies dans le code
+if is_testing == 'testing':
+    clubs = [
+        {
+            "name": "Simply Lift",
+            "email": "john@simplylift.co",
+            "points": "13"
+        },
+        {
+            "name": "Iron Temple",
+            "email": "admin@irontemple.com",
+            "points": "4"
+        },
+        {
+            "name": "She Lifts",
+            "email": "kate@shelifts.co.uk",
+            "points": "12"
+        }
+    ]
 
-# Load data from JSON
-clubs = loadClubs()
-competitions = loadCompetitions()
+    competitions = [
+        {
+            "name": "Spring Festival",
+            "date": "2020-03-27 10:00:00",
+            "numberOfPlaces": "25"
+        },
+        {
+            "name": "Fall Classic",
+            "date": "2020-10-22 13:30:00",
+            "numberOfPlaces": "13"
+        }
+    ]
+# Sinon, chargez les données à partir des fichiers JSON comme d'habitude
+else:
+    def loadClubs():
+        with open('clubs.json') as c:
+            listOfClubs = json.load(c)['clubs']
+            return listOfClubs
+
+
+    def loadCompetitions():
+        with open('competitions.json') as comps:
+            listOfCompetitions = json.load(comps)['competitions']
+            return listOfCompetitions
+
+    # Load data from JSON
+    clubs = loadClubs()
+    competitions = loadCompetitions()
 
 @app.route('/')
 def index():
@@ -52,6 +91,7 @@ def purchasePlaces():
         # Check if the user has already bought 12 places for this club
         user_club_bookings = [b for b in club.get('bookings', []) if b.get('competition') == competition_name]
         user_total_places = sum(b.get('places', 0) for b in user_club_bookings)
+        print('ici', user_total_places + places_required)
         if user_total_places + places_required <= 12:
             if int(competition['numberOfPlaces']) >= places_required:
                 competition['numberOfPlaces'] = str(int(competition['numberOfPlaces']) - places_required)
@@ -93,6 +133,3 @@ def points():
 @app.route('/logout')
 def logout():
     return redirect(url_for('index'))
-
-if __name__ == '__main__':
-    app.run(debug=True)

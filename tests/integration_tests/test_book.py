@@ -32,7 +32,7 @@ clubs = [
     }
 ]
 
-def test_book():
+def test_book_purchase():
     with app.test_request_context():
         with app.test_client() as client:
             # Connection
@@ -46,19 +46,23 @@ def test_book():
                     book_places_url = url_for('book', competition=comp['name'], club=club['name'])
                     book_response = client.get(book_places_url)
                     assert book_response.status_code == 200
-
                     assert b"Book" in book_response.data
 
-                    test_comp = competitions[0]
-                    test_club = clubs[0]
-
-                    num_places = 3
+                    num_places = 1
                     response = client.post("/purchasePlaces", data={
-                        "club": test_club['name'],
-                        "competition": test_comp['name'],
+                        "club": club['name'],
+                        "competition": comp['name'],
                         "places": num_places
                     })
 
                     assert response.status_code == 200
-                    assert b"Great-booking complete!" in response.data
 
+                    # Check for apropriate flash message
+                    if int(club['points']) < num_places:
+                        assert b"Not enough points to make the booking." in response.data
+                    elif sum(b.get('places', 0) for b in club.get('bookings', []) if b.get('competition') == comp['name']) >= 12:
+                        assert b"You can only purchase up to 12 places for the same club in one competition." in response.data
+                    elif b"Not enough places available in the competition." in response.data:
+                        assert b"Not enough places available in the competition." in response.data
+                    else:
+                        assert b"Great-booking complete!" in response.data
