@@ -1,5 +1,3 @@
-from server import app
-
 def test_index(test_client):
     """Test the index route."""
     response = test_client.get("/")

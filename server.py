@@ -6,56 +6,20 @@ from flask_testing import TestCase
 app = Flask(__name__)
 app.secret_key = 'something_special'
 
-is_testing = 'testing'
+def load_data(file_path):
+    with open(file_path) as f:
+        data = json.load(f)
+    return data
 
-# Si l'application est en mode test, utilisez les données prédéfinies dans le code
-if is_testing == 'testing':
-    clubs = [
-        {
-            "name": "Simply Lift",
-            "email": "john@simplylift.co",
-            "points": "13"
-        },
-        {
-            "name": "Iron Temple",
-            "email": "admin@irontemple.com",
-            "points": "4"
-        },
-        {
-            "name": "She Lifts",
-            "email": "kate@shelifts.co.uk",
-            "points": "12"
-        }
-    ]
+# Chemin du répertoire parent du fichier actuel
+base_dir = os.path.abspath(os.path.dirname(__file__))
 
-    competitions = [
-        {
-            "name": "Spring Festival",
-            "date": "2020-03-27 10:00:00",
-            "numberOfPlaces": "25"
-        },
-        {
-            "name": "Fall Classic",
-            "date": "2020-10-22 13:30:00",
-            "numberOfPlaces": "13"
-        }
-    ]
-# Sinon, chargez les données à partir des fichiers JSON comme d'habitude
-else:
-    def loadClubs():
-        with open('clubs.json') as c:
-            listOfClubs = json.load(c)['clubs']
-            return listOfClubs
+clubs_file_path = os.path.join(base_dir, 'clubs.json')
+competitions_file_path = os.path.join(base_dir, 'competitions.json')
 
-
-    def loadCompetitions():
-        with open('competitions.json') as comps:
-            listOfCompetitions = json.load(comps)['competitions']
-            return listOfCompetitions
-
-    # Load data from JSON
-    clubs = loadClubs()
-    competitions = loadCompetitions()
+# Chargement des données depuis les fichiers JSON
+clubs = load_data(clubs_file_path)['clubs']
+competitions = load_data(competitions_file_path)['competitions']
 
 @app.route('/')
 def index():
@@ -105,9 +69,9 @@ def purchasePlaces():
                         'places': places_required
                     })
                     # Save in JSON
-                    with open('clubs.json', 'w') as clubs_file:
+                    with open(clubs_file_path, 'w') as clubs_file:
                         json.dump({'clubs': clubs}, clubs_file, indent=4)
-                    with open('competitions.json', 'w') as competitions_file:
+                    with open(competitions_file_path, 'w') as competitions_file:
                         json.dump({'competitions': competitions}, competitions_file, indent=4)
 
                     flash('Great-booking complete!')

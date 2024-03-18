@@ -16,7 +16,6 @@ def test_client(app):
     with app.test_client() as client:
         yield client
 
-
 @pytest.fixture
 def competitions():
     return [
@@ -54,3 +53,10 @@ def clubs():
             "bookings":[]
         }
     ]
+
+
+def get_test_data():
+    return {
+        "clubs": clubs(),
+        "competitions": competitions()
+    }
