@@ -13,9 +13,14 @@ def load_data(file_path):
 
 # Chemin du répertoire parent du fichier actuel
 base_dir = os.path.abspath(os.path.dirname(__file__))
+testing = 'true'
 
-clubs_file_path = os.path.join(base_dir, 'clubs.json')
-competitions_file_path = os.path.join(base_dir, 'competitions.json')
+if testing == 'false':
+    clubs_file_path = os.path.join(base_dir, 'clubs.json')
+    competitions_file_path = os.path.join(base_dir, 'competitions.json')
+else:
+    clubs_file_path = os.path.join(base_dir, 'clubs_test.json')
+    competitions_file_path = os.path.join(base_dir, 'competitions_test.json')
 
 # Chargement des données depuis les fichiers JSON
 clubs = load_data(clubs_file_path)['clubs']

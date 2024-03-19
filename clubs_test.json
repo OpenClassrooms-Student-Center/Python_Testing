@@ -1,0 +1,149 @@
+{
+    "clubs": [
+        {
+            "name": "Simply Lift",
+            "email": "john@simplylift.co",
+            "points": "9",
+            "bookings": [
+                {
+                    "competition": "Spring Festival",
+                    "places": 1
+                },
+                {
+                    "competition": "Fall Classic",
+                    "places": 1
+                },
+                {
+                    "competition": "Spring Festival",
+                    "places": 1
+                },
+                {
+                    "competition": "Fall Classic",
+                    "places": 1
+                },
+                {
+                    "competition": "Fall Classic",
+                    "places": 1
+                },
+                {
+                    "competition": "Spring Festival",
+                    "places": 1
+                },
+                {
+                    "competition": "Fall Classic",
+                    "places": 1
+                },
+                {
+                    "competition": "Spring Festival",
+                    "places": 1
+                },
+                {
+                    "competition": "Fall Classic",
+                    "places": 1
+                },
+                {
+                    "competition": "Spring Festival",
+                    "places": 1
+                },
+                {
+                    "competition": "Fall Classic",
+                    "places": 1
+                }
+            ]
+        },
+        {
+            "name": "Iron Temple",
+            "email": "admin@irontemple.com",
+            "points": "12",
+            "bookings": [
+                {
+                    "competition": "Spring Festival",
+                    "places": 1
+                },
+                {
+                    "competition": "Fall Classic",
+                    "places": 1
+                },
+                {
+                    "competition": "Fall Classic",
+                    "places": 1
+                },
+                {
+                    "competition": "Fall Classic",
+                    "places": 1
+                },
+                {
+                    "competition": "Spring Festival",
+                    "places": 1
+                },
+                {
+                    "competition": "Fall Classic",
+                    "places": 1
+                },
+                {
+                    "competition": "Spring Festival",
+                    "places": 1
+                },
+                {
+                    "competition": "Fall Classic",
+                    "places": 1
+                },
+                {
+                    "competition": "Spring Festival",
+                    "places": 1
+                },
+                {
+                    "competition": "Fall Classic",
+                    "places": 1
+                }
+            ]
+        },
+        {
+            "name": "She Lifts",
+            "email": "kate@shelifts.co.uk",
+            "points": "12",
+            "bookings": [
+                {
+                    "competition": "Spring Festival",
+                    "places": 1
+                },
+                {
+                    "competition": "Fall Classic",
+                    "places": 1
+                },
+                {
+                    "competition": "Fall Classic",
+                    "places": 1
+                },
+                {
+                    "competition": "Fall Classic",
+                    "places": 1
+                },
+                {
+                    "competition": "Spring Festival",
+                    "places": 1
+                },
+                {
+                    "competition": "Fall Classic",
+                    "places": 1
+                },
+                {
+                    "competition": "Spring Festival",
+                    "places": 1
+                },
+                {
+                    "competition": "Fall Classic",
+                    "places": 1
+                },
+                {
+                    "competition": "Spring Festival",
+                    "places": 1
+                },
+                {
+                    "competition": "Fall Classic",
+                    "places": 1
+                }
+            ]
+        }
+    ]
+}

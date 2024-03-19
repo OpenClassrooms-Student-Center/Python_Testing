@@ -1,10 +1,10 @@
 from server import app
 from flask import url_for
-import sys
-sys.path.append("..")
-from conftest import competitions, clubs
+from ..utils import load_competitions, load_clubs
 
-def test_book_purchase(competitions, clubs):
+def test_book_purchase():
+    competitions = load_competitions()
+    clubs = load_clubs()
     with app.test_client() as client:
         # Connection
         login_response = client.post("/showSummary", data={"email": "john@simplylift.co"})
