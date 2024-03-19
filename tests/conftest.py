@@ -1,5 +1,8 @@
 import pytest
 from flask import Flask
+import sys
+sys.path.append("..")
+
 
 @pytest.fixture
 def app():
@@ -8,13 +11,14 @@ def app():
     @app.route('/')
     def index():
         return "Welcome to the GUDLFT Registration Portal!"
-
     return app
 
+
 @pytest.fixture
-def test_client(app):
+def test_client_fixture(app):
     with app.test_client() as client:
         yield client
+
 
 @pytest.fixture
 def competitions():
@@ -30,6 +34,7 @@ def competitions():
             "numberOfPlaces": "13"
         }
     ]
+
 
 @pytest.fixture
 def clubs():

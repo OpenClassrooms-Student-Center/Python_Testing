@@ -1,6 +1,6 @@
 from server import app
 
-def test_summary_page(test_client):
+def test_summary_page():
     with app.test_request_context():
         with app.test_client() as client:
             # Connection

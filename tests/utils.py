@@ -1,5 +1,6 @@
 import json
 
+
 def load_clubs():
     return [
         {
@@ -22,6 +23,7 @@ def load_clubs():
         }
     ]
 
+
 def load_competitions():
     return [
         {
@@ -35,3 +37,6 @@ def load_competitions():
             "numberOfPlaces": "13"
         }
     ]
+
+def purchasePlaces(club_name, competition_name, num_places):
+    return {"status_code": 200, "data": b"Mocked response"}

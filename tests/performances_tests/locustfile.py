@@ -1,4 +1,6 @@
 from locust import HttpUser, between, task
+import sys
+sys.path.append("..")
 from utils import load_clubs, load_competitions
 
 class WebsiteUser(HttpUser):
