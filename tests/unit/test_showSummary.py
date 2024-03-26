@@ -5,7 +5,7 @@ import server
 
 def test_showsummary_valid_credential(client, monkeypatch, club_fixture):
     monkeypatch.setattr(server, "clubs", club_fixture)
-    user = {"email": "john@simplylift.co"}
+    user = {"email": "admin@irontemple.com"}
     response = client.post("/showSummary", data=user)
     assert response.status_code == 200
 

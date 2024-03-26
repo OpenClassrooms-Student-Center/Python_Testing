@@ -7,5 +7,4 @@ def get_club(clubs: list, request_email: str):
     for club in clubs:
         if club["email"] == request_email:
             return club
-        else:
-            raise ClubNotFoundError
+    raise ClubNotFoundError
