@@ -31,6 +31,7 @@
         {% endfor %}
     </ul>
     {%endwith%}
+    <p><a href="{{ url_for('display_points_club', email=club['email']) }}">View Club Points</a></p>
 
 </body>
 </html>
