@@ -1,0 +1,59 @@
+import uuid
+from datetime import datetime
+
+
+class Reservation:
+    def __init__(self, club_id: str, competition_id: str, reserved_places: int, date: datetime):
+        self._id = str(uuid.uuid4())
+        self._club_id = club_id
+        self._competition_id = competition_id
+        self._reserved_places = reserved_places
+        self._date = date
+
+    @property
+    def club_id(self) -> str:
+        """Get the ID of the club."""
+        return self._club_id
+
+    @property
+    def competition_id(self) -> str:
+        """Get the ID of the competition."""
+        return self._competition_id
+
+    @property
+    def reserved_places(self) -> int:
+        """Get the number of reserved places."""
+        return self._reserved_places
+
+    @property
+    def date(self) -> datetime:
+        """Get the date of the reservation."""
+        return self._date
+
+    @classmethod
+    def deserialize(cls, data: dict):
+        """Deserialize data into the Reservation object."""
+        reservation = cls(
+            club_id=data.get("club_id"),
+            competition_id=data.get("competition_id"),
+            reserved_places=int(data.get("reserved_places")),
+            date=datetime.strptime(data.get("date"), "%Y-%m-%d %H:%M:%S"),
+        )
+        reservation._id = data.get("id")
+        return reservation
+
+    def serialize(self) -> dict:
+        """Serialize the Reservation object into a dictionary."""
+        return {
+            "id": self._id,
+            "club_id": self._club_id,
+            "competition_id": self._competition_id,
+            "reserved_places": str(self._reserved_places),
+            "date": self._date.strftime("%Y-%m-%d %H:%M:%S"),
+        }
+
+    def __str__(self) -> str:
+        return (
+            f"Reservation(id={self._id}, club_id={self._club_id}, "
+            f"competition_id={self._competition_id}, reserved_places={self._reserved_places}, date={self._date})"
+        )
