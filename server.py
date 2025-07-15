@@ -6,10 +6,6 @@ from services.services import validate_places_request, is_competition_in_future
 app = Flask(__name__)
 app.secret_key = 'something_special'
 
-clubs = []
-competitions = []
-
-# ------------------ Loaders ------------------
 
 def load_clubs():
     with open('clubs.json') as c:
@@ -19,15 +15,8 @@ def load_competitions():
     with open('competitions.json') as comps:
         return json.load(comps)['competitions']
 
-def initialize_data():
-    if os.getenv("FLASK_ENV") == "testing":
-        return
-    global clubs, competitions
-    clubs[:] = load_clubs()
-    competitions[:] = load_competitions()
-
-initialize_data()
-
+clubs = load_clubs()
+competitions = load_competitions()
 
 
 @app.route('/')
