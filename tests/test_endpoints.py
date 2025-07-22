@@ -71,6 +71,15 @@ def test_book_competition_in_the_future(client, clubs, competitions):
     soup = BeautifulSoup(response.data, 'html.parser')
     assert "How many places?" in soup.text
 
+def test_book_competition_with_wrong_competition_name(client, clubs, competitions):
+    competition_name = quote("Wrong competition name")
+    club_name = quote(clubs[0]["name"])
+    response = client.get(f'/book/{competition_name}/{club_name}')
+
+    assert response.status_code == 200
+    soup = BeautifulSoup(response.data, 'html.parser')
+    assert "Something went wrong – please try again." in soup.text
+
 def test_booking_more_than_available_points(client, clubs, competitions):
     clubs[0]["points"] = 3
     competitions[0]["numberOfPlaces"] = 10
@@ -107,3 +116,26 @@ def test_booking_more_than_competition_available_places(client, clubs, competiti
     soup = BeautifulSoup(response.data, 'html.parser')
 
     assert "Not enough places left in this competition." in soup.text
+
+def test_purchase_place_with_wrong_competition(client, clubs, competitions):
+    clubs[0]["points"] = 15
+    competitions[0]["numberOfPlaces"] = 3
+
+    response = client.post(
+        '/purchasePlaces',
+        data={
+            'club': clubs[0].get("name"),
+            'competition': "Wrong competition name",
+            'places': 4
+        }
+    )
+
+    assert response.status_code == 200
+    soup = BeautifulSoup(response.data, 'html.parser')
+
+    assert "Club or competition not found." in soup.text
+
+
+def test_logout_redirects_to_index(client):
+    response = client.get('/logout')
+    assert response.status_code == 302
