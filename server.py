@@ -53,7 +53,7 @@ def purchase_places():
 
     if not competition or not club:
         flash("Club or competition not found.")
-        return redirect(url_for('index'))
+        return render_template('welcome.html', club=club or {}, competitions=competitions)
 
     places_required = int(request.form['places'])
 
