@@ -134,3 +134,8 @@ def test_purchase_place_with_wrong_competition(client, clubs, competitions):
     soup = BeautifulSoup(response.data, 'html.parser')
 
     assert "Club or competition not found." in soup.text
+
+
+def test_logout_redirects_to_index(client):
+    response = client.get('/logout')
+    assert response.status_code == 302
