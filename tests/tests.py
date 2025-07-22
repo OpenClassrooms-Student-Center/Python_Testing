@@ -11,6 +11,12 @@ def test_show_summary_with_mock_data(client, clubs, competitions):
 
     assert "test@club.com" in soup.text
 
+def test_show_summary_with_non_existing_email(client, clubs, competitions):
+    response = client.post('/showSummary', data={'email': 'donotexist@club.com'},follow_redirects=True )
+    assert response.status_code == 200
+    soup = BeautifulSoup(response.data, 'html.parser')
+
+    assert "Club not found." in soup.text
 
 def test_book_more_than_12_tickets(client, clubs, competitions):
     response = client.post(
