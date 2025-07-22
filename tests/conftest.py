@@ -14,9 +14,12 @@ def clubs(monkeypatch):
 def competitions(monkeypatch):
     test_competitions = [
         {"name": "Test Competition", "date": "2025-12-31 10:00:00", "numberOfPlaces": "25"},
+        {"name": "Past Competition", "date": "2025-01-01 10:00:00", "numberOfPlaces": "25"},
     ]
     monkeypatch.setattr(server, "competitions", test_competitions)
     return test_competitions
+
+
 
 @pytest.fixture
 def client():
