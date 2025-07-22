@@ -1,6 +1,6 @@
 from urllib.parse import quote
 
-from .conftest import client
+from conftest import client
 from bs4 import BeautifulSoup
 
 
