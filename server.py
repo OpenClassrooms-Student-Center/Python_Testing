@@ -26,7 +26,7 @@ def index():
 
 @app.route('/showSummary', methods=['POST'])
 def showSummary():
-    # Je corrige debug1.
+    # Je corrige bug1 "email"
     email = request.form.get('email')
     club = next((club for club in clubs if club['email'] == email), None)
     
@@ -65,5 +65,5 @@ def purchasePlaces():
 def logout():
     return redirect(url_for('index'))
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     app.run()
