@@ -24,11 +24,17 @@ clubs = loadClubs()
 def index():
     return render_template('index.html')
 
-@app.route('/showSummary',methods=['POST'])
+@app.route('/showSummary', methods=['POST'])
 def showSummary():
-    club = [club for club in clubs if club['email'] == request.form['email']][0]
-    return render_template('welcome.html',club=club,competitions=competitions)
-
+    # Je corrige bug1 "email"
+    email = request.form.get('email')
+    club = next((club for club in clubs if club['email'] == email), None)
+    
+    if club:
+        return render_template('welcome.html', club=club, competitions=competitions)
+    else:
+        flash("Sorry, that email wasn't found.")
+        return redirect(url_for('index'))
 
 @app.route('/book/<competition>/<club>')
 def book(competition,club):
@@ -57,3 +63,6 @@ def purchasePlaces():
 @app.route('/logout')
 def logout():
     return redirect(url_for('index'))
+
+if __name__ == "__main__":
+    app.run()
