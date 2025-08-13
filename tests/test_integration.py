@@ -36,3 +36,7 @@ def test_full_booking_flow(client, clubs, competitions):
     updated_places = int(competitions[0]["numberOfPlaces"])
     assert updated_points == initial_points - places_to_book
     assert updated_places == initial_places - places_to_book
+
+    response = client.get('/logout', follow_redirects=True)
+    assert response.status_code == 200
+    assert "Welcome to the GUDLFT Registration Portal!" in response.get_data(as_text=True)
