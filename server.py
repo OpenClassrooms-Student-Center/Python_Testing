@@ -26,7 +26,24 @@ def index():
 
 @app.route('/showSummary',methods=['POST'])
 def showSummary():
-    club = [club for club in clubs if club['email'] == request.form['email']][0]
+    # Le rajout de .get évite une erreur si 'email' absent et renvoie None
+    email = request.form.get('email')
+    if email:
+        # si un email est présent, retrait des espaces
+        email = email.strip()
+    # Si pas d'email fourni, afficher un message et rester sur la page index
+    if not email:
+        flash("Sorry, that email wasn't found, please try again.")
+        return render_template('index.html')
+    # Liste en compréhension pour trouver la valeur associée à l'email. Et .get pour éviter une erreur si 'email' absent dans un club dans clubs.json
+    email_found = [c for c in clubs if c.get('email', '').strip() == email]
+    # print("Email recherché : ", email)
+    # print("Résultat de la recherche : ", email_found)
+    if not email_found:
+        flash("Sorry, that email wasn't found, please try again.")
+        return render_template('index.html')
+    club = email_found[0]
+    # print("Club trouvé : ", club)
     return render_template('welcome.html',club=club,competitions=competitions)
 
 
