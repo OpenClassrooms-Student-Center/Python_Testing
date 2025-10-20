@@ -30,7 +30,7 @@ def showSummary():
     email = email.strip()
     club = next((c for c in clubs if c.get('email', '').strip() == email), None)
     if not email or not club:
-        flash("Sorry, that email wasn't found, please try again.")
+        flash("Sorry, that email was not found, please try again.")
         return render_template('index.html')
     return render_template('welcome.html', club=club, competitions=competitions)
 
@@ -62,3 +62,6 @@ def purchasePlaces():
 @app.route('/logout')
 def logout():
     return redirect(url_for('index'))
+
+if __name__ == '__main__':
+     app.run(debug=True)
