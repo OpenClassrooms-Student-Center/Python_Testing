@@ -26,8 +26,13 @@ def index():
 
 @app.route('/showSummary',methods=['POST'])
 def showSummary():
-    club = [club for club in clubs if club['email'] == request.form['email']][0]
-    return render_template('welcome.html',club=club,competitions=competitions)
+    email = request.form.get('email', '')
+    email = email.strip()
+    club = next((c for c in clubs if c.get('email', '').strip() == email), None)
+    if not email or not club:
+        flash("Sorry, that email was not found, please try again.")
+        return render_template('index.html')
+    return render_template('welcome.html', club=club, competitions=competitions)
 
 
 @app.route('/book/<competition>/<club>')
@@ -46,6 +51,10 @@ def purchasePlaces():
     competition = [c for c in competitions if c['name'] == request.form['competition']][0]
     club = [c for c in clubs if c['name'] == request.form['club']][0]
     placesRequired = int(request.form['places'])
+    club_points = int(club['points'])
+    if placesRequired > club_points:
+        flash("Cannot book more places than club points.")
+        return render_template('welcome.html', club=club, competitions=competitions)
     competition['numberOfPlaces'] = int(competition['numberOfPlaces'])-placesRequired
     flash('Great-booking complete!')
     return render_template('welcome.html', club=club, competitions=competitions)
@@ -57,3 +66,6 @@ def purchasePlaces():
 @app.route('/logout')
 def logout():
     return redirect(url_for('index'))
+
+if __name__ == '__main__':
+     app.run(debug=True)
