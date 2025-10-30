@@ -7,10 +7,36 @@
 <body>
     <h1>Welcome to the GUDLFT Registration Portal!</h1>
     Please enter your secretary email to continue:
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <ul class="flashes" style="color: red;">
+                    {% for message in messages %}
+                        <li>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
     <form action="showSummary" method="post">
         <label for="email">Email:</label>
         <input type="email" name="email" id=""/>
         <button type="submit">Enter</button>
     </form>
+    <h2>Clubs Points Summary</h2>
+<table style="border-collapse: collapse; width: 30%; background-color: #f5f5f5; color: #333;">
+    <thead>
+        <tr style="background-color: #e0e0e0;">
+            <th style="border: 1px solid #ccc; padding: 6px;">Club</th>
+            <th style="border: 1px solid #ccc; padding: 6px;">Points</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for club in clubs %}
+        <tr style="text-align: center;">
+            <td style="border: 1px solid #ccc; padding: 6px;">{{ club['name'] }}</td>
+            <td style="border: 1px solid #ccc; padding: 6px;">{{ club['points'] }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
 </body>
 </html>
