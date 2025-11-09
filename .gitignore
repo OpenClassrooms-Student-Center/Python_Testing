@@ -1,0 +1,9 @@
+.env
+.git/
+.idea
+bin
+include
+lib
+.Python
+.envrc
+__pycache__
