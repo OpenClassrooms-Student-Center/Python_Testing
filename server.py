@@ -17,6 +17,10 @@ def loadCompetitions():
 app = Flask(__name__)
 app.secret_key = 'something_special'
 
+
+if __name__ == '__main__':
+    app.run(debug=True)
+
 competitions = loadCompetitions()
 clubs = loadClubs()
 
@@ -24,10 +28,18 @@ clubs = loadClubs()
 def index():
     return render_template('index.html')
 
-@app.route('/showSummary',methods=['POST'])
+@app.route('/showSummary', methods=['POST'])
 def showSummary():
-    club = [club for club in clubs if club['email'] == request.form['email']][0]
-    return render_template('welcome.html',club=club,competitions=competitions)
+    email = request.form['email']
+    club_trouve = None
+    for club in clubs:
+        if club['email'] == email:
+            club_trouve = club
+            break
+    if club_trouve is None:
+        flash("Sorry, the email is not registered in the database")
+        return redirect(url_for('index'))
+    return render_template('welcome.html', club=club_trouve, competitions=competitions)
 
 
 @app.route('/book/<competition>/<club>')
