@@ -61,8 +61,29 @@ def book(competition,club):
 
 @app.route('/purchasePlaces',methods=['POST'])
 def purchasePlaces():
-    competition = [c for c in competitions if c['name'] == request.form['competition']][0]
-    club = [c for c in clubs if c['name'] == request.form['club']][0]
+    """
+    Updates competition places and club points after a successful reservation.
+
+    Method: POST
+    Expects: form data containing:
+        - 'club': club name from booking form
+        - 'competition': competition name from booking form
+        - 'places': number of places requested
+    Returns: welcome.html with success message if reservation is valid
+             welcome.html with error message if competition not found
+             redirect to index if club not found
+    """
+    competition = next((c for c in competitions if c['name'] == request.form['competition']), None)
+    club = next((c for c in clubs if c['name'] == request.form['club']), None)
+
+    if not club:
+        flash("Something went wrong - please try again.")
+        return redirect(url_for('index'))
+
+    if not competition:
+        flash("A problem occurred. Please try again.")
+        return render_template('welcome.html', club=club, competitions=competitions)
+
     placesRequired = int(request.form['places'])
     competition['numberOfPlaces'] = int(competition['numberOfPlaces'])-placesRequired
     flash('Great-booking complete!')

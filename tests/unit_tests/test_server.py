@@ -56,3 +56,31 @@ class TestBooking:
         response = client.get("/book/Summer Time Competition/PowerUP Lifting")
         assert response.status_code == 404
 
+# ---------------------------------------------------------------------------
+# Test Reservations for Competitions
+# ---------------------------------------------------------------------------
+
+class TestReservationPurchases:
+    """Tests for the Reservation making route '/purchasePlaces'"""
+
+    # ---------------------------------------------------------------------------
+    # Sad path
+    # ---------------------------------------------------------------------------
+
+    def test_unknown_competition_does_not_crash(self, client, patch_server_data):
+        """Competition name not in database should not cause IndexError"""
+        response = client.post("/purchasePlaces", data={
+            "competition": "Nonexistent Cup",
+            "club": "PowerUP Lifting",
+            "places": "2"
+        })
+        assert response.status_code == 200  # stays on welcome.html
+
+    def test_unknown_club_does_not_crash(self, client, patch_server_data):
+        """Club name not in database should not cause IndexError"""
+        response = client.post("/purchasePlaces", data={
+            "competition": "Spring Festival",
+            "club": "Nonexistent Club",
+            "places": "2"
+        })
+        assert response.status_code == 302  # redirects to index
