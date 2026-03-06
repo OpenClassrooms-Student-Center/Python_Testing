@@ -1,5 +1,9 @@
 import pytest
 
+
+# ---------------------------------------------------------------------------
+# Test Login Functionality
+# ---------------------------------------------------------------------------
 class TestLogin:
     """Tests for the showSummary route - login behaviour."""
     # ---------------------------------------------------------------------------
@@ -24,8 +28,31 @@ class TestLogin:
     # Happy path
     # ---------------------------------------------------------------------------
     def test_valid_email_returns_200(self, client, patch_server_data):
+        """Tests a login submitted with a valid email address"""
         # Makes request to POST email in form
         response = client.post("/showSummary", data={"email": "powerup@lifting.com"})
         # Make assertion that it's a 200 success
         assert response.status_code == 200
+
+# ---------------------------------------------------------------------------
+# Test Booking Functionality
+# ---------------------------------------------------------------------------
+
+class TestBooking:
+    """Tests for the book() route '/book/<competition>/<club>'"""
+    # ---------------------------------------------------------------------------
+    # Happy path
+    # ---------------------------------------------------------------------------
+    def test_found_club_and_competition_references(self, client, patch_server_data):
+        """Test that the booking route matches Database"""
+        response = client.get("/book/Spring Festival/PowerUP Lifting")
+        assert response.status_code == 200
+
+    # ---------------------------------------------------------------------------
+    # Sad path
+    # ---------------------------------------------------------------------------
+    def test_unfound_competition_returns_404(self, client, patch_server_data):
+        """Invalid competition should return 404"""
+        response = client.get("/book/Summer Time Competition/PowerUP Lifting")
+        assert response.status_code == 404
 
