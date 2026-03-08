@@ -1,4 +1,11 @@
+import pytest
 import server
+
+@pytest.fixture(autouse=True)
+def reset_server_data():
+    server.clubs = server.load_clubs()
+    server.competitions = server.load_competitions()
+    yield
 
 class TestLoginIntegration:
     """Integration tests for login using real clubs.json data"""
