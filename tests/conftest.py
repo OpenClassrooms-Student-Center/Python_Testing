@@ -29,7 +29,8 @@ MOCK_CLUBS = [
 MOCK_COMPETITIONS = [
     { "name": "Spring Festival", "date": "2026-04-28 10:00:00", "numberOfPlaces": "20"},
     { "name": "Fall / Autumn Challenges", "date": "2026-09-05 14:00:00", "numberOfPlaces": "14"},
-    { "name": "SummerTime Fun", "date": "2026-08-14 16:00:00", "numberOfPlaces": "6"}
+    { "name": "SummerTime Fun", "date": "2026-08-14 16:00:00", "numberOfPlaces": "6"},
+    { "name": "Full Competition", "date": "2026-03-08 10:00:00", "numberOfPlaces": "0"}
 ]
 
 # ---------------------------------------------------------------------------
