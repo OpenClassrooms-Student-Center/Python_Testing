@@ -181,7 +181,7 @@ class TestReservationPurchases:
         before = int(server.clubs[1]["points"])
 
         # The club StrongWoMen only has 8 points, but tries to reserve 10 places
-        response = client.post(
+        client.post(
             "/purchasePlaces",
             data={
                 "competition": "Spring Festival",
@@ -199,4 +199,3 @@ class TestReservationPurchases:
 
     def test_club_blocked_if_not_enough_places_available(self, client, patch_server_data):
         """A booking cannot exceed the number of places available in the competition"""
-        pass
