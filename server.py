@@ -85,6 +85,9 @@ def purchasePlaces():
         return render_template('welcome.html', club=club, competitions=competitions)
 
     placesRequired = int(request.form['places'])
+    if placesRequired > 12:
+        flash("The limit for reservations is 12 maximum. Please try again.")
+        return render_template('booking.html', club=club, competition=competitions)
     competition['numberOfPlaces'] = int(competition['numberOfPlaces'])-placesRequired
 
     # Update club points in database

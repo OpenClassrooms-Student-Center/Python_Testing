@@ -133,7 +133,22 @@ class TestReservationPurchases:
         assert after == before - 8
 
     def test_club_reservations_blocked_at_max_12(self, client, patch_server_data):
-        pass
+        """
+        Checks that a single booking cannot exceed the maximum number of reservations (12 places)
+        """
+        before = int(server.competitions[0]["numberOfPlaces"])
+
+        client.post(
+            "/purchasePlaces",
+            data={
+                "competition": "Spring Festival",
+                "club": "PowerUP Lifting",
+                "places": "13"
+            }
+        )
+
+        after = int(server.competitions[0]["numberOfPlaces"])
+        assert after == before   # booking was blocked
 
     def test_club_blocked_from_reservation_if_missing_points(self, client, patch_server_data):
         pass
