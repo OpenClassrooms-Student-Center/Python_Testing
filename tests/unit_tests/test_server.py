@@ -132,6 +132,28 @@ class TestReservationPurchases:
 
         assert after == before - 8
 
+    # ---------------------------------------------------------------------------
+    # Sad path
+    # ---------------------------------------------------------------------------
+
+    def test_unknown_competition_does_not_crash(self, client, patch_server_data):
+        """Competition name not in database should not cause IndexError"""
+        response = client.post("/purchasePlaces", data={
+            "competition": "Nonexistent Cup",
+            "club": "PowerUP Lifting",
+            "places": "2"
+        })
+        assert response.status_code == 200  # stays on welcome.html
+
+    def test_unknown_club_does_not_crash(self, client, patch_server_data):
+        """Club name not in database should not cause IndexError"""
+        response = client.post("/purchasePlaces", data={
+            "competition": "Spring Festival",
+            "club": "Nonexistent Club",
+            "places": "2"
+        })
+        assert response.status_code == 302  # redirects to index
+
     def test_club_reservations_blocked_at_max_12(self, client, patch_server_data):
         """
         Checks that a single booking cannot exceed the maximum number of reservations (12 places)
@@ -171,28 +193,6 @@ class TestReservationPurchases:
         after = int(server.clubs[1]["points"])
 
         assert before == after  # places unchanged — booking was blocked
-
-    # ---------------------------------------------------------------------------
-    # Sad path
-    # ---------------------------------------------------------------------------
-
-    def test_unknown_competition_does_not_crash(self, client, patch_server_data):
-        """Competition name not in database should not cause IndexError"""
-        response = client.post("/purchasePlaces", data={
-            "competition": "Nonexistent Cup",
-            "club": "PowerUP Lifting",
-            "places": "2"
-        })
-        assert response.status_code == 200  # stays on welcome.html
-
-    def test_unknown_club_does_not_crash(self, client, patch_server_data):
-        """Club name not in database should not cause IndexError"""
-        response = client.post("/purchasePlaces", data={
-            "competition": "Spring Festival",
-            "club": "Nonexistent Club",
-            "places": "2"
-        })
-        assert response.status_code == 302  # redirects to index
 
     def test_failed_reservation_message(self, client, patch_server_data):
         pass
