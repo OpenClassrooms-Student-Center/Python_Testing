@@ -269,3 +269,8 @@ class TestPointsBoard:
         """Checks that a club's name is returned in table"""
         response = client.get('/pointsByClub')
         assert b"PowerUP Lifting" in response.data
+
+    def test_point_board_displays_club_points(self, client, patch_server_data):
+        """Checks that a club's points are returned in table"""
+        response = client.get('/pointsByClub')
+        assert b"24" in response.data
