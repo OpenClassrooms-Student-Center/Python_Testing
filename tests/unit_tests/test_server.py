@@ -249,3 +249,23 @@ class TestReservationPurchases:
             }
         )
         assert b"You cannot reserve more places than available inside the competition. Please try again." in response.data
+
+# ---------------------------------------------------------------------------
+# Test for Points Board
+# ---------------------------------------------------------------------------
+
+class TestPointsBoard:
+    """Tests for the public points board route '/pointsByClub'"""
+
+    # ---------------------------------------------------------------------------
+    # Happy path
+    # ---------------------------------------------------------------------------
+    def test_points_board_returns_200(self, client, patch_server_data):
+        """Checks template return/success for points board"""
+        response = client.get('/pointsByClub')
+        assert response.status_code == 200
+
+    def test_point_board_displays_club_names(self, client, patch_server_data):
+        """Checks that a club's name is returned in table"""
+        response = client.get('/pointsByClub')
+        assert b"PowerUP Lifting" in response.data

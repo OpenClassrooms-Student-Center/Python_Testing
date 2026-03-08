@@ -111,7 +111,16 @@ def purchase_places():
     return render_template('welcome.html', club=club, competitions=competitions)
 
 
-# TODO: Add route for points display
+@app.route('/pointsByClub')
+def show_points_board():
+    """
+    Displays a public read-only points board showing all clubs and their points.
+
+    Method: GET
+    Expects: Nothing - no login required
+    Returns: points_board.html with list of all clubs
+    """
+    return render_template('points_board.html', clubs=clubs)
 
 
 @app.route('/logout')
