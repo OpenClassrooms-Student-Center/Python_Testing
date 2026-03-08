@@ -2,30 +2,30 @@ import json
 from flask import Flask,render_template,request,redirect,flash,url_for,abort
 
 
-def loadClubs():
+def load_clubs():
     with open('clubs.json') as c:
-         listOfClubs = json.load(c)['clubs']
-         return listOfClubs
+         list_of_clubs = json.load(c)['clubs']
+         return list_of_clubs
 
 
-def loadCompetitions():
+def load_competitions():
     with open('competitions.json') as comps:
-         listOfCompetitions = json.load(comps)['competitions']
-         return listOfCompetitions
+         list_of_competitions = json.load(comps)['competitions']
+         return list_of_competitions
 
 
 app = Flask(__name__)
 app.secret_key = 'something_special'
 
-competitions = loadCompetitions()
-clubs = loadClubs()
+competitions = load_competitions()
+clubs = load_clubs()
 
 @app.route('/')
 def index():
     return render_template('index.html')
 
 @app.route('/showSummary',methods=['POST'])
-def showSummary():
+def show_summary():
     """
     Looks up club by email submitted via login form and displays club dashboard.
 
@@ -51,16 +51,16 @@ def book(competition,club):
     Returns: booking.html if both club and competition exist in database
              404 if either club or competition name does not match database
     """
-    foundClub = next((c for c in clubs if c['name'] == club), None)
-    foundCompetition = next((c for c in competitions if c['name'] == competition), None)
-    if foundClub and foundCompetition:
-        return render_template('booking.html',club=foundClub,competition=foundCompetition)
+    found_club = next((c for c in clubs if c['name'] == club), None)
+    found_competition = next((c for c in competitions if c['name'] == competition), None)
+    if found_club and found_competition:
+        return render_template('booking.html',club=found_club,competition=found_competition)
     else:
         abort(404)
 
 
 @app.route('/purchasePlaces',methods=['POST'])
-def purchasePlaces():
+def purchase_places():
     """
     Updates competition places and club points after a successful reservation.
 
@@ -86,27 +86,27 @@ def purchasePlaces():
         flash("A problem occurred. Please try again.")
         return render_template('welcome.html', club=club, competitions=competitions)
 
-    placesRequired = int(request.form['places'])
+    places_required = int(request.form['places'])
 
     # Validation step for attempts to reserve over 12 places
-    if placesRequired > 12:
+    if places_required > 12:
         flash("The limit for reservations is 12 maximum. Please try again.")
         return render_template('booking.html', club=club, competition=competition)
 
     # Validation step for reserving more places than points allow
-    if placesRequired > int(club['points']):
+    if places_required > int(club['points']):
         flash("You do not have enough points to reserve this many places. Please try again.")
         return render_template('booking.html', club=club, competition=competition)
 
     # Validation step for limiting competition reservations even if club has extra points
-    if placesRequired > int(competition['numberOfPlaces']):
+    if places_required > int(competition['numberOfPlaces']):
         flash("You cannot reserve more places than available inside the competition. Please try again.")
         return render_template('booking.html', club=club, competition=competition)
 
-    competition['numberOfPlaces'] = int(competition['numberOfPlaces']) - placesRequired
+    competition['numberOfPlaces'] = int(competition['numberOfPlaces']) - places_required
 
     # Update club points in database
-    club['points'] = int(club['points']) - placesRequired
+    club['points'] = int(club['points']) - places_required
     flash('Great-booking complete!')
     return render_template('welcome.html', club=club, competitions=competitions)
 
