@@ -194,8 +194,21 @@ class TestReservationPurchases:
 
         assert before == after  # places unchanged — booking was blocked
 
-    def test_failed_reservation_message(self, client, patch_server_data):
-        pass
-
     def test_club_blocked_if_not_enough_places_available(self, client, patch_server_data):
         """A booking cannot exceed the number of places available in the competition"""
+
+        before = int(server.competitions[2]["numberOfPlaces"])  # 6
+
+        client.post(
+            "/purchasePlaces",
+            data={
+                "competition": "SummerTime Fun",
+                "club": "StrongWoMen",
+                "places": "8"   # Matches the total points avail. in club
+            }
+        )
+
+        after = int(server.competitions[2]["numberOfPlaces"])
+
+        assert before == after
+

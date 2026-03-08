@@ -96,6 +96,11 @@ def purchasePlaces():
         flash("You don't have enough points to reserve this many places. Please try again.")
         return render_template('booking.html', club=club, competition=competition)
 
+    # Validation step for limiting competition reservations even if club has extra points
+    if placesRequired > int(competition["numberOfPlaces"]):
+        flash("You cannot reserve more places than available inside the competition. Please try again.")
+        return render_template('booking.html', club=club, competition=competition)
+
     competition['numberOfPlaces'] = int(competition['numberOfPlaces'])-placesRequired
 
     # Update club points in database
