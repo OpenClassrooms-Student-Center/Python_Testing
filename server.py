@@ -85,9 +85,17 @@ def purchasePlaces():
         return render_template('welcome.html', club=club, competitions=competitions)
 
     placesRequired = int(request.form['places'])
+
+    # Validation step for attempts to reserve over 12 places
     if placesRequired > 12:
         flash("The limit for reservations is 12 maximum. Please try again.")
-        return render_template('booking.html', club=club, competition=competitions)
+        return render_template('booking.html', club=club, competition=competition)
+
+    # Validation step for reserving more places than points allow
+    if placesRequired > int(club['points']):
+        flash("You don't have enough points to reserve this many places. Please try again.")
+        return render_template('booking.html', club=club, competition=competition)
+
     competition['numberOfPlaces'] = int(competition['numberOfPlaces'])-placesRequired
 
     # Update club points in database
