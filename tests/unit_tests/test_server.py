@@ -56,6 +56,14 @@ class TestBooking:
         response = client.get("/book/Summer Time Competition/PowerUP Lifting")
         assert response.status_code == 404
 
+    def test_fully_booked_competition_hides_booking_link(self, client, patch_server_data):
+        """Fully booked competition should show no places message and hide booking link"""
+        response = client.post(
+            "/showSummary",
+            data={"email": "powerup@lifting.com"}
+        )
+        assert b"No places available" in response.data
+
 # ---------------------------------------------------------------------------
 # Test Reservations for Competitions
 # ---------------------------------------------------------------------------
@@ -197,7 +205,7 @@ class TestReservationPurchases:
             data={
                 "competition": "SummerTime Fun",
                 "club": "StrongWoMen",
-                "places": "8"   # Matches the total points avail. in club
+                "places": "8"   # Exceeds the 6 places available in SummerTime Fun
             }
         )
 

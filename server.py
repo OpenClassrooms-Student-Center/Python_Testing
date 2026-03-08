@@ -70,6 +70,8 @@ def purchasePlaces():
         - 'competition': competition name from booking form
         - 'places': number of places requested
     Returns: welcome.html with success message if reservation is valid
+             booking.html with error message if validation fails (over 12 places,
+             insufficient points, or insufficient competition places)
              welcome.html with error message if competition not found
              redirect to index if club not found
     """
