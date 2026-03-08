@@ -1,4 +1,5 @@
 import pytest
+import server
 
 
 # ---------------------------------------------------------------------------
@@ -64,6 +65,80 @@ class TestReservationPurchases:
     """Tests for the Reservation making route '/purchasePlaces'"""
 
     # ---------------------------------------------------------------------------
+    # Happy path
+    # ---------------------------------------------------------------------------
+    def test_successful_reservation(self, client, patch_server_data):
+        """Test the successful POST of a form to reserve places = 200 status code"""
+        response = client.post(
+            "/purchasePlaces",
+            data={
+                "competition": "Spring Festival",
+                "club": "PowerUP Lifting",
+                "places": "8"
+            }
+        )
+        assert response.status_code == 200
+
+    def test_reservation_success_message(self, client, patch_server_data):
+        """Test the success messaging if posted"""
+        response = client.post(
+            "/purchasePlaces",
+            data={
+                "competition": "Spring Festival",
+                "club": "PowerUP Lifting",
+                "places": "8"
+            }
+        )
+        assert b"Great-booking complete!" in response.data
+
+    def test_compet_num_places_available_decrease(self, client, patch_server_data):
+        """
+        Verifies that following a reservation, the total number of places available for that competition
+        is decreased by the same amount.
+        """
+
+        before = int(server.competitions[0]["numberOfPlaces"])
+
+        client.post(
+            "/purchasePlaces",
+            data={
+                "competition": "Spring Festival",
+                "club": "PowerUP Lifting",
+                "places": "8"
+            }
+        )
+
+        after = int(server.competitions[0]["numberOfPlaces"])
+
+        assert after == before - 8
+
+    def test_num_club_points_avail_decrease_after_reservation(self, client, patch_server_data):
+        """
+        Verifies that the club's database file is updated with points available after reservations.
+        """
+
+        before = int(server.clubs[0]["points"])
+
+        client.post(
+            "/purchasePlaces",
+            data={
+                "competition": "Spring Festival",
+                "club": "PowerUP Lifting",
+                "places": "8"
+            }
+        )
+
+        after = int(server.clubs[0]["points"])
+
+        assert after == before - 8
+
+    def test_club_reservations_blocked_at_max_12(self, client, patch_server_data):
+        pass
+
+    def test_club_blocked_from_reservation_if_missing_points(self, client, patch_server_data):
+        pass
+
+    # ---------------------------------------------------------------------------
     # Sad path
     # ---------------------------------------------------------------------------
 
@@ -84,3 +159,6 @@ class TestReservationPurchases:
             "places": "2"
         })
         assert response.status_code == 302  # redirects to index
+
+    def test_failed_reservation_message(self, client, patch_server_data):
+        pass
