@@ -1,4 +1,3 @@
-import pytest
 import server
 
 
@@ -109,7 +108,6 @@ class TestReservationPurchases:
         )
 
         after = int(server.competitions[0]["numberOfPlaces"])
-
         assert after == before - 8
 
     def test_num_club_points_avail_decrease_after_reservation(self, client, patch_server_data):
@@ -129,7 +127,6 @@ class TestReservationPurchases:
         )
 
         after = int(server.clubs[0]["points"])
-
         assert after == before - 8
 
     # ---------------------------------------------------------------------------
@@ -176,8 +173,6 @@ class TestReservationPurchases:
         """
         Blocks a club from reserving more places than their points allow
         """
-
-
         before = int(server.clubs[1]["points"])
 
         # The club StrongWoMen only has 8 points, but tries to reserve 10 places
@@ -191,12 +186,10 @@ class TestReservationPurchases:
         )
 
         after = int(server.clubs[1]["points"])
-
         assert before == after  # places unchanged — booking was blocked
 
     def test_club_blocked_if_not_enough_places_available(self, client, patch_server_data):
         """A booking cannot exceed the number of places available in the competition"""
-
         before = int(server.competitions[2]["numberOfPlaces"])  # 6
 
         client.post(
@@ -209,6 +202,42 @@ class TestReservationPurchases:
         )
 
         after = int(server.competitions[2]["numberOfPlaces"])
-
         assert before == after
 
+    def test_error_message_when_exceeding_12_places(self, client, patch_server_data):
+        """Checks error message for exceeding 12 places in reservation"""
+        # Attempt that should fail
+        response = client.post(
+            "/purchasePlaces",
+            data={
+                "competition": "Spring Festival",
+                "club": "PowerUP Lifting",
+                "places": "13"
+            }
+        )
+        assert b"The limit for reservations is 12 maximum. Please try again." in response.data
+
+
+    def test_error_message_when_insufficient_points(self, client, patch_server_data):
+        """Checks error message for club insufficient points in reservation"""
+        response = client.post(
+            "/purchasePlaces",
+            data={
+                "competition": "Spring Festival",
+                "club": "StrongWoMen",
+                "places": "10"
+            }
+        )
+        assert b"You do not have enough points to reserve this many places. Please try again." in response.data
+
+    def test_error_message_when_insufficient_competition_places(self, client, patch_server_data):
+        """Checks error message for club reserving more places than available in competition"""
+        response = client.post(
+            "/purchasePlaces",
+            data={
+                "competition": "SummerTime Fun",  # Only has 6 places available
+                "club": "StrongWoMen",
+                "places": "8"
+            }
+        )
+        assert b"You cannot reserve more places than available inside the competition. Please try again." in response.data
