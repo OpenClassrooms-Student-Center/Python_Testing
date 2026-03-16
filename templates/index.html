@@ -6,11 +6,31 @@
 </head>
 <body>
     <h1>Welcome to the GUDLFT Registration Portal!</h1>
-    Please enter your secretary email to continue:
+
+    {% with messages = get_flashed_messages()%}
+        {% if messages %}
+            <ul>
+           {% for message in messages %}
+                <li>{{message}}</li>
+            {% endfor %}
+           </ul>
+        {% endif%}
+    {%endwith%}
+
+    Please enter your secretary email and your password to continue or <a href="{{url_for('sign_up')}}">sign up</a>
+    <br>
+    <br>
     <form action="showSummary" method="post">
         <label for="email">Email:</label>
         <input type="email" name="email" id=""/>
+
+        <label for="password">Password:</label>
+        <input type="password" name="password" id=""/>
+
         <button type="submit">Enter</button>
     </form>
+    <br>
+    <hr>
+    To see the clubs points board : <a href="{{url_for('points_board')}}">click here</a>
 </body>
 </html>
