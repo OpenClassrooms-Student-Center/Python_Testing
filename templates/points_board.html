@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block content %}
+    <h2>Points board</h2>
+    <br>
+    ⯈ Here is the board for all the clubs and their points.
+    <div class="board">
+        <table>
+            <thead>
+                <td><div class="cell_title">Club</div></td>
+                <td><div class="cell_title">Points</div></td>
+            </thead>
+            {% for club in clubs %}
+            <tr>
+                <td><div class="cell" style="background: {{ club["color"] }};">{{ club.name }}</div></td>
+                <td><div class="cell" style="background: {{ club["color"] }};">{{ club.points }}</div></td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <br>
+    To continue into the application, please <a href="{{url_for('index')}}">log in</a> or <a href="{{url_for('sign_up')}}">sign up</a>
+    <br>
+{% endblock %}
