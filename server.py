@@ -24,10 +24,13 @@ clubs = loadClubs()
 def index():
     return render_template('index.html')
 
-@app.route('/showSummary',methods=['POST'])
-def showSummary():
-    club = [club for club in clubs if club['email'] == request.form['email']][0]
-    return render_template('welcome.html',club=club,competitions=competitions)
+@app.route('/showSummary', methods=['POST'])
+def show_summary():
+    club = next((club for club in clubs if club['email'] == request.form['email']), None)
+    if not club:
+        flash("Sorry, that email was not found.")
+        return render_template('index.html'), 200
+    return render_template('welcome.html', club=club, competitions=competitions)
 
 
 @app.route('/book/<competition>/<club>')
@@ -41,12 +44,17 @@ def book(competition,club):
         return render_template('welcome.html', club=club, competitions=competitions)
 
 
-@app.route('/purchasePlaces',methods=['POST'])
-def purchasePlaces():
-    competition = [c for c in competitions if c['name'] == request.form['competition']][0]
-    club = [c for c in clubs if c['name'] == request.form['club']][0]
-    placesRequired = int(request.form['places'])
-    competition['numberOfPlaces'] = int(competition['numberOfPlaces'])-placesRequired
+@app.route('/purchasePlaces', methods=['POST'])
+def purchase_places():
+    competition = next((c for c in competitions if c['name'] == request.form['competition']), None)
+    club = next((c for c in clubs if c['name'] == request.form['club']), None)
+
+    if not competition or not club:
+        flash('Something went wrong - please try again.')
+        return render_template('welcome.html', club=club, competitions=competitions), 200
+
+    places_required = int(request.form['places'])
+    competition['numberOfPlaces'] = int(competition['numberOfPlaces']) - places_required
     flash('Great-booking complete!')
     return render_template('welcome.html', club=club, competitions=competitions)
 
@@ -57,3 +65,7 @@ def purchasePlaces():
 @app.route('/logout')
 def logout():
     return redirect(url_for('index'))
+
+# Needs this to run app
+if __name__ == '__main__':
+    app.run(debug=True)
