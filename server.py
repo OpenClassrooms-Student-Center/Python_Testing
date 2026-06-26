@@ -1,59 +1,151 @@
-import json
-from flask import Flask,render_template,request,redirect,flash,url_for
+from flask import Flask,render_template,request,redirect,flash,url_for,current_app
+from datetime import datetime
+from utils import (
+    loadClubs,
+    loadCompetitions,
+    getClubByEmail,
+    getCompetitionByName,
+    getClubByName,
+    getClubPoints,
+    getCompetitionPlaces,
+    isCompetitionBookable,
+    isBookingValid,
+)
+
+def create_app(config=None, clubs=None, competitions=None):
+    app = Flask(__name__)
+    app.secret_key = 'something_special'
+    if config:
+        app.config.update(config)
+
+    app.config['COMPETITIONS'] = competitions if competitions is not None else loadCompetitions()
+    app.config['CLUBS'] = clubs if clubs is not None else loadClubs()
+
+    def buildCompetitionsView(competitions):
+        now = datetime.now()
+        competitions_view = []
+
+        for competition in competitions:
+            competition_view = dict(competition)
+            competition_view['canBook'] = isCompetitionBookable(competition, now=now)
+            competitions_view.append(competition_view)
+
+        return competitions_view
+
+    @app.route('/')
+    def index():
+        return render_template('index.html')
+
+    @app.route('/showSummary',methods=['POST'])
+    def showSummary():
+        available_clubs = current_app.config['CLUBS']
+        available_competitions = current_app.config['COMPETITIONS']
+
+        if available_clubs is None or available_competitions is None:
+            flash("Error loading clubs or competitions data.")
+            return redirect(url_for('index'))
+
+        club = getClubByEmail(request.form['email'], available_clubs)
+        if club:
+            return render_template(
+                'welcome.html',
+                club=club,
+                competitions=buildCompetitionsView(available_competitions),
+            )
+
+        flash("Unfortunately, the email you entered was not found.")
+        return redirect(url_for('index'))
 
 
-def loadClubs():
-    with open('clubs.json') as c:
-         listOfClubs = json.load(c)['clubs']
-         return listOfClubs
+    @app.route('/book/<competition>/<club>')
+    def book(competition,club):
+        available_clubs = current_app.config['CLUBS']
+        available_competitions = current_app.config['COMPETITIONS']
+
+        if available_clubs is None or available_competitions is None:
+            flash("Error loading clubs or competitions data.")
+            return redirect(url_for('index'))
+        
+        found_competition = getCompetitionByName(competition, available_competitions)
+        found_club = getClubByName(club, available_clubs)
+        #on peut forcer via l'URL une compétition dans le passé ou une compétition sans places disponibles, mais on ne peut pas forcer une compétition ou un club qui n'existent pas
+
+        if found_club is None:
+            flash("Invalid booking URL. Please check the club name.")
+            return redirect(url_for('index'))
+
+        if found_competition is None:
+            flash("Invalid booking URL. Please check the competition name.")
+            return render_template(
+                'welcome.html',
+                club=found_club,
+                competitions=buildCompetitionsView(available_competitions),
+            )
+
+        if not isCompetitionBookable(found_competition):
+            flash("This competition is no longer open for booking.")
+            return render_template(
+                'welcome.html',
+                club=found_club,
+                competitions=buildCompetitionsView(available_competitions),
+            )
+        
 
 
-def loadCompetitions():
-    with open('competitions.json') as comps:
-         listOfCompetitions = json.load(comps)['competitions']
-         return listOfCompetitions
+        return render_template('booking.html', club=found_club, competition=found_competition)
+
+    @app.route('/purchasePlaces',methods=['POST'])
+    def purchasePlaces():
+        available_clubs = current_app.config['CLUBS']
+        available_competitions = current_app.config['COMPETITIONS']
+
+        if available_clubs is None or available_competitions is None:
+            flash("Error loading clubs or competitions data.")
+            return redirect(url_for('index'))
+
+        competition = getCompetitionByName(request.form['competition'], available_competitions)
+        club = getClubByName(request.form['club'], available_clubs)
+        placesRequired = int(request.form['places'])
+
+        if competition is None or club is None:
+            flash("Invalid booking request. Please check the club and competition names.")
+            return redirect(url_for('index'))
+        
+        if not isCompetitionBookable(competition):
+            flash("This competition is no longer open for booking.")
+            return render_template(
+                'welcome.html',
+                club=club,
+                competitions=buildCompetitionsView(available_competitions),
+            )
+
+        validation_errors = isBookingValid(
+            getClubPoints(club),
+            getCompetitionPlaces(competition),
+            placesRequired,
+        )
+
+        if validation_errors:
+            for error in validation_errors:
+                flash(error)
+            return render_template('booking.html', club=club, competition=competition)
+
+        competition['numberOfPlaces'] = str(getCompetitionPlaces(competition) - placesRequired)
+        flash(f'Booking complete: {placesRequired} places purchased.')
+        return render_template(
+            'welcome.html',
+            club=club,
+            competitions=buildCompetitionsView(available_competitions),
+        )
+    
+    # TODO: Add route for points display
 
 
-app = Flask(__name__)
-app.secret_key = 'something_special'
+    @app.route('/logout')
+    def logout():
+        return redirect(url_for('index'))
 
-competitions = loadCompetitions()
-clubs = loadClubs()
-
-@app.route('/')
-def index():
-    return render_template('index.html')
-
-@app.route('/showSummary',methods=['POST'])
-def showSummary():
-    club = [club for club in clubs if club['email'] == request.form['email']][0]
-    return render_template('welcome.html',club=club,competitions=competitions)
+    return app
 
 
-@app.route('/book/<competition>/<club>')
-def book(competition,club):
-    foundClub = [c for c in clubs if c['name'] == club][0]
-    foundCompetition = [c for c in competitions if c['name'] == competition][0]
-    if foundClub and foundCompetition:
-        return render_template('booking.html',club=foundClub,competition=foundCompetition)
-    else:
-        flash("Something went wrong-please try again")
-        return render_template('welcome.html', club=club, competitions=competitions)
-
-
-@app.route('/purchasePlaces',methods=['POST'])
-def purchasePlaces():
-    competition = [c for c in competitions if c['name'] == request.form['competition']][0]
-    club = [c for c in clubs if c['name'] == request.form['club']][0]
-    placesRequired = int(request.form['places'])
-    competition['numberOfPlaces'] = int(competition['numberOfPlaces'])-placesRequired
-    flash('Great-booking complete!')
-    return render_template('welcome.html', club=club, competitions=competitions)
-
-
-# TODO: Add route for points display
-
-
-@app.route('/logout')
-def logout():
-    return redirect(url_for('index'))
+app = create_app()
