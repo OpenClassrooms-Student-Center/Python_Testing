@@ -1,4 +1,5 @@
 import json
+from datetime import datetime
 from functools import wraps
 
 from flask import Flask, render_template, request, redirect, flash, url_for, session
@@ -14,6 +15,20 @@ def loadCompetitions():
     with open('competitions.json') as comps:
          listOfCompetitions = json.load(comps)['competitions']
          return listOfCompetitions
+
+
+COMPETITION_DATE_FORMAT = '%Y-%m-%d %H:%M:%S'
+
+
+def is_competition_upcoming(competition):
+    """Retourne True si la compétition n'a pas encore eu lieu."""
+    competition_date = datetime.strptime(competition['date'], COMPETITION_DATE_FORMAT)
+    return competition_date > datetime.now()
+
+
+def get_upcoming_competitions():
+    """Retourne uniquement les compétitions à venir (Phase 1)."""
+    return [competition for competition in competitions if is_competition_upcoming(competition)]
 
 
 def get_club_by_email(email):
@@ -71,6 +86,9 @@ def validate_purchase(club, competition, places_required):
     """
     if places_required <= 0:
         return 'Number of places must be at least 1.'
+
+    if not is_competition_upcoming(competition):
+        return 'This competition has already taken place.'
 
     if places_required > MAX_PLACES_PER_CLUB:
         return f'Cannot book more than {MAX_PLACES_PER_CLUB} places per competition.'
@@ -141,7 +159,11 @@ def showSummary():
 @login_required
 def _render_summary(logged_in_club):
     """Affiche le tableau de bord du club connecté (route GET /showSummary)."""
-    return render_template('welcome.html', club=logged_in_club, competitions=competitions)
+    return render_template(
+        'welcome.html',
+        club=logged_in_club,
+        competitions=get_upcoming_competitions(),
+    )
 
 
 # Réservation : accès réservé aux secrétaires connectés (@login_required)
@@ -154,6 +176,10 @@ def book(competition, club, logged_in_club):
     redirect_response = require_own_club(foundClub, logged_in_club)
     if redirect_response:
         return redirect_response
+
+    if not is_competition_upcoming(foundCompetition):
+        flash('This competition has already taken place.')
+        return redirect(url_for('showSummary'))
 
     if foundClub and foundCompetition:
         already_booked = get_places_already_booked(foundClub, foundCompetition)
