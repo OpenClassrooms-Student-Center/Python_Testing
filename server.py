@@ -46,6 +46,61 @@ def login_required(view_func):
     return wrapped_view
 
 
+MAX_PLACES_PER_CLUB = 12
+
+# Places déjà réservées par couple (club, compétition) — suivi cumulé en mémoire
+club_competition_bookings = {}
+
+
+def get_places_already_booked(club, competition):
+    """Retourne le nombre de places déjà réservées par un club pour une compétition."""
+    booking_key = (club['name'], competition['name'])
+    return club_competition_bookings.get(booking_key, 0)
+
+
+def record_purchase(club, competition, places):
+    """Enregistre une réservation dans le compteur cumulé."""
+    booking_key = (club['name'], competition['name'])
+    club_competition_bookings[booking_key] = get_places_already_booked(club, competition) + places
+
+
+def validate_purchase(club, competition, places_required):
+    """
+    Vérifie les règles métier avant une réservation.
+    Retourne un message d'erreur, ou None si la réservation est valide.
+    """
+    if places_required <= 0:
+        return 'Number of places must be at least 1.'
+
+    if places_required > MAX_PLACES_PER_CLUB:
+        return f'Cannot book more than {MAX_PLACES_PER_CLUB} places per competition.'
+
+    already_booked = get_places_already_booked(club, competition)
+    if already_booked + places_required > MAX_PLACES_PER_CLUB:
+        remaining_allowed = MAX_PLACES_PER_CLUB - already_booked
+        if remaining_allowed <= 0:
+            return (
+                f'Cannot book more than {MAX_PLACES_PER_CLUB} places per competition '
+                f'for your club.'
+            )
+        return (
+            f'Cannot book more than {MAX_PLACES_PER_CLUB} places per competition. '
+            f'You already have {already_booked}, you can only book {remaining_allowed} more.'
+        )
+
+    available_places = int(competition['numberOfPlaces'])
+    if available_places <= 0:
+        return 'Competition is full.'
+    if places_required > available_places:
+        return f'Not enough places available. Only {available_places} remaining.'
+
+    club_points = int(club['points'])
+    if places_required > club_points:
+        return 'Not enough points available.'
+
+    return None
+
+
 def require_own_club(club, logged_in_club):
     """
     Vérifie qu'un secrétaire ne réserve que pour son propre club.
@@ -101,7 +156,25 @@ def book(competition, club, logged_in_club):
         return redirect_response
 
     if foundClub and foundCompetition:
-        return render_template('booking.html', club=foundClub, competition=foundCompetition)
+        already_booked = get_places_already_booked(foundClub, foundCompetition)
+        max_places = min(
+            MAX_PLACES_PER_CLUB - already_booked,
+            int(foundCompetition['numberOfPlaces']),
+            int(foundClub['points']),
+        )
+        if max_places <= 0:
+            flash(
+                f'Cannot book more than {MAX_PLACES_PER_CLUB} places per competition '
+                f'for your club.'
+            )
+            return redirect(url_for('showSummary'))
+        return render_template(
+            'booking.html',
+            club=foundClub,
+            competition=foundCompetition,
+            max_places=max_places,
+            already_booked=already_booked,
+        )
 
     flash("Something went wrong-please try again")
     return redirect(url_for('showSummary'))
@@ -128,9 +201,22 @@ def _process_purchase(logged_in_club):
     if redirect_response:
         return redirect_response
 
-    placesRequired = int(request.form['places'])
-    competition['numberOfPlaces'] = int(competition['numberOfPlaces']) - placesRequired
-    flash('Great-booking complete!')
+    try:
+        placesRequired = int(request.form['places'])
+    except (ValueError, TypeError, KeyError):
+        flash('Invalid number of places.')
+        return redirect(url_for('showSummary'))
+
+    error_message = validate_purchase(club, competition, placesRequired)
+    if error_message:
+        flash(error_message)
+        return redirect(url_for('showSummary'))
+
+    # Déduction des places et des points (1 point = 1 place)
+    competition['numberOfPlaces'] = str(int(competition['numberOfPlaces']) - placesRequired)
+    club['points'] = str(int(club['points']) - placesRequired)
+    record_purchase(club, competition, placesRequired)
+    flash(f'Great-booking complete! {placesRequired} places purchased.')
     # POST-redirect-GET : l'URL ne reste plus bloquée sur /purchasePlaces
     return redirect(url_for('showSummary'))
 
