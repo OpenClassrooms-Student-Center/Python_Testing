@@ -247,7 +247,11 @@ def _process_purchase(logged_in_club):
     return redirect(url_for('showSummary'))
 
 
-# TODO: Add route for points display
+# Phase 2 : tableau public des points, consultable sans être connecté
+@app.route('/clubsPoints')
+def clubsPoints():
+    """Affiche le solde de points de tous les clubs (lecture seule, accès public)."""
+    return render_template('clubs_points.html', clubs=clubs)
 
 
 @app.route('/logout')
