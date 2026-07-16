@@ -1,0 +1,8 @@
+[run]
+source = server
+omit =
+    tests/*
+
+[report]
+show_missing = True
+skip_covered = False
