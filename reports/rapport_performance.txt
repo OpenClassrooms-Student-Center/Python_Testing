@@ -1,0 +1,79 @@
+================================================================
+RAPPORT DE PERFORMANCE — GUDLFT Registration Portal
+Projet 11 — OpenClassrooms
+Date du test : 16/07/2026
+================================================================
+
+1. OUTIL ET CONFIGURATION
+----------------------------------------------------------------
+Outil           : Locust 2.44.4
+Fichier         : locustfile.py
+Hôte cible      : http://127.0.0.1:5000
+Utilisateurs    : 6 (conforme au guide de développement)
+Taux de montée  : 2 utilisateurs/seconde
+Durée du test   : 30 secondes
+Profil simulé   : Secrétaire de club connecté (SecretaryUser)
+
+Commande exécutée :
+  locust -f locustfile.py --headless -u 6 -r 2 --run-time 30s \
+         --host http://127.0.0.1:5000
+
+2. CRITÈRES DE LA PHASE 2 (rules.md)
+----------------------------------------------------------------
+| Critère                              | Seuil max | Résultat |
+|--------------------------------------|-----------|----------|
+| Chargement liste des compétitions    | 5 s       | VALIDÉ   |
+| Mise à jour du total de points       | 2 s       | VALIDÉ   |
+| Nombre d'utilisateurs simultanés     | 6         | VALIDÉ   |
+
+3. RÉSULTATS DÉTAILLÉS
+----------------------------------------------------------------
+
+3.1 Liste des compétitions — GET /showSummary
+    Requêtes totales : 53
+    Échecs           : 0 (0 %)
+    Temps moyen      : 3 ms
+    Temps médian     : 4 ms
+    Temps maximum    : 6 ms
+    95e percentile   : 5 ms
+    Verdict          : VALIDÉ (< 5 s)
+
+3.2 Mise à jour des points — POST /purchasePlaces
+    Requêtes totales : 47
+    Échecs           : 0 (0 %)
+    Temps moyen      : 3 ms
+    Temps médian     : 4 ms
+    Temps maximum    : 6 ms
+    95e percentile   : 5 ms
+    Verdict          : VALIDÉ (< 2 s)
+
+3.3 Tableau public des points — GET /clubsPoints (Phase 2)
+    Requêtes totales : 18
+    Échecs           : 0 (0 %)
+    Temps moyen      : 2 ms
+    Temps médian     : 3 ms
+    Temps maximum    : 7 ms
+    Verdict          : VALIDÉ
+
+3.4 Synthèse globale
+    Requêtes totales : 124
+    Échecs           : 0 (0 %)
+    Débit moyen      : ~4,2 requêtes/seconde
+
+4. SCÉNARIOS TESTÉS
+----------------------------------------------------------------
+- Connexion par email (POST /showSummary) au démarrage de chaque utilisateur
+- Consultation répétée de la liste des compétitions à venir
+- Réservation de 1 place (déduction de points en mémoire)
+- Consultation du tableau public des points (sans authentification)
+
+5. CONCLUSION
+----------------------------------------------------------------
+L'application respecte les seuils de performance définis dans les
+spécifications fonctionnelles Phase 2. Aucune requête n'a dépassé les
+limites de 5 secondes (liste compétitions) ni de 2 secondes (mise à jour
+des points), avec 6 utilisateurs simultanés pendant 30 secondes.
+
+Sortie brute Locust : reports/locust_output.txt
+
+================================================================
